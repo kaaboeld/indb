@@ -1,0 +1,63 @@
+site_name: INDB
+site_description: Implicit Neural Database — Signed Memory
+site_author: INDB
+dev_addr: '127.0.0.1:8001'
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: black
+    accent: red
+  font:
+    text: IBM Plex Sans
+    code: IBM Plex Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+extra_css:
+  - stylesheets/indb.css
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Concepts:
+    - Conceptual Alignment: CONCEPTUAL_ALIGNMENT.md
+    - Philosophy & Use Cases: PHILOSOPHY.md
+    - Architecture: architecture.md
+    - Protocols: PROTOCOLS.md
+    - Authentication: AUTHENTICATION.md
+    - Typing System: TYPING.md
+    - Cognitive Firewall: COGNITIVE_FIREWALL.md
+  - Reference:
+    - API Reference: API.md
+    - Technical Reference: TECHNICAL_REFERENCE.md
+    - Query Cookbook: QUERY_COOKBOOK.md
+    - LLM + INDB Benchmark Notes (EN): LLM_INDB_BENCHMARK_NOTES.md
+    - LLM + INDB Report (RU): LLM_INDB_REPORT_RU.md
+  - Ecosystem: ecosystem.md
+  - Hermes Integration:
+    - Workflow: HERMES_INDB_WORKFLOW.md
+    - Integration Scenarios: HERMES_INTEGRATION_SCENARIOS.md
+  - Guides:
+    - CLI & TUI: cli.md
+    - Deployment: DEPLOYMENT.md
+    - Contributing: CONTRIBUTING.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables

@@ -1,0 +1,20 @@
+# fly.docs.toml — INDB Documentation site on Fly.io
+# Deploy with: fly deploy --config fly.docs.toml --app indb-little-frog-2154-docs
+
+app = 'indb-docs'
+primary_region = 'fra'
+
+[build]
+  dockerfile = 'Dockerfile.docs'
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = true    # docs can sleep — no persistent state needed
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 512

@@ -1,0 +1,228 @@
+/* INDB Design System — Russian Constructivism palette */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+:root,
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color:        #0A0A0A;
+  --md-default-bg-color--light: #111111;
+  --md-default-bg-color--lighter: #1A1A1A;
+  --md-default-bg-color--lightest: #222222;
+
+  --md-default-fg-color:        #F5F0E8;
+  --md-default-fg-color--light: rgba(245,240,232,0.75);
+  --md-default-fg-color--lighter: rgba(245,240,232,0.45);
+  --md-default-fg-color--lightest: rgba(245,240,232,0.12);
+
+  --md-primary-fg-color:        #E63329;
+  --md-primary-fg-color--light: rgba(230,51,41,0.24);
+  --md-primary-bg-color:        #F5F0E8;
+  --md-primary-bg-color--light: rgba(245,240,232,0.8);
+
+  --md-accent-fg-color:         #F2C12E;
+  --md-accent-fg-color--transparent: rgba(242,193,46,0.1);
+  --md-accent-bg-color:         #0A0A0A;
+
+  --md-code-fg-color:           #F5F0E8;
+  --md-code-bg-color:           #111111;
+
+  --md-typeset-a-color:         #E63329;
+  --md-typeset-mark-color:      rgba(242,193,46,0.3);
+}
+
+/* Header */
+.md-header {
+  background: #0A0A0A;
+  border-bottom: 1px solid #2A2A2A;
+  box-shadow: none;
+}
+
+.md-header__title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #F5F0E8;
+}
+
+/* Nav sidebar */
+.md-nav__title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  color: rgba(245,240,232,0.45);
+  padding-top: 1.2rem;
+}
+
+.md-nav__item--active > .md-nav__link {
+  color: #E63329;
+  font-weight: 600;
+}
+
+.md-nav__link:hover {
+  color: #F2C12E;
+}
+
+/* Sidebar bg */
+.md-sidebar__scrollwrap {
+  background: #0A0A0A;
+}
+
+/* Main content */
+.md-main {
+  background: #0A0A0A;
+}
+
+.md-content {
+  max-width: 860px;
+}
+
+/* Typography */
+.md-typeset h1 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #F5F0E8;
+  border-bottom: 2px solid #E63329;
+  padding-bottom: 0.4em;
+  margin-bottom: 1.2em;
+}
+
+.md-typeset h2 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #F5F0E8;
+  margin-top: 2em;
+}
+
+.md-typeset h3 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+  color: rgba(245,240,232,0.8);
+  margin-top: 1.5em;
+}
+
+.md-typeset p,
+.md-typeset li {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.75;
+  color: rgba(245,240,232,0.85);
+}
+
+.md-typeset strong {
+  color: #F5F0E8;
+  font-weight: 600;
+}
+
+.md-typeset a {
+  color: #E63329;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(230,51,41,0.3);
+  transition: border-color 0.2s;
+}
+
+.md-typeset a:hover {
+  color: #F2C12E;
+  border-bottom-color: rgba(242,193,46,0.5);
+}
+
+/* Code blocks */
+.md-typeset code {
+  background: #111111;
+  color: #F5F0E8;
+  border-radius: 2px;
+  padding: 0.1em 0.35em;
+  font-size: 0.85em;
+}
+
+.md-typeset pre > code {
+  background: transparent;
+  padding: 0;
+}
+
+.md-typeset pre {
+  background: #111111;
+  border: 1px solid #2A2A2A;
+  border-left: 3px solid #E63329;
+  border-radius: 0;
+  padding: 16px 20px;
+}
+
+/* Admonitions */
+.md-typeset .admonition,
+.md-typeset details {
+  border: none;
+  border-left: 3px solid #E63329;
+  background: #111111;
+  border-radius: 0;
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+  background: rgba(230,51,41,0.12);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Tables */
+.md-typeset table:not([class]) {
+  border: 1px solid #2A2A2A;
+  border-radius: 0;
+}
+
+.md-typeset table:not([class]) th {
+  background: #111111;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(245,240,232,0.55);
+  border-bottom: 1px solid #E63329;
+}
+
+.md-typeset table:not([class]) tr:hover td {
+  background: #111111;
+}
+
+/* Search */
+.md-search__input {
+  background: #111111;
+  color: #F5F0E8;
+  border: 1px solid #2A2A2A;
+  border-radius: 0;
+}
+
+.md-search__input::placeholder {
+  color: rgba(245,240,232,0.3);
+}
+
+/* Footer */
+.md-footer {
+  background: #0A0A0A;
+  border-top: 1px solid #2A2A2A;
+}
+
+.md-footer-meta {
+  background: #0A0A0A;
+}
+
+/* Tags / badges */
+.md-typeset .md-tag {
+  background: rgba(230,51,41,0.15);
+  color: #E63329;
+  font-family: 'IBM Plex Mono', monospace;
+  border-radius: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: #2A2A2A; }
+::-webkit-scrollbar-thumb:hover { background: #E63329; }

@@ -1,0 +1,86 @@
+# Temporal Query Keywords Configuration
+# English is the canonical query language.
+# To add another language, extend the tables below — no Python changes needed.
+#
+# Sections:
+#   [anchor_resolver] — gateway config for holiday/event data sources
+#   [days_of_week]    — day name → weekday int (0=Mon … 6=Sun)
+#   [time_of_day]     — phrase → [start_hour, end_hour]  (exclusive end, 24h)
+#   [delta_units]     — unit word → canonical name
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Anchor Resolver
+#  Named anchors ("independence day", "christmas", etc.) are resolved at
+#  runtime via the holidays library and/or Nager.Date REST API.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[anchor_resolver]
+default_country   = "US"     # ISO 3166-1 alpha-2
+fuzzy_threshold   = 0.55     # difflib.SequenceMatcher cutoff
+nager_base_url    = "https://date.nager.at"
+nager_timeout_sec = 3
+cache_ttl_hours   = 24
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Days of Week
+# ─────────────────────────────────────────────────────────────────────────────
+
+[days_of_week]
+"monday"    = 0
+"mon"       = 0
+"tuesday"   = 1
+"tue"       = 1
+"tues"      = 1
+"wednesday" = 2
+"wed"       = 2
+"thursday"  = 3
+"thu"       = 3
+"thur"      = 3
+"thurs"     = 3
+"friday"    = 4
+"fri"       = 4
+"saturday"  = 5
+"sat"       = 5
+"sunday"    = 6
+"sun"       = 6
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Time-of-Day Ranges   [start_hour, end_hour]  (start inclusive, end exclusive)
+#  Longer phrases first — the parser matches by descending length.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[time_of_day]
+"in the afternoon" = [12, 18]
+"in the evening"   = [18, 24]
+"in the morning"   = [6,  12]
+"at night"         = [0,   6]
+"at noon"          = [12, 13]
+"afternoon"        = [12, 18]
+"evening"          = [18, 24]
+"morning"          = [6,  12]
+"noon"             = [12, 13]
+"midnight"         = [0,   1]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Time Delta Units   (→ canonical name used by _make_delta)
+# ─────────────────────────────────────────────────────────────────────────────
+
+[delta_units]
+"second"  = "seconds"
+"seconds" = "seconds"
+"minute"  = "minutes"
+"minutes" = "minutes"
+"hour"    = "hours"
+"hours"   = "hours"
+"day"     = "days"
+"days"    = "days"
+"week"    = "weeks"
+"weeks"   = "weeks"
+"month"   = "months"
+"months"  = "months"
+"year"    = "years"
+"years"   = "years"
