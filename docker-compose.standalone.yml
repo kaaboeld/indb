@@ -1,0 +1,38 @@
+services:
+  # INDB Standalone (No Raft)
+  indb-standalone:
+    build: .
+    container_name: indb-standalone
+    hostname: indb-standalone
+    ports:
+      - "8000:8000" # HTTP API
+      - "9001:9001" # UDP
+      - "50051:50051" # gRPC
+    environment:
+      - RAFT_ENABLED=false  # STANDALONE MODE
+      - INDB_USE_SSL=false
+      - PORT=8000
+      - DATA_DIR=/data
+      - LOG_LEVEL=INFO
+      - HERMES_SESSIONS_PATH=/hermes/sessions
+      - HERMES_MEMORIES_PATH=/hermes/memories
+    volumes:
+      - indb-standalone-data:/data
+      - indb-standalone-logs:/app/logs
+      - ~/.hermes:/hermes:ro  # Hermes integration — sessions & memories
+    networks:
+      - indb-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  indb-standalone-data:
+  indb-standalone-logs:
+
+networks:
+  indb-network:
+    driver: bridge

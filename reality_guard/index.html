@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDB // PROTOCOL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;400;800&family=Inter:wght@400;800&display=swap');
+
+        :root {
+            --bg-color: #f0f0f0;
+            --ink-color: #1a1a1a;
+            --card-width: 128px;
+            --card-height: 176px;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg-color);
+            color: var(--ink-color);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .technical-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image:
+                linear-gradient(var(--ink-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--ink-color) 1px, transparent 1px);
+            background-size: 100px 100px;
+            background-position: center center;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: -2;
+        }
+
+        #viewport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            perspective: 2000px;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #world {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* Scroll Progress Elements */
+        .progress-line {
+            position: fixed;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: var(--ink-color);
+            opacity: 0.2;
+            z-index: 100;
+        }
+
+        /* Removed .progress-fill styles */
+
+        .progress-indicator {
+            position: fixed;
+            left: 46px;
+            top: 10px;
+            width: 9px;
+            height: 9px;
+            background: var(--ink-color);
+            border-radius: 50%;
+            z-index: 101;
+        }
+
+        /* Stats Log */
+        #stats-log {
+            position: fixed;
+            left: 70px;
+            top: 40%;
+            transform: translateY(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 2;
+            z-index: 100;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            opacity: 0.5;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-weight: 800;
+            min-width: 60px;
+            display: inline-block;
+        }
+
+        .scroll-section {
+            height: 150vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            pointer-events: none;
+            padding: 0 10%;
+        }
+
+        .scroll-section:nth-child(even) {
+            justify-content: flex-start;
+        }
+
+        .scroll-section:first-child,
+        .scroll-section:last-child {
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .narrative-block {
+            background: white;
+            border: 2px solid black;
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            max-width: 500px;
+            text-align: left;
+            pointer-events: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .phase-badge {
+            background: black;
+            color: white;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .narrative-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            line-height: 0.9;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+        }
+
+        .narrative-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* Cards */
+        .card {
+            position: absolute;
+            width: var(--card-width);
+            height: var(--card-height);
+            left: calc(var(--card-width) * -0.5);
+            top: calc(var(--card-height) * -0.5);
+            background: white;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            backface-visibility: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            transform-origin: center center;
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            z-index: 1000 !important;
+            border-color: blue;
+            box-shadow: 0 0 15px rgba(0, 0, 255, 0.2);
+        }
+
+        .card.ghost {
+            opacity: 0.6;
+            border: 1px solid #ccc;
+            background: #fafafa;
+            color: #aaa !important;
+            box-shadow: none !important;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .card-corner {
+            line-height: 1;
+            text-align: center;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .card-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            opacity: 1;
+        }
+
+        .data-rows {
+            font-size: 6px;
+            line-height: 1.2;
+            text-align: left;
+            overflow: hidden;
+            max-height: 40px;
+            opacity: 0.5;
+            margin-top: 5px;
+            border-top: 1px solid #eee;
+            padding-top: 4px;
+        }
+
+        .card.red:not(.ghost) {
+            border-color: #e5e5e5;
+            color: #d00;
+        }
+
+        .card.black:not(.ghost) {
+            border-color: #e5e5e5;
+            color: #111;
+        }
+
+        /* HUD */
+        #hud {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 350px;
+            background: white;
+            border: 2px solid black;
+            box-shadow: 8px 8px 0 black;
+            padding: 25px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="technical-grid"></div>
+    <div class="progress-line"></div>
+    <!-- Fill element removed -->
+    <div class="progress-indicator" id="scroll-dot"></div>
+
+    <!-- LEFT SIDE METRICS LOG -->
+    <div id="stats-log">
+        <div class="stat-item">
+            <span class="stat-label">RAW INPUT:</span>
+            <span class="stat-value" id="stat-raw">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">FUSION OPS:</span>
+            <span class="stat-value" id="stat-fusion">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">CPU COST:</span>
+            <span class="stat-value text-red-500" id="stat-cpu">HIGH</span>
+        </div>
+        <div class="mt-4 pt-4 border-t border-black border-dashed opacity-0 transition-opacity duration-1000"
+            id="final-stats">
+            <div class="stat-item">
+                <span class="stat-label">TRUTH FOUND:</span>
+                <span class="stat-value text-blue-600" id="stat-truth">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">OPTIMIZATION:</span>
+                <span class="stat-value bg-black text-white px-1" id="stat-eff">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Layer -->
+    <div id="viewport">
+        <div id="world"></div>
+    </div>
+
+    <!-- Scrollytelling Content -->
+    <div id="scroll-container">
+
+        <!-- INTRO -->
+        <section class="scroll-section">
+            <div class="text-center">
+                <div class="text-xs tracking-[0.5em] mb-4 font-bold">SYSTEM_ONLINE</div>
+                <h1 class="text-9xl font-black mb-6 tracking-tighter">INDB</h1>
+                <div class="bg-black text-white px-4 py-2 inline-block font-mono text-sm">SCROLL TO QUANTIFY</div>
+            </div>
+        </section>
+
+        <!-- CHAOS -->
+        <section class="scroll-section">
+            <div class="narrative-block">
+                <div class="phase-badge">PHASE_01 // INGESTION</div>
+                <h2 class="narrative-title">Entropy &<br>Chaos</h2>
+                <p class="narrative-text">All signals accepted. Real-time metrics tracking raw volume left.</p>
+            </div>
+        </section>
+
+        <!-- STRUCTURE -->
+        <section class="scroll-section">
+            <div class="narrative-block">
+                <div class="phase-badge">PHASE_02 // STRUCTURE</div>
+                <h2 class="narrative-title">Pattern<br>Recognition</h2>
+                <p class="narrative-text">Sorting... Watch the Fusion Ops counter begin to calculation redundancy.</p>
+            </div>
+        </section>
+
+        <!-- FUSION -->
+        <section class="scroll-section">
+            <div class="narrative-block">
+                <div class="phase-badge">PHASE_03 // FUSION</div>
+                <h2 class="narrative-title">Neural<br>Compression</h2>
+                <p class="narrative-text">Fusing duplicates. CPU load drops to zero as Truth structure solidifies.</p>
+            </div>
+        </section>
+
+        <!-- AXIOM -->
+        <section class="scroll-section">
+            <div class="text-center">
+                <div class="phase-badge">PHASE_04 // AXIOM</div>
+                <h2 class="text-8xl font-black mb-8 bg-black text-white px-6 inline-block">TRUTH</h2>
+                <p class="max-w-md mx-auto bg-white border-2 border-black p-6 text-left shadow-[6px_6px_0px_black]">
+                    Final State Reached.<br>Optimization Complete.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="hud">
+        <div class="flex justify-between items-center mb-4 border-b-2 border-black pb-2">
+            <span class="font-black text-lg">EVENT_LOG</span>
+            <button onclick="document.getElementById('hud').style.display='none'"
+                class="hover:bg-black hover:text-white px-2">X</button>
+        </div>
+        <div class="hud-row"><span class="opacity-50">ID</span><span id="hud-id" class="font-bold">--</span></div>
+        <div class="hud-row"><span class="opacity-50">LOCATION</span><span id="hud-loc" class="font-bold">--</span>
+        </div>
+        <div class="hud-row"><span class="opacity-50">FUSION</span><span id="hud-fusion"
+                class="bg-black text-white px-1">0</span></div>
+        <div class="mt-4 text-xs opacity-70 border-t pt-2"><span class="block mb-1 font-bold opacity-100">PAYLOAD
+                SAMPLE:</span>
+            <div id="hud-payload" class="font-sans leading-tight">...</div>
+        </div>
+    </div>
+
+    <script src="demo.js?v=5.0.3"></script>
+</body>
+
+</html>

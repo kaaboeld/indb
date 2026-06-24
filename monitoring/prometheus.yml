@@ -1,0 +1,34 @@
+# Prometheus configuration for INDB
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # INDB Node 1
+  - job_name: 'indb-node-1'
+    static_configs:
+      - targets: ['indb-node-1:8003']
+        labels:
+          node: 'node-1'
+          cluster: 'indb-prod'
+
+  # INDB Node 2
+  - job_name: 'indb-node-2'
+    static_configs:
+      - targets: ['indb-node-2:8003']
+        labels:
+          node: 'node-2'
+          cluster: 'indb-prod'
+
+  # INDB Node 3
+  - job_name: 'indb-node-3'
+    static_configs:
+      - targets: ['indb-node-3:8003']
+        labels:
+          node: 'node-3'
+          cluster: 'indb-prod'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

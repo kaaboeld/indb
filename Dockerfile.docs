@@ -1,0 +1,18 @@
+FROM python:3.13-slim
+
+WORKDIR /docs
+
+# Install MkDocs + Material theme
+RUN pip install --no-cache-dir mkdocs mkdocs-material pymdown-extensions
+
+# Copy only docs/ and mkdocs config — everything needed is inside docs/
+COPY mkdocs.yml .
+COPY docs/ docs/
+
+# Build static site
+RUN mkdocs build
+
+EXPOSE 8000
+
+# Serve built static site
+CMD ["python3", "-m", "http.server", "8000", "--directory", "site"]

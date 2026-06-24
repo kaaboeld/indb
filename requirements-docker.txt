@@ -1,0 +1,73 @@
+# INDB Production Docker Requirements
+# ML packages (torch, sentence-transformers) intentionally EXCLUDED:
+#   - torch alone unpacks to ~6-8GB, exceeding Fly.io's 8GB image limit
+#   - Core INDB runtime (Raft, Prism, Echo, Instinct, Fusion) does NOT require torch
+#   - ML features are opt-in via requirements-ml.txt and a separate ML service
+#
+# To enable ML locally: pip install -r requirements-ml.txt
+
+# ── Core Framework ────────────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+python-multipart
+httpx
+
+# ── Data & Serialization ──────────────────────────────────────────────────────
+msgpack
+pydantic
+pydantic-settings
+
+# ── Security & Crypto ─────────────────────────────────────────────────────────
+cryptography
+passlib
+python-jose[cryptography]
+webauthn
+
+# ── Rate Limiting ─────────────────────────────────────────────────────────────
+slowapi
+
+# ── WebSocket ─────────────────────────────────────────────────────────────────
+websockets
+
+# ── CLI & Terminal UI ─────────────────────────────────────────────────────────
+rich
+textual
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+mkdocs
+mkdocs-material
+
+# ── Observability ─────────────────────────────────────────────────────────────
+brotli
+prometheus-client
+psutil
+
+# ── Advanced Transport ────────────────────────────────────────────────────────
+mcp
+sse-starlette
+strawberry-graphql
+grpcio
+grpcio-tools
+protobuf
+
+# ── Tracing ───────────────────────────────────────────────────────────────────
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+opentelemetry-exporter-otlp
+
+# ── Webhooks ──────────────────────────────────────────────────────────────────
+aiohttp
+
+# ── Security & Compliance ─────────────────────────────────────────────────────
+cyclonedx-bom
+
+# ── Performance (v1.0.0) ──────────────────────────────────────────────────────
+aiofiles
+lz4
+
+# ── Lightweight ML (no torch) ─────────────────────────────────────────────────
+# These are small and needed for non-neural pattern detection
+scikit-learn
+numpy
+scipy

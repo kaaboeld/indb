@@ -1,0 +1,464 @@
+/* INDB Swagger UI — Russian Constructivism, no white/gray */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+
+/* Override rgb(239,239,239) / #efefef — must not appear anywhere */
+.swagger-ui div,
+.swagger-ui span,
+.swagger-ui section,
+.swagger-ui p,
+.swagger-ui li,
+.swagger-ui table,
+.swagger-ui tr,
+.swagger-ui td,
+.swagger-ui th,
+.swagger-ui article,
+.swagger-ui header,
+.swagger-ui footer,
+.swagger-ui label,
+.swagger-ui h1, .swagger-ui h2, .swagger-ui h3, .swagger-ui h4 {
+  background-color: #111111 !important;
+  border-color: #2A2A2A !important;
+}
+
+/* Kill all white/gray from default Swagger */
+body, .swagger-ui, .swagger-ui .wrapper,
+.swagger-ui .info, .swagger-ui .scheme-container,
+.swagger-ui .opblock, .swagger-ui .opblock-body,
+.swagger-ui .opblock-section-header,
+.swagger-ui .tab li, .swagger-ui .tab li button,
+.swagger-ui .responses-inner, .swagger-ui .responses-table,
+.swagger-ui .model-box-control, .swagger-ui .model-toggle,
+.swagger-ui .parameter__name.required span,
+.swagger-ui section.models, .swagger-ui .model,
+.swagger-ui .dialog-ux, .swagger-ui .modal-ux,
+.swagger-ui .filter-container, .swagger-ui .filter .operation-filter-input,
+.swagger-ui table, .swagger-ui th, .swagger-ui td,
+.swagger-ui .opblock-section,
+.swagger-ui .opblock-section-header,
+.swagger-ui .tab li, .swagger-ui .tab li.active button {
+  background: #0A0A0A !important;
+  background-color: #0A0A0A !important;
+  color: #F5F0E8 !important;
+  border-color: #2A2A2A !important;
+}
+
+/* Schemas section — expandable model boxes (AppendRequest, EventCreate, etc.) */
+.swagger-ui .model-container,
+.swagger-ui .model-container .model-box,
+.swagger-ui .model-container .model-box-control,
+.swagger-ui .model-container .model,
+.swagger-ui .model-container .prop-row,
+.swagger-ui .model-container .prop-name,
+.swagger-ui .model-container .prop-type,
+.swagger-ui .model-container .prop-body,
+.swagger-ui .model-container .prop-wrap,
+.swagger-ui .model-container .model-toggle,
+.swagger-ui .model-container .model-box-control,
+.swagger-ui .model-container .model-hint,
+.swagger-ui .model-container .model-jump-to-path,
+.swagger-ui .model-container .model-toggle-control,
+.swagger-ui .model-container .models-control,
+.swagger-ui .model-container .models,
+.swagger-ui .model-container .model-box {
+  background: #111111 !important;
+  background-color: #111111 !important;
+  color: #F5F0E8 !important;
+}
+
+/* Nuclear: any descendant of schemas/models area */
+.swagger-ui section.models *,
+.swagger-ui .model-container *,
+.swagger-ui .model-box * {
+  background: #111111 !important;
+  background-color: #111111 !important;
+}
+
+/* Swagger v5 specifics — no white */
+.swagger-ui .info .base-url,
+.swagger-ui .info .title small,
+.swagger-ui .opblock-description-wrapper,
+.swagger-ui .opblock-external-docs-wrapper,
+.swagger-ui .opblock-title_normal,
+.swagger-ui .parameter__name,
+.swagger-ui .prop-type,
+.swagger-ui .prop-format,
+.swagger-ui .markdown p, .swagger-ui .markdown code,
+.swagger-ui .response-col_links {
+  color: #F5F0E8 !important;
+  background: transparent !important;
+}
+
+.swagger-ui .opblock-tag-section { background: #0A0A0A !important; }
+
+.swagger-ui .opblock-body, .swagger-ui .opblock-section,
+.swagger-ui .table-container, .swagger-ui .responses-inner {
+  background: #111111 !important;
+}
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+}
+
+/* Top bar */
+.swagger-ui .topbar {
+  background: #0A0A0A !important;
+  border-bottom: 1px solid #2A2A2A !important;
+  padding: 12px 0 !important;
+}
+
+.swagger-ui .topbar .download-url-wrapper { display: none !important; }
+
+.swagger-ui .topbar-wrapper .link {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #F5F0E8 !important;
+}
+
+.swagger-ui .topbar-wrapper img { display: none !important; }
+
+/* Info section */
+.swagger-ui .info {
+  margin: 32px 0 !important;
+}
+
+.swagger-ui .info .title {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #F5F0E8 !important;
+}
+
+.swagger-ui .info p,
+.swagger-ui .info li,
+.swagger-ui .info table {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  color: rgba(245,240,232,0.75) !important;
+}
+
+.swagger-ui .info a {
+  color: #E63329 !important;
+}
+
+/* Background of entire UI */
+.swagger-ui {
+  background: #0A0A0A !important;
+  color: #F5F0E8 !important;
+}
+
+.swagger-ui .wrapper {
+  background: #0A0A0A !important;
+}
+
+/* Operation blocks */
+.swagger-ui .opblock {
+  background: #111111 !important;
+  border: 1px solid #2A2A2A !important;
+  border-radius: 0 !important;
+  margin-bottom: 8px !important;
+  box-shadow: none !important;
+}
+
+.swagger-ui .opblock.is-open {
+  border-left: 3px solid #E63329 !important;
+}
+
+.swagger-ui .opblock-summary {
+  border: none !important;
+  background: transparent !important;
+}
+
+.swagger-ui .opblock-summary-method {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  border-radius: 0 !important;
+  min-width: 70px !important;
+}
+
+/* HTTP methods — each protocol its own color */
+.swagger-ui .opblock.opblock-get    .opblock-summary-method { background: #0D9488 !important; color: #F5F0E8 !important; } /* teal — read */
+.swagger-ui .opblock.opblock-post   .opblock-summary-method { background: #E63329 !important; color: #F5F0E8 !important; } /* red — create */
+.swagger-ui .opblock.opblock-put    .opblock-summary-method { background: #F2C12E !important; color: #0A0A0A !important; } /* yellow — update */
+.swagger-ui .opblock.opblock-patch  .opblock-summary-method { background: #16A34A !important; color: #F5F0E8 !important; } /* green — partial */
+.swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #DC2626 !important; color: #F5F0E8 !important; } /* dark red — delete */
+.swagger-ui .opblock.opblock-head   .opblock-summary-method { background: #6366F1 !important; color: #F5F0E8 !important; } /* indigo */
+.swagger-ui .opblock.opblock-options .opblock-summary-method { background: #7C3AED !important; color: #F5F0E8 !important; } /* violet */
+
+.swagger-ui .opblock-summary-path {
+  font-family: 'IBM Plex Mono', monospace !important;
+  color: #F5F0E8 !important;
+  font-size: 0.85rem !important;
+}
+
+.swagger-ui .opblock-summary-description {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  color: rgba(245,240,232,0.5) !important;
+  font-size: 0.8rem !important;
+}
+
+/* Section tags — each section its own accent color */
+.swagger-ui .opblock-tag {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  border-bottom: 2px solid !important;
+  background: transparent !important;
+}
+
+.swagger-ui .opblock-tag:nth-child(1) { color: #E63329 !important; border-color: #E63329 !important; }
+.swagger-ui .opblock-tag:nth-child(2) { color: #0D9488 !important; border-color: #0D9488 !important; }
+.swagger-ui .opblock-tag:nth-child(3) { color: #F2C12E !important; border-color: #F2C12E !important; }
+.swagger-ui .opblock-tag:nth-child(4) { color: #16A34A !important; border-color: #16A34A !important; }
+.swagger-ui .opblock-tag:nth-child(5) { color: #6366F1 !important; border-color: #6366F1 !important; }
+.swagger-ui .opblock-tag:nth-child(6) { color: #7C3AED !important; border-color: #7C3AED !important; }
+.swagger-ui .opblock-tag:nth-child(n+7) { color: #E63329 !important; border-color: #E63329 !important; }
+
+.swagger-ui .opblock-tag:hover {
+  background: rgba(230,51,41,0.06) !important;
+  color: #F5F0E8 !important;
+}
+
+/* Inputs / form fields */
+.swagger-ui input[type=text],
+.swagger-ui textarea,
+.swagger-ui select {
+  background: #0A0A0A !important;
+  border: 1px solid #2A2A2A !important;
+  color: #F5F0E8 !important;
+  border-radius: 0 !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.8rem !important;
+}
+
+.swagger-ui input[type=text]:focus,
+.swagger-ui textarea:focus {
+  border-color: #E63329 !important;
+  outline: none !important;
+}
+
+/* Buttons */
+.swagger-ui .btn {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.7rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+}
+
+.swagger-ui .btn.execute {
+  background: #E63329 !important;
+  border-color: #E63329 !important;
+  color: #F5F0E8 !important;
+}
+
+.swagger-ui .btn.execute:hover {
+  background: #c42820 !important;
+}
+
+.swagger-ui .btn.authorize {
+  background: transparent !important;
+  border: 1px solid #E63329 !important;
+  color: #E63329 !important;
+}
+
+.swagger-ui .btn.authorize:hover {
+  background: rgba(230,51,41,0.08) !important;
+}
+
+/* Code / responses */
+.swagger-ui .microlight,
+.swagger-ui pre.microlight {
+  background: #0A0A0A !important;
+  border: 1px solid #2A2A2A !important;
+  border-left: 3px solid #E63329 !important;
+  color: #F5F0E8 !important;
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.78rem !important;
+  border-radius: 0 !important;
+  padding: 16px 20px !important;
+}
+
+.swagger-ui .response-col_status { color: #F2C12E !important; font-family: 'IBM Plex Mono', monospace !important; }
+
+/* Response content */
+.swagger-ui .responses-inner {
+  background: #111111 !important;
+}
+
+.swagger-ui .response-col_description { color: rgba(245,240,232,0.75) !important; }
+
+/* Schema / models — Schemas section, expandable boxes */
+.swagger-ui .model-box,
+.swagger-ui .model-box-control,
+.swagger-ui .model-toggle,
+.swagger-ui .model,
+.swagger-ui .model-container,
+.swagger-ui .models-control,
+.swagger-ui section.models,
+.swagger-ui .model-box-control .model-box,
+.swagger-ui .prop-row,
+.swagger-ui .prop-name,
+.swagger-ui .prop-type,
+.swagger-ui .prop-enum,
+.swagger-ui .model-toggle::after,
+.swagger-ui .model .property,
+.swagger-ui .model .property-row,
+.swagger-ui .model-hint,
+.swagger-ui .model-jump-to-path,
+.swagger-ui .model-toggle-control {
+  background: #111111 !important;
+  background-color: #111111 !important;
+  color: #F5F0E8 !important;
+  border-color: #2A2A2A !important;
+}
+
+.swagger-ui .model-box {
+  border: 1px solid #2A2A2A !important;
+  border-radius: 0 !important;
+}
+
+.swagger-ui .model .property.primitive { color: #F2C12E !important; font-family: 'IBM Plex Mono', monospace !important; }
+.swagger-ui .model-title,
+.swagger-ui .prop-name { font-family: 'IBM Plex Mono', monospace !important; color: #F5F0E8 !important; }
+
+/* Tables */
+.swagger-ui table,
+.swagger-ui table thead,
+.swagger-ui table tbody,
+.swagger-ui table tr,
+.swagger-ui table th,
+.swagger-ui table td {
+  background: #111111 !important;
+  background-color: #111111 !important;
+}
+
+.swagger-ui table thead tr th {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.65rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  color: rgba(245,240,232,0.4) !important;
+  border-bottom: 1px solid #2A2A2A !important;
+}
+
+.swagger-ui table tbody tr td {
+  font-family: 'IBM Plex Sans', sans-serif !important;
+  color: rgba(245,240,232,0.8) !important;
+  border-bottom: 1px solid #1A1A1A !important;
+}
+
+/* Arrows / toggles */
+.swagger-ui .arrow { fill: rgba(245,240,232,0.4) !important; }
+
+/* Auth modal — Available authorizations */
+.swagger-ui .dialog-ux .modal-ux {
+  background: #111111 !important;
+  border: 1px solid #2A2A2A !important;
+  border-top: 3px solid #E63329 !important;
+  border-radius: 0 !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header {
+  background: #111111 !important;
+  border-bottom: 1px solid #2A2A2A !important;
+  padding: 16px 20px !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header h3 {
+  font-family: 'IBM Plex Mono', monospace !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #F5F0E8 !important;
+}
+
+/* Close button — visible on dark background */
+.swagger-ui .dialog-ux .modal-ux-header .close-modal {
+  background: transparent !important;
+  border: 1px solid #2A2A2A !important;
+  border-radius: 0 !important;
+  color: #F5F0E8 !important;
+  padding: 8px !important;
+  cursor: pointer !important;
+  transition: border-color 0.2s, color 0.2s !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header .close-modal:hover {
+  border-color: #E63329 !important;
+  color: #E63329 !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-header .close-modal svg {
+  fill: currentColor !important;
+}
+
+/* Buttons with gap */
+.swagger-ui .dialog-ux .modal-ux .auth-container,
+.swagger-ui .dialog-ux .modal-ux .modal-btn-auth,
+.swagger-ui .dialog-ux .modal-ux .btn-group {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux .btn.modal-btn {
+  margin: 0 !important;
+  padding: 10px 20px !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux .btn.modal-btn.btn-done {
+  background: #E63329 !important;
+  border-color: #E63329 !important;
+  color: #F5F0E8 !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux .btn.modal-btn.btn-done:hover {
+  background: #c42820 !important;
+}
+
+.swagger-ui .dialog-ux .modal-ux-content {
+  background: #111111 !important;
+  color: #F5F0E8 !important;
+  padding: 20px !important;
+}
+
+/* Labels */
+.swagger-ui label {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: rgba(245,240,232,0.5) !important;
+}
+
+/* Parameter names */
+.swagger-ui .parameter__name {
+  font-family: 'IBM Plex Mono', monospace !important;
+  color: #F5F0E8 !important;
+}
+
+.swagger-ui .parameter__type {
+  font-family: 'IBM Plex Mono', monospace !important;
+  color: #F2C12E !important;
+}
+
+/* Content type select */
+.swagger-ui .content-type { 
+  background: #0A0A0A !important;
+  border: 1px solid #2A2A2A !important;
+  color: #F5F0E8 !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: #2A2A2A; }
+::-webkit-scrollbar-thumb:hover { background: #E63329; }

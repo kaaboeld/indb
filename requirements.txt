@@ -1,0 +1,79 @@
+# INDB Backend Dependencies
+# PHILOSOPHY: INDB is AUTONOMOUS - no external databases, no dependency injection
+
+# Core Framework
+fastapi
+uvicorn[standard]
+python-multipart
+httpx  # For HTTP testing
+
+# Data & Serialization (Pure Python)
+msgpack  # Binary serialization
+pydantic
+pydantic-settings
+
+# Security & Crypto
+cryptography
+passlib
+python-jose[cryptography]
+
+# WebAuthn
+webauthn
+
+
+# Rate Limiting
+slowapi
+
+# WebSocket
+websockets
+
+# CLI & Terminal UI
+rich
+textual
+httpx
+
+# Testing
+pytest-asyncio  # For async tests
+
+# Documentation
+mkdocs
+mkdocs-material
+
+# Observability & Hardening
+brotli
+prometheus-client
+psutil
+
+# Advanced Transport
+mcp
+sse-starlette
+strawberry-graphql
+grpcio
+grpcio-tools
+protobuf
+
+# Tracing
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-instrumentation-fastapi
+opentelemetry-exporter-otlp
+
+# Webhooks
+aiohttp
+
+# Security & Compliance
+cyclonedx-bom
+
+# Performance (v1.0.0)
+aiofiles  # Async file I/O
+lz4  # Fast compression
+
+# ML Dependencies (ACTIVATED)
+# ML Dependencies (ACTIVATED)
+scikit-learn
+numpy
+scipy
+sentence-transformers
+torch>=2.0.0
+# See requirements-ml.txt for details
+

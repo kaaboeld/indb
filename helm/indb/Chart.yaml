@@ -1,0 +1,14 @@
+apiVersion: v2
+name: indb
+description: INDB - Autonomous Interpretative Neural Database
+type: application
+version: 0.7.0
+appVersion: "0.7.0"
+keywords:
+  - database
+  - event-sourcing
+  - raft
+  - autonomous
+home: https://indb.tech
+sources:
+  - https://indb.tech

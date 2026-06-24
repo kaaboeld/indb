@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package indb;
+
+service INDBService {
+  rpc GetEvent (GetEventRequest) returns (EventResponse) {}
+  rpc ListEvents (ListEventsRequest) returns (EventListResponse) {}
+  rpc StreamEvents (StreamEventsRequest) returns (stream EventResponse) {}
+  rpc IngestStream (stream IngestStreamRequest) returns (IngestStreamResponse) {}
+}
+
+message GetEventRequest {
+  string id = 1;
+}
+
+message ListEventsRequest {
+  int32 limit = 1;
+  string location = 2;
+}
+
+message StreamEventsRequest {
+  string location = 1;
+}
+
+message IngestStreamRequest {
+  oneof payload {
+    StreamMetadata metadata = 1;
+    bytes chunk_data = 2;
+  }
+}
+
+message StreamMetadata {
+  repeated string raw_data_anchor = 1;
+  string location = 2;
+  int32 ttl = 3;
+  string blind_payload = 4;
+}
+
+message IngestStreamResponse {
+  string id = 1;
+  string status = 2;
+  string message = 3;
+}
+
+message EventResponse {
+  string id = 1;
+  string time = 2;
+  string location = 3;
+  string source = 4;
+  string data_json = 5;
+}
+
+message EventListResponse {
+  repeated EventResponse events = 1;
+}

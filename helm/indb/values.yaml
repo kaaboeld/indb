@@ -1,0 +1,77 @@
+# Default values for INDB Helm chart
+
+replicaCount: 3
+
+image:
+  repository: indb/indb
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+
+service:
+  type: ClusterIP
+  port: 8003
+  udpPort: 9001
+  grpcPort: 50051
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: indb.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+raft:
+  enabled: true
+  nodeId: "node-1"
+  peers: "node-1:8003,node-2:8003,node-3:8003"
+
+ssl:
+  enabled: false
+  certPath: "/certs/server.crt"
+  keyPath: "/certs/server.key"
+
+monitoring:
+  prometheus:
+    enabled: true
+    port: 8003
+    path: /metrics
+  
+  grafana:
+    enabled: true
+    dashboards: true
+
+env:
+  - name: PORT
+    value: "8003"
+  - name: INDB_USE_SSL
+    value: "false"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

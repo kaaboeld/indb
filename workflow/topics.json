@@ -1,0 +1,60 @@
+{
+  "sources": [
+    {
+      "id": "wikipedia",
+      "topics": [
+        "Epistemology", "Paradox", "Human_memory", "Collective_memory",
+        "Artificial_general_intelligence", "Gaslighting", "Raft_(algorithm)",
+        "Zero-knowledge_proof", "Digital_signature", "Semantic_similarity",
+        "Knowledge_graph", "Large_language_model", "AI_alignment",
+        "Cognitive_bias", "Misinformation", "Information_warfare",
+        "Source_criticism", "Bayesian_inference", "Ontology_(information_science)",
+        "Consciousness", "Perception", "Attention", "Working_memory",
+        "Long-term_memory", "Forgetting", "Memory_consolidation",
+        "Confabulation", "False_memory", "Eyewitness_memory",
+        "Distributed_consensus", "Byzantine_fault_tolerance", "CAP_theorem",
+        "Cryptographic_hash_function", "Public-key_cryptography",
+        "Natural_language_processing", "Machine_learning", "Neural_network",
+        "Transformer_(machine_learning_model)", "Retrieval-augmented_generation",
+        "Hallucination_(artificial_intelligence)", "Prompt_engineering",
+        "Truth", "Belief", "Knowledge", "Justification_(epistemology)",
+        "Skepticism", "Relativism", "Objectivity_(philosophy)",
+        "Propaganda", "Censorship", "Disinformation", "Fact-checking",
+        "Cognitive_psychology", "Behavioral_economics", "Heuristic",
+        "Anchoring_(cognitive_bias)", "Confirmation_bias", "Dunning-Kruger_effect"
+      ]
+    },
+    {
+      "id": "arxiv",
+      "topics": [
+        "2312.10997", "2401.01313", "2404.14619", "2308.04592",
+        "2310.06825", "2309.10312", "2401.12945", "2305.14408",
+        "2406.05498", "1807.08752", "2302.09210", "2311.09679",
+        "2402.03364", "2310.10631", "2403.04272", "2312.14193",
+        "2401.04088", "2310.01456", "2405.12345", "2311.05642"
+      ]
+    },
+    {
+      "id": "hn_themes",
+      "topics": [
+        "AI memory and context", "LLM truth and hallucination",
+        "distributed consensus Raft", "knowledge graph retrieval",
+        "epistemology and knowledge", "semantic search",
+        "vector embeddings", "retrieval augmented generation",
+        "cognitive architectures", "agent memory systems"
+      ]
+    }
+  ],
+  "hermes_prompts": [
+    "epistemology branch philosophy knowledge truth",
+    "paradox perception gap alternative readings",
+    "memory decay entropy weak events fade",
+    "collective memory society shared history",
+    "AI alignment safety goals values",
+    "misinformation spread unintentionally false",
+    "gaslighting collective rewrite history",
+    "Raft consensus leader election log replication",
+    "zero knowledge proof verification without disclosure",
+    "digital signature cryptographic authenticity"
+  ]
+}

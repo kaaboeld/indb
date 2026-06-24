@@ -1,0 +1,24 @@
+# INDB ML Dependencies (Optional)
+# 
+# These dependencies are required for ML-powered features:
+# - Pattern Recognition (DBSCAN clustering)
+# - Semantic Embeddings (sentence-transformers)
+# - Emotion Classification
+#
+# Installation:
+#   pip install -r requirements-ml.txt
+#
+# Note: These are OPTIONAL. INDB core functionality works without them.
+
+# Machine Learning Core
+scikit-learn>=1.4.0
+numpy>=1.26.3
+scipy>=1.12.0
+
+# Semantic Embeddings
+sentence-transformers>=2.3.1
+torch>=2.0.0  # Required by sentence-transformers
+
+# Optional: Advanced Features
+# transformers  # For custom transformer models
+# qdrant-client  # For vector database integration

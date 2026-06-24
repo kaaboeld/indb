@@ -1,0 +1,1381 @@
+{
+  "total_requests": 100,
+  "success_rate": 0.0,
+  "avg_latency": 36.39046669006348,
+  "min_latency": 0.6747245788574219,
+  "max_latency": 3114.7170066833496,
+  "details": [
+    {
+      "id": 1,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.5940666198730469,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 2,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.1441707611083984,
+      "request": {
+        "context_mood": "Dark",
+        "limit": 5,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961017.244716
+        }
+      },
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 3,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.1472702026367188,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 4,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.280069351196289,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 5,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 2.0160675048828125,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 6,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.3480186462402344,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 7,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.6989707946777344,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 8,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.6171932220458984,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 9,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.1630058288574219,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 10,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.4331340789794922,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 11,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 0.7450580596923828,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 12,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 0.8912086486816406,
+      "request": {
+        "context_mood": "Dark",
+        "limit": 5,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961017.244716
+        }
+      },
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 13,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 20.415067672729492,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 14,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "exception",
+      "code": 0,
+      "latency_ms": 1.0020732879638672,
+      "request": null,
+      "response": "[Errno 61] Connection refused"
+    },
+    {
+      "id": 15,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3114.7170066833496,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 16,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.3779144287109375,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 17,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 8.578062057495117,
+      "request": {
+        "context_mood": "Dark",
+        "limit": 5,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961017.244716
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 18,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 6.483316421508789,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 19,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 5.663871765136719,
+      "request": {
+        "context": {
+          "mood": "Neutral",
+          "location": "St. Petersburg"
+        },
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961007.6697931
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 20,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 12.201070785522461,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 21,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 9.82809066772461,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 22,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 5.703210830688477,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 23,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.445220947265625,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 24,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.833127975463867,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 25,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 14.741182327270508,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 26,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 8.701801300048828,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 27,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 4.928827285766602,
+      "request": {
+        "context": {
+          "mood": "Neutral",
+          "location": "St. Petersburg"
+        },
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961007.6697931
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 28,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 7.316112518310547,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 29,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.731800079345703,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 30,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 56.21695518493652,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 31,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 16.40605926513672,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 32,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 21.26598358154297,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 33,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.600027084350586,
+      "request": {
+        "context": {
+          "mood": "Neutral",
+          "location": "St. Petersburg"
+        },
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961007.6697931
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 34,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 8.736133575439453,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 35,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 4.436969757080078,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 36,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 0.6747245788574219,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 37,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.64794921875,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 38,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.1741390228271484,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 39,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 0.9999275207519531,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 40,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.6090869903564453,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 41,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.0461082458496094,
+      "request": {
+        "context": {
+          "mood": "Neutral",
+          "location": "St. Petersburg"
+        },
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961007.6697931
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 42,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.6880035400390625,
+      "request": {
+        "context": {
+          "mood": "Fear",
+          "location": "Moscow"
+        },
+        "firewall_mode": "block",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961008.6999419
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 43,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 4.047155380249023,
+      "request": {
+        "context": {
+          "mood": "Fear",
+          "location": "Moscow"
+        },
+        "firewall_mode": "block",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961008.6999419
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 44,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.672983169555664,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 45,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.8820037841796875,
+      "request": {
+        "context": {
+          "mood": "Fear",
+          "location": "Moscow"
+        },
+        "firewall_mode": "block",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961008.6999419
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 46,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.376079559326172,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 47,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.9731521606445312,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 48,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.3119449615478516,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 49,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 4.869937896728516,
+      "request": {
+        "context": {
+          "mood": "Neutral",
+          "location": "St. Petersburg"
+        },
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961007.6697931
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 50,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 0.8859634399414062,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 51,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.1200180053710938,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 52,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.8989315032958984,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 53,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.7649402618408203,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 54,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 4.302024841308594,
+      "request": {
+        "context": {
+          "mood": "Neutral",
+          "location": "St. Petersburg"
+        },
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961007.6697931
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 55,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.074003219604492,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 56,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.589059829711914,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 57,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.8797855377197266,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 58,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.1681060791015625,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 59,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.206087112426758,
+      "request": {
+        "context": {
+          "mood": "Fear",
+          "location": "Moscow"
+        },
+        "firewall_mode": "block",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961008.6999419
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 60,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.3499259948730469,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 61,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.004789352416992,
+      "request": {
+        "context_mood": "Dark",
+        "limit": 5,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961017.244716
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 62,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.113985061645508,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 63,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.9020309448242188,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 64,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.8680095672607422,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 65,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.5919208526611328,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 66,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.9600391387939453,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 67,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 5.693197250366211,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 68,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.6079883575439453,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 69,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.1892318725585938,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 70,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.257823944091797,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 71,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 0.8339881896972656,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 72,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.766132354736328,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 73,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.6056766510009766,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 74,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.7452239990234375,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 75,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.395153045654297,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 76,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.074718475341797,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 77,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.4330615997314453,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 78,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.2242069244384766,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 79,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.9099712371826172,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 80,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.3407936096191406,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 81,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.3429393768310547,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 82,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.0418167114257812,
+      "request": {
+        "context_mood": "Dark",
+        "limit": 5,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961017.244716
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 83,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.6701221466064453,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 84,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.500844955444336,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 85,
+      "method": "POST",
+      "url": "/api/v2/interpret",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 11.380195617675781,
+      "request": {
+        "context": {
+          "mood": "Joy",
+          "location": "Kiev"
+        },
+        "temporal_query": "winter",
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961014.03891
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 86,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.376079559326172,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 87,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.2428760528564453,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 88,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.153085708618164,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 89,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.6862621307373047,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 90,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.972126007080078,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 91,
+      "method": "GET",
+      "url": "/api/v2/analytics/overview",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.7719268798828125,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 92,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.602815628051758,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 93,
+      "method": "GET",
+      "url": "/api/v2/fusion/patterns",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 4.58073616027832,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 94,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.583026885986328,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 95,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.9068717956542969,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 96,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.4338493347167969,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 97,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 3.381967544555664,
+      "request": {
+        "filter_key": "location",
+        "filter_value": "St. Petersburg",
+        "limit": 10,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961016.5092301
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 98,
+      "method": "GET",
+      "url": "/api/v2/health",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 122.65205383300781,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 99,
+      "method": "GET",
+      "url": "/api/v2/fusion/stats",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 1.4688968658447266,
+      "request": null,
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    },
+    {
+      "id": 100,
+      "method": "POST",
+      "url": "/api/v2/events/query",
+      "status": "fail",
+      "code": 503,
+      "latency_ms": 2.1600723266601562,
+      "request": {
+        "context_mood": "Dark",
+        "limit": 5,
+        "signature": {
+          "algorithm": "Ed25519",
+          "public_key": "ClientMockKey==",
+          "signature": "MockRequestSignature==",
+          "timestamp": 1769961017.244716
+        }
+      },
+      "response": "<html><body><h1>503 Service Unavailable</h1>\nNo server is available to handle this request.\n</body></html>\n"
+    }
+  ]
+}

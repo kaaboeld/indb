@@ -1,0 +1,171 @@
+services:
+  # INDB Node 1 (Leader)
+  indb-node-1:
+    build: .
+    container_name: indb-node-1
+    hostname: indb-node-1
+    ports:
+      - "8000:8000" # HTTP API
+      - "9001:9001" # UDP
+      - "50051:50051" # gRPC
+    environment:
+      - RAFT_ENABLED=${RAFT_ENABLED:-true}
+      - RAFT_NODE_ID=${RAFT_NODE_1_ID:-indb-node-1}
+      - RAFT_PEERS=${RAFT_NODE_1_PEERS:-http://indb-node-2:8000,http://indb-node-3:8000}
+      - INDB_USE_SSL=${INDB_USE_SSL:-false}
+      - PORT=${INDB_PORT:-8000}
+      - DATA_DIR=${DATA_DIR:-/data}
+      - INDB_MASTER_KEY=${INDB_MASTER_KEY}
+      - HERMES_SESSIONS_PATH=/hermes/sessions
+      - HERMES_MEMORIES_PATH=/hermes/memories
+    volumes:
+      - ./data-node-1:/data
+      - ./logs-node-1:/app/logs
+      - ~/.hermes:/hermes:ro  # Hermes integration — sessions & memories
+    networks:
+      - indb-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # INDB Node 2 (Follower)
+  indb-node-2:
+    build: .
+    container_name: indb-node-2
+    hostname: indb-node-2
+    ports:
+      - "8004:8000" # Map external 8004 to internal 8000
+      - "9002:9001"
+      - "50052:50051"
+    environment:
+      - RAFT_ENABLED=${RAFT_ENABLED:-true}
+      - RAFT_NODE_ID=${RAFT_NODE_2_ID:-indb-node-2}
+      - RAFT_PEERS=${RAFT_NODE_2_PEERS:-http://indb-node-1:8000,http://indb-node-2:8000,http://indb-node-3:8000}
+      - INDB_USE_SSL=${INDB_USE_SSL:-false}
+      - PORT=${INDB_PORT:-8000}
+      - DATA_DIR=${DATA_DIR:-/data}
+      - INDB_MASTER_KEY=${INDB_MASTER_KEY}
+      - HERMES_SESSIONS_PATH=/hermes/sessions
+      - HERMES_MEMORIES_PATH=/hermes/memories
+    volumes:
+      - ./data-node-2:/data
+      - ./logs-node-2:/app/logs
+      - ~/.hermes:/hermes:ro
+    networks:
+      - indb-network
+    depends_on:
+      - indb-node-1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # INDB Node 3 (Follower)
+  indb-node-3:
+    build: .
+    container_name: indb-node-3
+    hostname: indb-node-3
+    ports:
+      - "8005:8000" # Map external 8005 to internal 8000
+      - "9003:9001"
+      - "50053:50051"
+    environment:
+      - RAFT_ENABLED=${RAFT_ENABLED:-true}
+      - RAFT_NODE_ID=${RAFT_NODE_3_ID:-indb-node-3}
+      - RAFT_PEERS=${RAFT_NODE_3_PEERS:-http://indb-node-1:8000,http://indb-node-2:8000,http://indb-node-3:8000}
+      - INDB_USE_SSL=${INDB_USE_SSL:-false}
+      - PORT=${INDB_PORT:-8000}
+      - DATA_DIR=${DATA_DIR:-/data}
+      - INDB_MASTER_KEY=${INDB_MASTER_KEY}
+      - HERMES_SESSIONS_PATH=/hermes/sessions
+      - HERMES_MEMORIES_PATH=/hermes/memories
+    volumes:
+      - ./data-node-3:/data
+      - ./logs-node-3:/app/logs
+      - ~/.hermes:/hermes:ro
+    networks:
+      - indb-network
+    depends_on:
+      - indb-node-1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # HAProxy Load Balancer (Autonomous)
+  loadbalancer:
+    image: haproxy:2.9-alpine
+    container_name: indb-loadbalancer
+    ports:
+      - "8888:80" # Main HTTP endpoint (8888 external, 80 internal)
+      - "8080:8080" # Stats/monitoring page
+      - "50050:50050" # gRPC load balanced endpoint
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    networks:
+      - indb-network
+    depends_on:
+      - indb-node-1
+      - indb-node-2
+      - indb-node-3
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8080/stats" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # TUI (Terminal User Interface)
+  # Run with: docker-compose run --rm tui
+  tui:
+    build: .
+    container_name: indb-tui
+    profiles:
+      - tools # Don't start automatically, only with: docker-compose --profile tools up
+    environment:
+      - INDB_API_URL=${INDB_API_URL:-http://loadbalancer:80}
+      - INDB_IN_DOCKER=${INDB_IN_DOCKER:-true}
+    command: python -m cli.tui.app
+    stdin_open: true # docker run -i
+    tty: true # docker run -t
+    networks:
+      - indb-network
+    depends_on:
+      - loadbalancer
+    volumes:
+      - indb-logs-1:/app/logs
+
+  # Documentation Site (docs.backend.orb.local)
+  docs:
+    image: squidfunk/mkdocs-material
+    container_name: indb-docs
+    ports:
+      - "8008:8000"
+    volumes:
+      - ./:/docs
+    networks:
+      - indb-network
+    restart: unless-stopped
+    labels:
+      - dev.orbstack.http-port=8000
+      - dev.orbstack.domains=docs.backend.orb.local,indb-docs.backend.orb.local
+
+volumes:
+  indb-data-1:
+  indb-data-2:
+  indb-data-3:
+  indb-logs-1:
+  indb-logs-2:
+  indb-logs-3:
+
+
+networks:
+  indb-network:
+    driver: bridge

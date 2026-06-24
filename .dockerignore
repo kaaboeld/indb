@@ -1,0 +1,69 @@
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.*
+
+# Storage and data files
+# NOTE: *.key intentionally NOT excluded — indb.key is needed by the storage engine
+# In production, provide INDB_MASTER_KEY env var instead (takes priority over the file)
+*.bin
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+# NOTE: tests/ is NOT excluded — app_factory.py imports tests.integrity_check at startup
+test_*.py
+*_test.py
+
+# Documentation (excluded from main app image, but needed for Dockerfile.docs)
+# Un-ignore docs/ and mkdocs.yml for the docs build:
+!docs/
+!mkdocs.yml
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Development tools
+Makefile
+run_tests.py
+conftest.py
+
+# Examples
+examples/
+# cli/ tools are excluded except what's needed
+cli/tui/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# macOS
+.DS_Store
