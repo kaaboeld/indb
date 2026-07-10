@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-10',
+  compatibilityDate: '2025-07-15',
+  future: {
+    compatibilityVersion: 4,
+  },
   devtools: { enabled: false },
   modules: ['@nuxtjs/tailwindcss'],
   ssr: true,
