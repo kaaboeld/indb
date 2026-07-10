@@ -1,0 +1,5 @@
+# Root ignores
+.DS_Store
+site/node_modules/
+site/.nuxt/
+site/.output/
