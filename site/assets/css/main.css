@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0a0a0a;
+  color: #f5f0e8;
+  cursor: crosshair;
+  font-family: 'IBM Plex Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #e63329;
+  color: #f5f0e8;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e63329;
+}
+
+.ecg-line {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: ecg-draw 1.4s ease-in-out infinite;
+}
+
+.ecg-line-mini {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  animation: ecg-draw 1.4s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+@keyframes ecg-draw {
+  0% {
+    stroke-dashoffset: 120;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -120;
+  }
+}

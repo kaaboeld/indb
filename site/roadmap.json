@@ -1,0 +1,364 @@
+{
+  "updatedAt": "2026-03-12T23:07:25.476Z",
+  "version": "0.7.0",
+  "entries": [
+    {
+      "version": "v0.3.0",
+      "title": "The Cognitive Core",
+      "focus": "Stability, Fusion, and Interpretation.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "Event Stream: Immutable, time-ordered log.",
+          "done": true
+        },
+        {
+          "text": "Event Fusion: 35:1 Compression of repetitive signals.",
+          "done": true
+        },
+        {
+          "text": "JIT Interpretation: Context-aware retrieval (\"Driver\" vs \"Analyst\").",
+          "done": true
+        },
+        {
+          "text": "Security: Ed25519 Response Signing.",
+          "done": true
+        },
+        {
+          "text": "Blind Store: Basic Zero-Knowledge encrypted payloads (ChaCha20).",
+          "done": true
+        },
+        {
+          "text": "Protocols: HTTP/2, WebSocket, UDP.",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v0.4.0",
+      "title": "Distributed Autonomy",
+      "focus": "Raft Consensus & Self-Healing.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "Raft Replication: Robust Leader Election and Log Replication.",
+          "done": true
+        },
+        {
+          "text": "Resilience: Retry logic and partitioned networking handling.",
+          "done": true
+        },
+        {
+          "text": "Persistence: WAL (Write-Ahead Log) for atomic state preservation.",
+          "done": true
+        },
+        {
+          "text": "State Machine: Direct linkage between Raft Log and INDB Kernel Ingest.",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v0.5.0",
+      "title": "The Fortress",
+      "focus": "Enterprise Security & Privacy.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "Immutable Audit: Merkle Tree-backed audit logs for tamper evidence.",
+          "done": true
+        },
+        {
+          "text": "RBAC: Role-Based Access Control enforcing Least Privilege.",
+          "done": true
+        },
+        {
+          "text": "Hardware Ops: (Deferred to v1.0)",
+          "done": true
+        },
+        {
+          "text": "Defense-in-Depth: Application-layer permission boundaries.",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v0.6.0",
+      "title": "Binary Stream",
+      "focus": "Large Data Ingestion & Decoupling.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "gRPC Streaming: IngestStream RPC for efficient chunked binary upload.",
+          "done": true
+        },
+        {
+          "text": "Binary Payload: Native support for bytes in Event model.",
+          "done": true
+        },
+        {
+          "text": "Refactoring: Decoupled JITRenderer from Core Storage for modular architecture.",
+          "done": true
+        },
+        {
+          "text": "Async Bridge: Standardized Async/Sync interop for Services.",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v0.7.0",
+      "title": "The Origin Layer",
+      "focus": "Epistemology, Trust, and Source Verification.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "Source Entity: First-class \"Source\" citizen with SourceType (Sensor, AI, Human, etc.).",
+          "done": true
+        },
+        {
+          "text": "Source Registry: Kernel-level registry for trusted agents and sensors.",
+          "done": true
+        },
+        {
+          "text": "Provenance: source_id linking for every Event to its origin.",
+          "done": true
+        },
+        {
+          "text": "Weighted Consensus: Using Source Reputation as gravity in Event Fusion.",
+          "done": true
+        },
+        {
+          "text": "Signature Chain: Cryptographic signing of events by Sources.",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v0.8.0",
+      "title": "Autonomous Security",
+      "focus": "Encryption & Zero Dependencies.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "At-Rest Encryption: AES-256-GCM for indb.bin storage (upgraded from Fernet).",
+          "done": true
+        },
+        {
+          "text": "PBKDF2 Key Derivation: 100,000 iterations for master key.",
+          "done": true
+        },
+        {
+          "text": "TLS/SSL Transport: Self-signed certificate generation and Uvicorn SSL support.",
+          "done": true
+        },
+        {
+          "text": "Certificate Management: Automatic generation, validation, and renewal.",
+          "done": true
+        },
+        {
+          "text": "Zero External Databases: Removed pymongo/BSON, replaced with msgpack.",
+          "done": true
+        },
+        {
+          "text": "Autonomy Principle: NO Redis, NO PostgreSQL, NO MongoDB - pure binary storage.",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v0.9.0",
+      "title": "Performance & Caching",
+      "focus": "In-Memory Optimization & Speed.",
+      "date": "Q1 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "TTL Cache: Time-to-live in-memory cache with LRU eviction.",
+          "done": true
+        },
+        {
+          "text": "Bloom Filters: Probabilistic duplicate detection (0.1% false positive rate).",
+          "done": true
+        },
+        {
+          "text": "Weak References: Memory-efficient object caching.",
+          "done": true
+        },
+        {
+          "text": "Query Cache: Automatic caching of expensive queries (5-10 min TTL).",
+          "done": true
+        },
+        {
+          "text": "Cache Statistics: Real-time hit/miss ratio monitoring.",
+          "done": true
+        },
+        {
+          "text": "MessagePack Protocol: Binary content negotiation (autonomous alternative to BSON).",
+          "done": true
+        }
+      ]
+    },
+    {
+      "version": "v1.0.0",
+      "title": "Stable-Cognitive Edition",
+      "focus": "Autonomous Optimization, Zero-CPU Reality.",
+      "date": "January 12, 2026",
+      "done": true,
+      "items": [
+        {
+          "text": "Async Optimization: Convert all blocking I/O to async/await.",
+          "done": true
+        },
+        {
+          "text": "Memory-Mapped Storage: Fast binary access for large datasets.",
+          "done": true
+        },
+        {
+          "text": "Object Pooling: Reusable Event objects for reduced GC pressure.",
+          "done": true
+        },
+        {
+          "text": "LZ4 Compression: Optional storage compression.",
+          "done": true
+        },
+        {
+          "text": "Reality Guard Demo: Interactive Inhale-Exhale-Axiom visualization.",
+          "done": true
+        },
+        {
+          "text": "Comprehensive README: All startup commands for all components.",
+          "done": true
+        },
+        {
+          "text": "MkDocs Site: Full API reference and guides.",
+          "done": true
+        },
+        {
+          "text": "Type System Docs: Complete with binary type.",
+          "done": true
+        },
+        {
+          "text": "CHANGELOG: Complete release history.",
+          "done": true
+        },
+        {
+          "text": "Version Updates: All files updated to v1.0.0.",
+          "done": true
+        },
+        {
+          "text": "SDKs: Official Python, TypeScript, and Go clients.",
+          "done": false
+        },
+        {
+          "text": "CLI Improvements: Interactive mode, better error messages.",
+          "done": false
+        },
+        {
+          "text": "TUI Enhancements: Real-time metrics dashboard.",
+          "done": false
+        },
+        {
+          "text": "Load Testing: 100k events/sec benchmark.",
+          "done": true
+        },
+        {
+          "text": "Security Audit: Penetration testing and vulnerability scan.",
+          "done": false
+        },
+        {
+          "text": "Performance Profiling: Memory and CPU optimization.",
+          "done": false
+        },
+        {
+          "text": "Integration Tests: End-to-end protocol testing.",
+          "done": true
+        },
+        {
+          "text": "Docker Compose: Multi-node Raft cluster setup.",
+          "done": true
+        },
+        {
+          "text": "Prometheus Monitoring: Metrics collection configured.",
+          "done": true
+        },
+        {
+          "text": "Kubernetes Helm: Production-ready charts.",
+          "done": true
+        },
+        {
+          "text": "Grafana Dashboards: Visualization templates.",
+          "done": true
+        },
+        {
+          "text": "LTS: Long Term Support release with 2-year maintenance.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "version": "v2.0.0",
+      "title": "The Neural Layer",
+      "focus": "Machine Learning & Cognitive Processing.",
+      "date": "Q3-Q4 2026",
+      "done": false,
+      "items": [
+        {
+          "text": "Embedding Engine: Automatic vector embeddings for events.",
+          "done": false
+        },
+        {
+          "text": "Semantic Search: Similarity-based retrieval.",
+          "done": false
+        },
+        {
+          "text": "Pattern Recognition: ML-based anomaly detection.",
+          "done": false
+        },
+        {
+          "text": "Predictive Fusion: AI-assisted deduplication.",
+          "done": false
+        },
+        {
+          "text": "Neural Interpreter: Context-aware event interpretation using transformers.",
+          "done": false
+        }
+      ]
+    },
+    {
+      "version": "v3.0.0",
+      "title": "The Marketplace",
+      "focus": "Extensibility & Community.",
+      "date": "2027",
+      "done": false,
+      "items": [
+        {
+          "text": "Plugin System: Custom interpreters and fusion algorithms.",
+          "done": false
+        },
+        {
+          "text": "Marketplace: Community-contributed extensions.",
+          "done": false
+        },
+        {
+          "text": "Federation: Cross-INDB instance queries.",
+          "done": false
+        },
+        {
+          "text": "GraphQL Federation: Distributed schema stitching.",
+          "done": false
+        },
+        {
+          "text": "Event Sourcing: CQRS pattern support.",
+          "done": false
+        }
+      ]
+    }
+  ]
+}
