@@ -97,6 +97,7 @@ if [ "$STANDALONE" = true ]; then
   success "Standalone node deployed!"
   echo ""
   echo "  URL: https://$APP.fly.dev"
+  echo "  WUI: https://$APP.fly.dev/wui/"
   echo "  Docs: https://$APP.fly.dev/docs"
   echo ""
   exit 0
@@ -208,6 +209,7 @@ echo "╔═══════════════════════�
 echo "║  🎉 INDB Cluster deployed on Fly.io!                ║"
 echo "╠══════════════════════════════════════════════════════╣"
 printf "║  API:       %-42s ║\n" "https://$APP.fly.dev"
+printf "║  WUI:       %-42s ║\n" "https://$APP.fly.dev/wui/"
 printf "║  Docs:      %-42s ║\n" "https://$APP.fly.dev/docs"
 printf "║  GraphQL:   %-42s ║\n" "https://$APP.fly.dev/graphql"
 printf "║  Raft:      %-42s ║\n" "https://$APP.fly.dev/raft/status"

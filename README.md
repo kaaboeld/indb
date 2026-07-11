@@ -256,7 +256,8 @@ After Fusion:
 | **WebSocket** | ✅ Production | Real-time subscriptions | Live updates |
 | **GraphQL** | ✅ Production | Flexible queries | Schema introspection |
 | **MCP** | ✅ Production | Model Context Protocol | AI integration |
-| **TUI** | ✅ Production | Terminal interface | Scripts + cluster management |
+| **TUI** | ✅ Production | Terminal dashboard | Scripts + Query Lab |
+| **WUI** | ✅ Production | Web dashboard at `/wui/` | Query Lab + analytics |
 | **Source Connectors** | ✅ Production | Modular ingestion adapters | Plug-and-play, auto-discovered |
 
 ---
@@ -428,29 +429,40 @@ docker-compose -f docker-compose.standalone.yml up -d
 
 ---
 
-### **TUI — Terminal Dashboard**
+### **Operations dashboards**
+
+| Interface | Command / URL |
+|-----------|---------------|
+| **WUI** (browser) | [https://api.indb.tech/wui/](https://api.indb.tech/wui/) |
+| **TUI** (terminal) | `cd db && ./start_tui.sh` |
+
+Docs: [docs/CONSOLE.md](docs/CONSOLE.md) · [docs/wui.md](docs/wui.md) · [docs/cli.md](docs/cli.md)
+
+#### TUI — Terminal Dashboard
 
 ```bash
-# Activate venv first
-source venv/bin/activate
+cd db
+./start_tui.sh
 
-# Launch against local cluster (via load balancer)
-python3 -m cli.tui.app
+# Production (default)
+INDB_API_URL=https://api.indb.tech ./start_tui.sh
 
-# Launch against a specific node
-INDB_API_URL=http://localhost:8000 python3 -m cli.tui.app
-
-# Or use Orb hostname (when running via Docker/Orb)
-INDB_API_URL=https://indb-node-1.backend.orb.local python3 -m cli.tui.app
+# Local cluster
+INDB_API_URL=http://localhost:8888 ./start_tui.sh
 ```
 
-**Tabs:**
-- **Control** — live event count, fusion %, server status, system log
-- **Events** — searchable event table (updates every 3s)
-- **Load Balancer** — per-node health + Raft leader indicator
-- **Scripts** — run operational scripts directly from TUI
+**Tabs:** Control · Events · Modules · Cluster · Query · Analytics · Scripts
 
-**Shortcuts:** `q` quit · `r` refresh · `s` jump to Scripts tab
+**Shortcuts:** `q` quit · `r` refresh · `e` events · `p` query · `a` analytics · `s` scripts
+
+#### WUI — Web Console
+
+```bash
+cd db/wui && npm install && npm run dev    # dev: localhost:5174/wui/
+cd db/wui && npm run build                 # prod: served at /wui/
+```
+
+**Tabs:** Control · Events · Modules · Cluster · Query · Analytics (no Scripts — use TUI)
 
 ---
 

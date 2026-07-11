@@ -64,3 +64,7 @@ examples/
 
 # macOS
 .DS_Store
+
+# WUI — built inside Docker multi-stage; skip local artifacts
+wui/node_modules/
+wui/dist/

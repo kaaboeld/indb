@@ -1,35 +1,28 @@
 # INDB Web Console (WUI)
 
-Modern web dashboard — Vue 3 mirror of the TUI.
+Browser dashboard for INDB — Vue 3 SPA served at **`/wui/`**.
 
-## Dev
+**Full documentation:** [../docs/wui.md](../docs/wui.md)  
+**TUI + WUI overview:** [../docs/CONSOLE.md](../docs/CONSOLE.md)
+
+## Quick links
+
+| Environment | URL |
+|-------------|-----|
+| Production | https://api.indb.tech/wui/ |
+| Local (built) | http://localhost:8000/wui/ |
+| Dev server | http://localhost:5174/wui/ |
+
+## Commands
 
 ```bash
-cd db/wui
 npm install
-npm run dev
+npm run dev      # hot reload + API proxy
+npm run build    # output to dist/ for FastAPI
 ```
-
-Open http://localhost:5174/wui/ — API proxied to `https://api.indb.tech` (override with `INDB_API_URL`).
-
-## Production build
-
-```bash
-cd db/wui
-npm install
-npm run build
-```
-
-Served by FastAPI at **`/wui/`** when `db/wui/dist/` exists.
-
-## Config
-
-| Variable | Purpose |
-|----------|---------|
-| `VITE_INDB_API_URL` | API base at build time (empty = same origin) |
-| `VITE_INDB_CLUSTER_NODES` | Comma-separated cluster URLs |
-| Browser `localStorage.indb_api_url` | Runtime API override in UI |
 
 ## Tabs
 
 Control · Events · Modules · Cluster · Query · Analytics
+
+Query Lab supports all cognitive modes (interpret, prism, echo, paradox, …) — see [Console Guide](../docs/CONSOLE.md#query-lab--all-modes-with-examples).
