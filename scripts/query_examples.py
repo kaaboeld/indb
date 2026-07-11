@@ -1,89 +1,123 @@
-import requests
+#!/usr/bin/env python3
+"""Run sample queries against live data in the configured INDB API."""
+
+from __future__ import annotations
+
 import json
-import sys
 import os
+import sys
+from typing import Any, Dict, List
 
-# Load configuration
-try:
-    sys.path.insert(0, "..")
-    from core.config import config
-    BASE_URL = config.base_url
-except ImportError:
-    # Fallback for standalone execution
-    HTTP_PORT = int(os.getenv("INDB_PORT", "8000"))
-    BASE_URL = f"http://localhost:{HTTP_PORT}"
+import httpx
 
-def run_query(title, payload):
-    print(f"\n🔍 {title}")
+BASE_URL = os.environ.get("INDB_API_URL", "https://api.indb.tech").rstrip("/")
+TIMEOUT = float(os.environ.get("INDB_HTTP_TIMEOUT", "30"))
+
+
+def _client() -> httpx.Client:
+    return httpx.Client(base_url=BASE_URL, timeout=TIMEOUT, follow_redirects=True)
+
+
+def _unwrap(payload: Dict[str, Any]) -> Any:
+    if isinstance(payload, dict) and "data" in payload:
+        return payload["data"]
+    return payload
+
+
+def top_locations(client: httpx.Client, limit: int = 5) -> List[str]:
+    response = client.get("/api/v2/analytics/overview")
+    response.raise_for_status()
+    overview = _unwrap(response.json())
+    top = overview.get("database", {}).get("top_locations", {})
+    return list(top.keys())[:limit]
+
+
+def run_search(client: httpx.Client, query: str, limit: int = 5) -> None:
+    print(f"\n🔍 Search: {query!r}")
+    response = client.get("/api/v2/search", params={"q": query, "limit": limit})
+    response.raise_for_status()
+    events = _unwrap(response.json())
+    if not isinstance(events, list):
+        events = []
+    print(f"   ✅ {len(events)} results")
+    for index, event in enumerate(events[:5], start=1):
+        tokens = event.get("raw_data_anchor") or event.get("tokens")
+        location = event.get("location", "unknown")
+        print(f"      {index}. [{location}] -> {tokens}")
+
+
+def run_location_filter(client: httpx.Client, location: str, limit: int = 5) -> None:
+    print(f"\n🗂️  Location: {location}")
+    response = client.get(
+        "/api/v2/events",
+        params={"filter_key": "location", "filter_value": location, "limit": limit},
+    )
+    response.raise_for_status()
+    events = _unwrap(response.json())
+    if not isinstance(events, list):
+        events = []
+    print(f"   ✅ {len(events)} events")
+    for index, event in enumerate(events[:3], start=1):
+        tokens = event.get("raw_data_anchor") or event.get("tokens")
+        print(f"      {index}. {tokens}")
+
+
+def run_interpret(client: httpx.Client, location: str, limit: int = 5) -> None:
+    payload = {"context": {"mood": "Neutral", "location": location}, "limit": limit}
+    print(f"\n🧠 Interpret @ {location}")
     print(f"   Payload: {json.dumps(payload)}")
-    
+    response = client.post("/api/v2/interpret", json=payload)
+    if response.status_code >= 400:
+        print(f"   ❌ HTTP {response.status_code}: {response.text[:160]}")
+        return
+    data = _unwrap(response.json())
+    events = data.get("events", []) if isinstance(data, dict) else []
+    print(f"   ✅ {len(events)} results")
+    for index, event in enumerate(events[:3], start=1):
+        tokens = event.get("raw_data_anchor") or event.get("tokens")
+        print(f"      {index}. {tokens}")
+
+
+def main() -> int:
+    print("=" * 60)
+    print("INDB Query Examples (live data)")
+    print(f"API: {BASE_URL}")
+    print("=" * 60)
+
     try:
-        response = requests.post(f"{BASE_URL}/api/v2/interpret", json=payload)
-        response.raise_for_status()
-        data = response.json()
-        
-        events = data.get("data", {}).get("events", [])
-        print(f"   ✅ Found {len(events)} memories")
-        
-        for i, e in enumerate(events[:5]): # Show top 5
-            tokens = e.get('tokens') or e.get('raw_data_anchor')
-            is_fused = e.get('is_fused', False)
-            fusion_count = e.get('fusion_count', 1)
-            print(f"      {i+1}. [{e.get('location')}] (Fused: {is_fused}) -> {tokens}")
-            
-    except Exception as e:
-        print(f"   ❌ Error: {e}")
+        with _client() as client:
+            health = client.get("/health")
+            health.raise_for_status()
+            print(f"Health: {health.json().get('status', 'unknown')}")
 
-def main():
-    print("="*60)
-    print("🧠 INDB Query Examples")
-    print("="*60)
+            locations = top_locations(client)
+            if not locations:
+                print("No locations in database.")
+                return 0
 
-    # 1. Contextual Query: What does a 'Driver' care about?
-    # Expectation: Should prioritize 'traffic' related tokens or locations due to mood/context relevance
-    # (Note: In this basic version, mood might just be metadata, but let's see)
-    run_query("Context: Driver (Traffic Focus)", {
-        "context": {"mood": "Driver"},
-        "limit": 5
-    })
+            for location in locations[:3]:
+                run_location_filter(client, location, limit=5)
 
-    # 2. Contextual Query: What does an 'Analyst' see?
-    # Expectation: Might see generic or all events, or specific cyber details
-    run_query("Context: Analyst (Cyber/Office Focus)", {
-        "context": {"mood": "Analyst"},
-        "limit": 5
-    })
-    
-    # 3. Keyword/Token Search (Using Dedicated Search Endpoint)
-    # Finding memories with specific qualities
-    print("\n🔍 Search: 'Blue' (Ocean/Calm)")
-    try:
-        # Note: Search endpoint is GET
-        response = requests.get(f"{BASE_URL}/api/v2/search", params={"q": "blue", "limit": 5, "fuzzy": True})
-        response.raise_for_status()
-        data = response.json()
-        
-        # Search returns list of dicts directly in data
-        events = data.get("data", [])
-        print(f"   ✅ Found {len(events)} memories")
-        
-        for i, item in enumerate(events):
-            e = item
-            # Search endpoint structure is flat list of objects
-            # matches = item.get('matches', [])
-            tokens = e.get('raw_data_anchor') or e.get('tokens')
-            is_fused = e.get('is_fused', False)
-            print(f"      {i+1}. [{e.get('location')}] (Fused: {is_fused}) -> {tokens}")
-            
-    except Exception as e:
-        print(f"   ❌ Error: {e}")
+            for location in locations[:2]:
+                token = location.rsplit("/", 1)[-1].lower()
+                if token:
+                    run_search(client, token, limit=5)
 
-    # 4. Fusion Inspector
-    # Show that we are hitting fused events
-    run_query("Fusion Inspection (All Events)", {
-        "context": {"mood": "Inspector"},
-        "limit": 50
-    })
+            for location in locations[:2]:
+                run_interpret(client, location, limit=5)
+    except httpx.ConnectError:
+        print(
+            f"❌ Cannot connect to {BASE_URL}. Set INDB_API_URL.",
+            file=sys.stderr,
+        )
+        return 1
+    except Exception as exc:
+        print(f"❌ Error: {exc}", file=sys.stderr)
+        return 1
+
+    print("\nDone.")
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

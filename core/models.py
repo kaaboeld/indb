@@ -29,9 +29,11 @@ class EventCreate(BaseModel):
     """Request model for creating events."""
     raw_data_anchor: List[str]
     location: str
+    id: Optional[str] = None
     ttl: Optional[int] = None
     timestamp: Optional[float] = Field(default_factory=time.time)
     blind_payload: Optional[str] = None
+    signature: Optional[Dict[str, Any]] = None
 
     @model_validator(mode="after")
     def black_box_contract(self) -> "EventCreate":
@@ -69,6 +71,7 @@ class EventResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = None
     encrypted_payload: Optional[str] = None
     blind_payload: Optional[str] = None
+    signature: Optional[Dict[str, Any]] = None
 
 
 class BatchEventCreate(BaseModel):

@@ -63,6 +63,12 @@ class INDB:
         # Internal Cache (No Redis needed)
         self.cache = TTLCache()
 
+        # Paradox store (separate from events)
+        from storage.paradox_store import load_paradoxes
+
+        self.paradoxes: Dict[str, Any] = load_paradoxes()
+        logger.info("Paradox store loaded: %d entities", len(self.paradoxes))
+
         # Analytics Engine
         from core.analytics import INDBAnalytics
 
@@ -382,6 +388,9 @@ class INDB:
         binary_payload: Optional[bytes] = None,
         source_id: Optional[str] = None,
         temporal_metadata: Optional[Dict[str, Any]] = None,
+        signature: Optional[Dict[str, Any]] = None,
+        id: Optional[str] = None,
+        timestamp: Optional[float] = None,
     ) -> Event:
         """
         Public Ingest API.
@@ -392,13 +401,35 @@ class INDB:
           - Directly stores.
         """
         # Create Event object tentatively
+        if signature:
+            from core.signing import verify_event_signature, normalize_signature_block
+
+            probe = {
+                "id": id,
+                "timestamp": timestamp if timestamp is not None else time.time(),
+                "raw_data_anchor": raw_data_anchor,
+                "location": location,
+                "ttl": ttl,
+                "blind_payload": blind_payload,
+                "signature": signature,
+            }
+            if not id:
+                raise ValueError("Signed events require an explicit id")
+            valid, key_id, err = verify_event_signature(probe)
+            if not valid:
+                raise ValueError(f"Invalid event signature: {err}")
+            signature = normalize_signature_block(signature)
+
         event = Event(
             raw_data_anchor=raw_data_anchor,
             location=location,
+            id=id,
+            timestamp=timestamp,
             ttl=ttl,
             blind_payload=blind_payload,
             binary_payload=binary_payload,
             source_id=source_id,
+            signature=signature,
         )
         if temporal_metadata:
             event.temporal_metadata = temporal_metadata
@@ -543,3 +574,103 @@ class INDB:
         if self.fusion_engine:
             return self.fusion_engine.detect_global_patterns(self.memory.get_all())
         return {"error": "Fusion Engine disabled"}
+
+    def _event_signature_key_id(self, event: Any) -> Optional[str]:
+        if isinstance(event, dict):
+            sig = event.get("signature")
+        else:
+            sig = getattr(event, "signature", None)
+        if not sig:
+            return None
+        return sig.get("key_id")
+
+    def events_by_key_id(self, key_id: str) -> List[Event]:
+        """Return events signed by the given key_id hash."""
+        from core.signing import compute_key_id
+
+        results: List[Event] = []
+        with self.lock:
+            for event in self.memory:
+                sig = event.signature if hasattr(event, "signature") else None
+                if not sig:
+                    continue
+                event_key_id = sig.get("key_id")
+                if not event_key_id and sig.get("public_key"):
+                    event_key_id = compute_key_id(sig["public_key"])
+                if event_key_id == key_id:
+                    results.append(event)
+        return results
+
+    def get_event_by_id(self, event_id: str) -> Optional[Event]:
+        with self.lock:
+            for event in self.memory:
+                if event.id == event_id:
+                    return event
+        return None
+
+    def restore_signed_events(
+        self,
+        events: List[Dict[str, Any]],
+        key_id: str,
+        verify_only: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Verify and optionally re-import events for a signing identity (key_id).
+        """
+        from core.signing import verify_event_signature, normalize_signature_block
+
+        verified: List[Dict[str, Any]] = []
+        failed: List[Dict[str, Any]] = []
+        imported = 0
+        skipped = 0
+
+        existing_ids = {e.id for e in self.memory.get_all()}
+
+        for raw in events:
+            event_id = raw.get("id", "unknown")
+            valid, resolved_key_id, err = verify_event_signature(raw)
+            if not valid:
+                failed.append({"id": event_id, "reason": err or "invalid signature"})
+                continue
+
+            if not resolved_key_id:
+                failed.append({"id": event_id, "reason": "unsigned event"})
+                continue
+
+            if resolved_key_id != key_id:
+                failed.append({"id": event_id, "reason": "key_id mismatch"})
+                continue
+
+            verified.append(raw)
+            if verify_only:
+                continue
+
+            if event_id in existing_ids:
+                skipped += 1
+                continue
+
+            sig = normalize_signature_block(raw["signature"])
+            event = Event.from_dict({**raw, "signature": sig})
+            self._store_event(event)
+            existing_ids.add(event.id)
+            imported += 1
+
+        return {
+            "key_id": key_id,
+            "verify_only": verify_only,
+            "verified_count": len(verified),
+            "failed_count": len(failed),
+            "imported_count": imported,
+            "skipped_count": skipped,
+            "failed": failed,
+        }
+
+    def store_paradox(self, paradox: Any) -> None:
+        from storage.paradox_store import save_paradoxes
+
+        with self.lock:
+            self.paradoxes[paradox.id] = paradox
+            save_paradoxes(self.paradoxes)
+
+    def get_paradox(self, paradox_id: str) -> Optional[Any]:
+        return self.paradoxes.get(paradox_id)

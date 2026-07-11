@@ -15,11 +15,16 @@ All defaults and thresholds live in `core/constants.py` — no hardcoded values.
 
 ## Core Concepts
 
-All INDB responses are **cryptographically signed**.
-- **Signature Algorithm**: Ed25519  
-- **Verification**: Clients verify the `signature` field using the server public key.
+All INDB API responses may be **cryptographically signed** by the server (response sealing).
+- **Signature Algorithm**: Ed25519
+- **Server key**: `SIGNING_PRIVATE_KEY` env — never sent to clients
+- **Verification**: Clients verify the response `signature` using the server public key (`GET /recovery/identity`)
 
-Events are the only primitive. Everything you store is an `Event`:
+Events may optionally carry **writer signatures** at ingest (`signature` block with `public_key` + proof).
+- **Writer private key**: stays on the client — never in recovery API
+- **Identity**: `key_id` = SHA-256(public key) — see [SIGNED_MEMORY_RECOVERY.md](./SIGNED_MEMORY_RECOVERY.md)
+
+Events are the primary primitive. Everything you store is an `Event`:
 - It can **age** (`ttl`, fusion).
 - It can **change weight** (`fusion_count`, reputation).
 - It can **hide meaning** (`blind_payload`).
@@ -42,6 +47,25 @@ Single event:
   "blind_payload": null
 }
 ```
+
+**Signed event** (optional — client signs locally; requires explicit `id`):
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "timestamp": 1770018534.0,
+  "raw_data_anchor": ["rain", "memory"],
+  "location": "demo/signed",
+  "signature": {
+    "algorithm": "Ed25519",
+    "public_key": "BASE64_PUBLIC_KEY",
+    "signature": "BASE64_SIGNATURE",
+    "key_id": "64_CHAR_HEX_FINGERPRINT"
+  }
+}
+```
+
+Private signing keys are **never** sent. See [SIGNED_MEMORY_RECOVERY.md](./SIGNED_MEMORY_RECOVERY.md) for full patterns.
 
 **Black Box Contract** — if `blind_payload` is set, both `location` and `timestamp` become mandatory at the protocol level. An empty or missing location will be rejected:
 
@@ -219,7 +243,80 @@ Given evidence (events), infers chains and conclusions.
 
 ---
 
-### 2.4 Webhooks
+### 2.4 Signed Memory Recovery
+
+Prefix: `/api/v2/recovery`
+
+Recovery verifies Ed25519 proofs by **public** `key_id`. Private keys, seeds, and shared secrets are rejected.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /recovery/identity` | Server response-signing public key + `key_id` |
+| `GET /recovery/resolve-key?public_key=` | Derive `key_id` from public key |
+| `GET /recovery/key/{key_id}` | Events signed by identity hash |
+| `GET /recovery/verify/{event_id}` | Verify single event signature |
+| `POST /recovery/restore` | Verify export; optional import |
+
+**Restore request:**
+
+```json
+{
+  "key_id": "64_CHAR_HEX_FINGERPRINT",
+  "verify_only": false,
+  "events": [
+    {
+      "id": "uuid",
+      "timestamp": 1770018600.0,
+      "raw_data_anchor": ["restore", "test"],
+      "location": "recovery/lab",
+      "signature": {
+        "algorithm": "Ed25519",
+        "public_key": "BASE64_PUBLIC_KEY",
+        "signature": "BASE64_SIGNATURE",
+        "key_id": "64_CHAR_HEX_FINGERPRINT"
+      }
+    }
+  ]
+}
+```
+
+Implementation examples for each pattern: [SIGNED_MEMORY_RECOVERY.md](./SIGNED_MEMORY_RECOVERY.md).
+
+---
+
+### 2.5 Paradox (type) — contract
+
+> **Status:** API contract (v0.8). Prism read-time paradox (`is_paradoxical`) is live — see §1.3.
+
+Paradox is **not** an Event flag. Separate store, empty anchor until observation.
+
+| Endpoint | Purpose |
+|----------|---------|
+| `POST /api/v2/paradox` | Create superposed paradox (context only) |
+| `GET /api/v2/paradox/{id}?collapse=true` | Observe / collapse |
+
+**Generation modes:** `resonance_weighted` · `pool` · `fusion`  
+**Collapse modes:** `sample_once` (→ signed Event) · `sample_on_read` (ephemeral)
+
+```json
+{
+  "location": "books/Dostoevsky",
+  "paradox_context": {
+    "themes": ["love", "death"],
+    "token_pool": ["love", "death", "memory"]
+  },
+  "paradox_generation": {
+    "mode": "pool",
+    "collapse": "sample_once"
+  }
+}
+```
+
+Per-pattern curl and Python examples: [PARADOX.md](./PARADOX.md).
+
+---
+
+### 2.6 Webhooks
 
 Register a webhook to receive outbound notifications (e.g., new Axioms).
 

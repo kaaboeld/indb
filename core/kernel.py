@@ -351,6 +351,9 @@ class INDBKernel:
                 blind_payload=data.get("blind_payload"),
                 binary_payload=data.get("binary_payload"),
                 source_id=data.get("source_id"),
+                signature=data.get("signature"),
+                id=data.get("id"),
+                timestamp=data.get("timestamp"),
             )
             
             # Audit Log (Success)
@@ -371,6 +374,10 @@ class INDBKernel:
             return event_dict
         except PermissionError as e:
              raise e
+        except ValueError as e:
+            if "signature" in str(e).lower():
+                raise ValueError(str(e)) from e
+            raise
         except Exception as e:
             if "RedirectToLeader" not in str(e):
                 logger.error(
@@ -414,3 +421,30 @@ class INDBKernel:
         self._check_initialized()
 
         return {"total_events": self.db.get_event_count(), "encrypted": True, "cache_active": True}
+
+    # --- Paradox & recovery delegates ---
+
+    def store_paradox(self, paradox: Any) -> None:
+        self._check_initialized()
+        self.db.store_paradox(paradox)
+
+    def get_paradox(self, paradox_id: str) -> Optional[Any]:
+        self._check_initialized()
+        return self.db.get_paradox(paradox_id)
+
+    def events_by_key_id(self, key_id: str) -> List[Event]:
+        self._check_initialized()
+        return self.db.events_by_key_id(key_id)
+
+    def get_event_by_id(self, event_id: str) -> Optional[Event]:
+        self._check_initialized()
+        return self.db.get_event_by_id(event_id)
+
+    def restore_signed_events(
+        self,
+        events: List[Dict[str, Any]],
+        key_id: str,
+        verify_only: bool = False,
+    ) -> Dict[str, Any]:
+        self._check_initialized()
+        return self.db.restore_signed_events(events, key_id, verify_only)

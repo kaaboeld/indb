@@ -40,7 +40,7 @@ INDB is a multi-protocol database. It exposes different interfaces for different
 ## 2. Security Layer
 
 ### Response Signing
-Every response from INDB is cryptographically signed to prevent tampering (Man-in-the-Middle).
+Every response from INDB may be cryptographically signed to prevent tampering (Man-in-the-Middle).
 
 **Structure**:
 ```json
@@ -50,10 +50,23 @@ Every response from INDB is cryptographically signed to prevent tampering (Man-i
     "algorithm": "Ed25519",
     "public_key": "...",
     "signature": "...",
+    "key_id": "...",
     "timestamp": 1700000000
   }
 }
 ```
+
+Server public identity: `GET /api/v2/recovery/identity`.  
+Private `SIGNING_PRIVATE_KEY` stays on the server.
+
+### Event Signing (writer)
+Clients may sign events at ingest with a **local** Ed25519 private key.
+
+- Sent: `id` + `signature` block (`public_key`, `signature`, `key_id`)
+- **Never sent:** `private_key`, `seed`, `shared_secret`
+- Recovery: `GET /recovery/key/{key_id}`, `POST /recovery/restore`
+
+See [SIGNED_MEMORY_RECOVERY.md](./SIGNED_MEMORY_RECOVERY.md) for implementation examples per pattern.
 
 ### End-to-End Encryption (Blind Store)
 Data in the `blind_payload` field is opaque to the server.
@@ -73,6 +86,8 @@ Data in the `blind_payload` field is opaque to the server.
 | **Instinct** | Adrenaline reflexes. Modes: Analytical (0.0), Alert (0.5), Instinctive (1.0). Fast pattern matching. |
 | **Deduction** | Chain inference. Seeds → Echo expansion → temporal/spatial/token chains → conclusion. |
 | **Blind** | Zero-knowledge storage. `blind_payload` — ChaCha20, server never reads. Requires `timestamp` + `location`. |
+| **Paradox (type)** | Pre-observation superposition. Separate from Event; collapses on read. See [PARADOX.md](./PARADOX.md). |
+| **Recovery** | Verify/restore by public `key_id` + signed proofs. See [SIGNED_MEMORY_RECOVERY.md](./SIGNED_MEMORY_RECOVERY.md). |
 
 ---
 

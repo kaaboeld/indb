@@ -457,7 +457,21 @@ def cmd_fsck(args):
 def cmd_tui(args):
     """Launch Terminal User Interface"""
     try:
-        from cli.tui.app import INDBTuiApp
+        import importlib
+        import shutil
+        import sys
+        from pathlib import Path
+
+        tui_root = Path(__file__).resolve().parent / "tui"
+        for cache in tui_root.rglob("__pycache__"):
+            if cache.is_dir():
+                shutil.rmtree(cache, ignore_errors=True)
+
+        importlib.invalidate_caches()
+        from cli.tui.app import INDBTuiApp, TUI_BUILD, _verify_tui_modules
+
+        _verify_tui_modules()
+        print_info(f"Starting INDB TUI ({TUI_BUILD})…")
         app = INDBTuiApp(api_url=args.api)
         app.run()
     except ImportError as e:
@@ -521,7 +535,7 @@ def main():
 
     # TUI command
     parser_tui = subparsers.add_parser('tui', help='Launch Terminal UI')
-    parser_tui.add_argument('--api', default='http://localhost:8000', help='API base URL')
+    parser_tui.add_argument('--api', default=None, help='API base URL (auto-detects if omitted)')
     parser_tui.set_defaults(func=cmd_tui)
     
     args = parser.parse_args()

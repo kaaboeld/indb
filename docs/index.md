@@ -418,9 +418,13 @@ pytest --cov=core --cov-report=html
 - Same event → different readings for different observers
 
 ### **Signed Memory** ✅
-- Every API response signed with Ed25519
-- System cannot disown what it said — mathematically
-- Stable key via `SIGNING_PRIVATE_KEY` env variable
+- API responses sealed with Ed25519 (`SIGNING_PRIVATE_KEY` on server)
+- Optional writer signatures at ingest — private key never transmitted
+- Recovery by public `key_id` + proof verification — [SIGNED_MEMORY_RECOVERY.md](./SIGNED_MEMORY_RECOVERY.md)
+
+### **Paradox Patterns** 📋
+- Prism read-time paradox live (`is_paradoxical`, `perception_gap`)
+- Paradox (type) contract documented — generation + collapse examples — [PARADOX.md](./PARADOX.md)
 
 ### **Black Box Contract** ✅
 - `blind_payload` validated at protocol level

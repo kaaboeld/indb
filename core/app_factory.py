@@ -9,7 +9,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 
 logger = logging.getLogger("indb.app")
 from fastapi.middleware.cors import CORSMiddleware
@@ -197,10 +197,12 @@ def create_app() -> FastAPI:
     # GraphQL
     graphql_app = GraphQLRouter(graphql_schema)
     app.include_router(graphql_app, prefix="/graphql")
-    from routes import events, query, websockets, health, system, analytics, echo, prism, instinct, deduction, what_if, slice, subwave
+    from routes import events, query, websockets, health, system, analytics, echo, prism, instinct, deduction, what_if, slice, subwave, recovery, paradox
 
     app.include_router(health.router)
     app.include_router(events.router)
+    app.include_router(recovery.router)
+    app.include_router(paradox.router)
     app.include_router(query.router)
     app.include_router(websockets.router)
     app.include_router(system.router)
@@ -226,6 +228,21 @@ def create_app() -> FastAPI:
     _static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
     if os.path.isdir(_static_dir):
         app.mount("/static", StaticFiles(directory=_static_dir), name="static")
+
+    # Web UI (WUI) — Vue dashboard at /wui/
+    _wui_dist = os.path.join(os.path.dirname(__file__), "..", "wui", "dist")
+    if os.path.isdir(_wui_dist):
+        _wui_assets = os.path.join(_wui_dist, "assets")
+        if os.path.isdir(_wui_assets):
+            app.mount("/wui/assets", StaticFiles(directory=_wui_assets), name="wui_assets")
+
+        @app.get("/wui", include_in_schema=False)
+        @app.get("/wui/", include_in_schema=False)
+        async def wui_index():
+            return FileResponse(
+                os.path.join(_wui_dist, "index.html"),
+                media_type="text/html",
+            )
 
     # Custom Swagger UI — default CDN CSS first, then our overrides on top
     @app.get("/docs", include_in_schema=False)
@@ -270,6 +287,7 @@ def create_app() -> FastAPI:
                 "health": "/health",
                 "api": "/api/v2/health",
                 "docs": "/docs",
+                "wui": "/wui/",
                 "graphql": "/graphql",
                 "metrics": "/metrics"
             }
