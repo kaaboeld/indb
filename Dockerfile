@@ -1,3 +1,11 @@
+FROM node:22-alpine AS wui-builder
+
+WORKDIR /wui
+COPY wui/package.json wui/package-lock.json ./
+RUN npm ci
+COPY wui/ ./
+RUN npm run build
+
 FROM python:3.13-slim
 
 WORKDIR /app
@@ -14,6 +22,9 @@ RUN pip install --no-cache-dir -r requirements-docker.txt
 
 # Application code
 COPY . .
+
+# Web console (built in wui-builder stage)
+COPY --from=wui-builder /wui/dist /app/wui/dist
 
 # Persistent storage directory
 RUN mkdir -p /data

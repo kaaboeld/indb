@@ -7,7 +7,7 @@
 
 **Version:** 0.7.0  
 **Status:** ✅ Production-Ready  
-**Last Updated:** March 4, 2026
+**Last Updated:** July 11, 2026
 
 ---
 
@@ -373,6 +373,14 @@ Monitor system for anomalies.
 
 ## 📖 Interactive Documentation
 
+### Operations dashboards
+
+| Interface | URL / command | Docs |
+|-----------|---------------|------|
+| **WUI** (Web Console) | [api.indb.tech/wui/](https://api.indb.tech/wui/) | [wui.md](wui.md) |
+| **TUI** (Terminal) | `cd db && ./start_tui.sh` | [cli.md](cli.md) |
+| **Overview** | — | [CONSOLE.md](CONSOLE.md) |
+
 ### API Documentation
 - **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
@@ -457,8 +465,8 @@ Russian summary report:
 - ✅ Raft stability fixes
 - ✅ Prism/Echo/Instinct modules
 - ✅ Production deployment
+- ✅ Monitoring dashboard (WUI + TUI)
 - 🔄 Performance optimization
-- 🔄 Monitoring dashboard
 
 ### **Q2 2026**
 - Advanced fusion patterns

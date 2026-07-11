@@ -1,228 +1,328 @@
 # CLI & TUI Guide
 
-INDB ships with a full-featured **Terminal User Interface** built on [Textual](https://textual.textualize.io/).
-It provides real-time monitoring, event search, modules status (hermes, moltbook), cluster status, and one-click script execution — all from the terminal.
+The **INDB Terminal User Interface (TUI)** is a full-screen dashboard built with [Textual](https://textual.textualize.io/). It connects to a live INDB API (production or local cluster) and provides monitoring, event inspection, cognitive queries, and one-click scripts.
+
+For the browser equivalent, see [Web Console (WUI)](./wui.md).  
+Overview of both: [Console Guide](./CONSOLE.md).
 
 ---
 
 ## Starting the TUI
 
-### Local run
-
-Run from the **backend** directory. Activate the virtual environment and ensure `.env` is loaded (the TUI uses `python-dotenv` automatically).
+Always launch from the **`db/`** directory using the helper script (clears stale Python cache):
 
 ```bash
-cd backend
-source venv/bin/activate
-python -m cli.tui.app
-
-# With explicit API URL (cluster via load balancer)
-INDB_API_URL=http://localhost:8888 python -m cli.tui.app
-
-# Or direct to node-1 (standalone)
-INDB_API_URL=http://localhost:8000 python -m cli.tui.app
+cd db
+./start_tui.sh
 ```
 
-Alternative launcher: `python cli/tui/launch.py`
-
-### Docker mode
+Alternative:
 
 ```bash
-# Start TUI container (connects to the cluster via the internal Docker network)
+cd db
+python3 -m cli.tui.app
+```
+
+### API endpoints
+
+| Target | Command |
+|--------|---------|
+| **Production** (default) | `./start_tui.sh` |
+| **Production explicit** | `INDB_API_URL=https://api.indb.tech ./start_tui.sh` |
+| **Local load balancer** | `INDB_API_URL=http://localhost:8888 ./start_tui.sh` |
+| **Single node** | `INDB_API_URL=http://localhost:8000 ./start_tui.sh` |
+
+The TUI loads `.env` from `db/` via `python-dotenv`. Production is the default when `INDB_API_URL` is unset.
+
+### Docker
+
+```bash
 docker compose --profile tools run --rm tui
 ```
 
-In Docker mode the **Control Panel** (Restart / Run Tests / Run Audit buttons) is hidden — use scripts instead.
+In Docker (`INDB_IN_DOCKER=true`), the **Run Tests / Run Audit / Restart** buttons on Control are hidden.
+
+### Verify correct version
+
+On startup, stderr shows:
+
+```
+picker=inline-dropdown-v2 widgets=.../db/cli/tui/widgets.py
+INDB TUI 2026-07-11e
+```
+
+The Control log must contain:
+
+```
+TUI build 2026-07-11e picker=inline-dropdown-v2
+```
+
+If you see `PickerOverlay` errors, kill old processes (`pkill -f cli.tui.app`) and restart with `./start_tui.sh`.
 
 ---
 
-## Interface Layout
+## Interface layout
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  INDB v1.2.0                   http://localhost:8888                │  ← Header
-├──────────┬──────────┬──────────┬──────────────┬────────────────────┤
-│ Control  │  Events  │ Modules  │ Load Balancer│  Scripts            │  ← Tabs
-├──────────┴──────────┴──────────┴──────────────┴────────────────────┤
-│                                                         │
-│             [Tab content area]                          │
-│                                                         │
-├─────────────────────────────────────────────────────────┤
-│  q Quit   r Refresh   m Modules   s Scripts              │  ← Footer
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────┐
+│  INDB                          https://api.indb.tech · clock             │
+│  [████████░░░░] Loading Events…                                          │  ← loading bar
+├──────────────────────────────────────────────────────────────────────────┤
+│ Control │ Events │ Modules │ Cluster │ Query │ Analytics │ Scripts       │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│                     [ active tab content ]                               │
+│                                                                          │
+├──────────────────────────────────────────────────────────────────────────┤
+│  q Quit   r Refresh   e Events   m Modules   p Query   a Analytics  …    │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Tab 1 — Control
 
-The default view. Shows live system stats and a scrolling system log.
+**Purpose:** Answer “is INDB up and healthy?” in one glance. This is the home tab.
 
-### Stats Bar
+### Stats bar (refreshes ~every 3–5 s)
 
-Three real-time counters updated every 3 seconds by polling `/api/v2/analytics/overview`:
+| Card | Meaning | API source |
+|------|---------|------------|
+| **Events** | Total events in memory | `GET /api/v2/analytics/overview` → `database.total_events` |
+| **Fusion %** | Semantic compression rate | `performance.fusion_compression_rate` or `fusion.fusion_rate` |
+| **Server** | `Running` / `Down` | `GET /health` → `status: ok` |
 
-| Widget | Value | Source |
-|---|---|---|
-| **Events** | Total event count in memory | `database.total_events` |
-| **Fusion %** | Fusion compression rate | `performance.fusion_compression_rate` |
-| **Server** | `Running` / `Stopped` / `Error` | `/health` endpoint |
+### System log
 
-### System Log
+Scrollable, selectable log (mouse + Cmd/Ctrl+C, or **Copy log** bottom-right, or `y`):
 
-A live scrolling log showing:
-- Console startup timestamp
-- CPU % and RAM (MB) polled every 5 seconds from `system_health`
-- Output from Control Panel button actions (tests, audit, restart)
+- Startup build id and API URL
+- Connection note when API is probed
+- Periodic CPU % and RAM from `system_health`
+- Output from Run Tests / Run Audit / Restart
 
-### Control Panel (standalone mode only)
-
-Three action buttons — only visible when **not** running in Docker:
+### Control actions (local mode only)
 
 | Button | Action |
-|---|---|
-| **Run Tests** | Runs `pytest tests/unit -v` and streams output to the log |
-| **Run Audit** | Runs `./run_audit.sh` |
-| **Restart** | Launches `./start.sh` in the background |
+|--------|--------|
+| **Run Tests** | `pytest tests/unit -v --tb=short` |
+| **Run Audit** | `./run_audit.sh` or `scripts/audit_protocols.py` |
+| **Restart** | `./start.sh` in background |
+
+Hidden when `INDB_IN_DOCKER=true`.
 
 ---
 
 ## Tab 2 — Events
 
-Live searchable table of all events in memory.
+**Purpose:** See what INDB remembers — raw event stream with search.
 
-### Search Bar
+### Toolbar (one row)
 
-Type a query and press **Enter** or click **Search**. Client-side filter — searches across all event fields (location, tokens, ID, timestamp).
+| Control | Action |
+|---------|--------|
+| **Source ▾** | `All sources` (mixed per location), `Latest`, or a specific book/location |
+| **Filter** | Client-side filter; press Enter or **Filter** |
+| **API Search** | `GET /api/v2/search?q=...` server-side |
 
-```
-[ Search events (e.g. jerusalem)...   ] [Search]
-```
+### Table columns
 
-### Events Table
+| Column | Description |
+|--------|-------------|
+| **ID** | Short UUID; **⚡** = fused event |
+| **Time** | Local `HH:MM:SS` |
+| **Location** | e.g. `books/Orwell/1984` |
+| **Content** | Token anchor text (truncated) |
 
-| Column | Width | Content |
-|---|---|---|
-| **ID** | 12 | First 8 chars of UUID. `⚡` prefix = fused event |
-| **Time** | 10 | `HH:MM:SS` from event timestamp |
-| **Location** | 20 | Event location (truncated to 15 chars) |
-| **Content** | 60 | First token, or `event:`/`quote:` prefix stripped |
+### Example workflow
 
-The table fetches the latest 50 events from `GET /api/v2/events?limit=50` and refreshes every 3 seconds. While typing a filter, results update immediately on Enter.
-
-**Fused events** (`fusion_count > 0`) are marked with `⚡` in the ID column.
+1. Open Events → source **All sources**
+2. Type `kjv` in filter → **API Search**
+3. Copy an event ID → switch to **Query** → Echo Resonate
 
 ---
 
 ## Tab 3 — Modules
 
-Source connector modules (hermes, moltbook, etc.) and their status.
+**Purpose:** Monitor ingest connectors and system protocols.
 
-### Module Table
+### Source connectors
 
-Polls `/api/v2/modules` every 3 seconds:
+`GET /api/v2/modules` — polled on refresh.
 
-| Column | Content |
-|---|---|
-| **Module** | `hermes`, `moltbook`, etc. |
+| Column | Meaning |
+|--------|---------|
+| **Module** | Connector name (`hermes`, `moltbook`, …) |
 | **Enabled** | ✓ / ✗ |
-| **Status** | 🟢 running, 🟡 no_api_key, ⚪ disabled, 🔴 error |
-| **API Key** | ✓ / ✗ / — (if not required) |
+| **Status** | `running`, `no_api_key`, `disabled`, `error` |
+| **API Key** | ✓ / ✗ / — |
 
-**Shortcut:** Press `m` to jump to the Modules tab.
+### Active protocols
 
----
+`GET /api/v2/system/protocols` — HTTP, gRPC, UDP, WebSocket, etc.
 
-## Tab 4 — Load Balancer
-
-Real-time Raft cluster status across all 3 nodes.
-
-### Node Table
-
-Polls `/health` and `/raft/status` on each node every 3 seconds:
-
-| Column | Content |
-|---|---|
-| **Node** | `node-1`, `node-2`, `node-3` |
-| **Status** | `✅ UP` / `❌ DOWN` / `⚠️ ERROR` |
-| **Port** | External port (`8000`, `8004`, `8005`) |
-| **Role** | `👑 LEADER` or `Follower` (from Raft state) |
-
-### Cluster Health Summary
-
-```
-Active Nodes: 3/3 | Strategy: Round-Robin
-```
-
-Shows how many nodes are currently healthy and the load balancing strategy (HAProxy round-robin).
+**Shortcut:** `m` → Modules tab.
 
 ---
 
-## Tab 5 — Scripts
+## Tab 4 — Cluster
 
-One-click access to all operational scripts. Output streams live into the embedded log.
+**Purpose:** Check API reachability and Raft role for configured endpoints.
 
-### Script Buttons
+Polls `/health` and `/raft/status` per node from `INDB_CLUSTER_NODES` or the main API URL.
 
-| Button | Script | Purpose |
-|---|---|---|
-| 🩺 **Integrity Check** | `tests/integrity_check.py` | 7-point startup integrity test |
-| 🔍 **Explore DB** | `scripts/explore_db.py` | Browse events interactively |
-| 📡 **Verify Cluster** | `scripts/verify_cluster.py` | Check all 3 Raft nodes |
-| 🛡️ **Audit Protocols** | `scripts/audit_protocols.py` | Test all 6 transports |
-| 📚 **Analyze Books** | `scripts/analyze_books.py` | Run book corpus analysis |
-| 💬 **Query Examples** | `scripts/query_examples.py` | Demonstrate API queries |
-| 📥 **Load 5k Events** | `scripts/load_5000_events.py` | Seed 5000 test events |
-| 🦉 **Hermes Integration** | `scripts/test_hermes_integration.sh` | Test Hermes MCP and connector |
+| Column | Meaning |
+|--------|---------|
+| **Endpoint** | Host label |
+| **Status** | UP / DOWN |
+| **Port** | 443, 8000, … |
+| **Raft** | Leader (★) or Follower |
+| **Term** | Current Raft term |
 
-### Output Log
-
-Script stdout and stderr stream line-by-line into the **Output** log area below the buttons. Both stdout and stderr are shown, with `[ERR]` prefix on stderr lines.
-
-```
-[08:15:32] ▶  🩺 Integrity Check
-────────────────────────────────────────────────────────────
-  INFO  indb.integrity  ✓  INDB initialises  (20 events in memory)
-  INFO  indb.integrity  ✓  Storage loads without error  (20 raw items)
-  ...
-  INFO  indb.integrity  Result: 7/7 checks passed in 4212ms
-[08:15:36] Done (Exit 0)
-```
+Summary line: `Endpoints N/M up · Raft <status>`
 
 ---
 
-## Key Bindings
+## Tab 5 — Query
+
+**Purpose:** Interactive **Query Lab** — run cognitive API calls without curl.
+
+### Toolbar
+
+| Control | Role |
+|---------|------|
+| **Mode ▾** | Dropdown with ▾ marker (inline overlay, not modal) |
+| **Primary** | Main input; use `\|` for compound values |
+| **Secondary** | Optional second parameter |
+| **Tertiary** | Third parameter (paradox modes) |
+| **Run** | Execute query |
+| Hint line | Required fields for selected mode |
+
+### Modes and examples
+
+| Mode | Primary example | Notes |
+|------|-----------------|-------|
+| **Interpret** | `Neutral \| books/Bible/KJV \| peace` | mood \| location [\| goal] |
+| **Prism Synthesize** | `would have died` | text or event UUID |
+| **Prism Instinct** | `query text \| 0.7` | adrenaline 0.0–1.0 |
+| **Lens Query** | `recent \| historical` | context_a \| context_b |
+| **Echo Resonate** | `<event-uuid>` | seed from Events tab |
+| **Deduction** | `birthday cheese` | evidence text |
+| **What-If** | `whale \| captain` | base \| modifier |
+| **Context Slice** | `lord \| holy` | query \| modifier |
+| **Paradox Create** | `id1,id2` | Secondary=generation_mode, Tertiary=collapse_mode |
+| **Paradox Read** | `<paradox-uuid>` | |
+| **Recovery Identity** | `<key_id sha256>` | |
+
+Press **Enter** in Primary or Secondary to run.
+
+Output appears in the log below with **Copy log** (bottom-right).
+
+**Shortcut:** `p` → Query tab.
+
+See [Console Guide — Query Lab](./CONSOLE.md#query-lab--all-modes-with-examples) for curl equivalents.
+
+---
+
+## Tab 6 — Analytics
+
+**Purpose:** Deep system analytics beyond the Control summary.
+
+### Stats
+
+| Card | Source |
+|------|--------|
+| Health | `health_score` |
+| Locations | `database.unique_locations` |
+| Tokens | `tokens.unique_tokens` |
+| Fusion Rate | fusion metrics |
+| WS Clients | `websocket/stats` |
+
+### Insights
+
+Bullet list from `GET /api/v2/analytics/insights`.
+
+### Detail log
+
+JSON sections: Database, Fusion, Temporal, Performance, Cognitive, WebSocket.
+
+**Shortcut:** `a` → Analytics tab.
+
+---
+
+## Tab 7 — Scripts
+
+**Purpose:** Run maintenance/diagnostic scripts against the live API. stdout/stderr stream line-by-line into the log.
+
+| Button | Script |
+|--------|--------|
+| 🩺 Integrity Check | `tests/integrity_check.py` |
+| 🔍 Explore DB | `scripts/explore_db.py` |
+| 🛡️ Audit Protocols | `scripts/audit_protocols.py` |
+| 📊 Analyze Sources | `scripts/analyze_books.py` |
+| 💬 Query Examples | `scripts/query_examples.py` |
+| 🦉 Hermes Integration | `scripts/test_hermes_integration.sh` |
+
+Scripts receive `INDB_API_URL` from the TUI config. Only one script runs at a time.
+
+**Shortcut:** `s` → Scripts tab.
+
+---
+
+## Key bindings
 
 | Key | Action |
-|---|---|
-| `q` | Quit the TUI |
-| `r` | Force refresh (re-poll all widgets) |
-| `m` | Jump to the **Modules** tab |
-| `s` | Jump to the **Scripts** tab |
+|-----|--------|
+| `q` | Quit |
+| `r` | Refresh all pollable tabs |
+| `1`–`7` | Jump to tab by number |
+| `e` | Events |
+| `m` | Modules |
+| `p` | Query |
+| `a` | Analytics |
+| `s` | Scripts |
+| `y` | Copy log (when log focused) |
+
+`Ctrl+C` is **not** bound to quit (so copy works).
 
 ---
 
 ## Configuration
 
-| Environment Variable | Default | Description |
-|---|---|---|
-| `INDB_API_URL` | `http://localhost:8888` | API endpoint (load balancer or single node) |
-| `INDB_IN_DOCKER` | `false` | Hides Control Panel in Docker deployments |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `INDB_API_URL` | `https://api.indb.tech` | API base URL |
+| `INDB_CLUSTER_NODES` | — | Comma-separated URLs for Cluster tab |
+| `INDB_IN_DOCKER` | `false` | Hides local control buttons |
+| `INDB_VERSION` | `0.7.0` | Shown in header |
 
-The TUI loads `.env` from the project root automatically on startup (via `python-dotenv`).
+---
+
+## CLI entry point
+
+```bash
+cd db
+python3 -m cli.indb_cli tui
+python3 -m cli.indb_cli tui --api https://api.indb.tech
+```
 
 ---
 
 ## Troubleshooting
 
-**`Server: Stopped`** in the stats bar
-: The TUI cannot reach `INDB_API_URL/health`. Check that the server is running and the URL is correct.
+| Problem | Solution |
+|---------|----------|
+| `Server: Down` | Check `curl $INDB_API_URL/health` |
+| Empty Events | Try **All sources**; verify production has data |
+| Dropdown crash (`PickerOverlay`) | Stale process — `pkill -f cli.tui.app`; `./start_tui.sh` |
+| Log one long line | Fixed in build `2026-07-11e` — restart TUI |
+| Vertical lines on inputs | Fixed — flat `solid` borders in app CSS |
+| Script stuck | Wait for `Done (Exit N)`; scripts cannot be cancelled |
 
-**Empty Events table**
-: No events in the database yet. Run `python scripts/load_books.py` or click **Load 5k Events** in the Scripts tab.
+---
 
-**All nodes show `❌ DOWN`**
-: The cluster is not running. Use `docker compose up -d` or `./start.sh` to bring it up.
+## Related docs
 
-**Script output stuck**
-: The script is long-running. Wait for `Done (Exit 0)` or restart the TUI. Scripts run as async subprocesses and cannot be cancelled mid-run.
+- [Console Guide (TUI + WUI)](./CONSOLE.md)
+- [WUI Guide](./wui.md)
+- [Query Cookbook](./QUERY_COOKBOOK.md)

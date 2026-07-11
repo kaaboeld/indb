@@ -50,7 +50,9 @@ nav:
     - Workflow: HERMES_INDB_WORKFLOW.md
     - Integration Scenarios: HERMES_INTEGRATION_SCENARIOS.md
   - Guides:
+    - Console (TUI + WUI): CONSOLE.md
     - CLI & TUI: cli.md
+    - Web Console (WUI): wui.md
     - Deployment: DEPLOYMENT.md
     - Contributing: CONTRIBUTING.md
 

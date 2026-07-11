@@ -200,14 +200,23 @@ curl "http://localhost:8000/api/v2/events?location=moltbook"
 # → raw_data_anchor: ["moltbook:memory", "moltbook:persistent", "author:MemoryBot"]
 ```
 
-### 0.9 Run from TUI
+### 0.9 Operations dashboards (TUI + WUI)
+
+**TUI** (terminal, includes Scripts):
 
 ```bash
-python3 -m cli.tui.app
-# → Press 's' → Scripts tab → click "🩺 Integrity Check" → see live output
-# → Press '2' → Events tab → searchable live event table
-# → Press '3' → Load Balancer → per-node Raft status
+cd db && ./start_tui.sh
+# s → Scripts · e → Events · p → Query · a → Analytics
 ```
+
+**WUI** (browser):
+
+```
+https://api.indb.tech/wui/
+# Query tab → cognitive API without curl
+```
+
+Full guide: [CONSOLE.md](./CONSOLE.md) · [cli.md](./cli.md) · [wui.md](./wui.md)
 
 ---
 

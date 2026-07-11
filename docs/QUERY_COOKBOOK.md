@@ -1,10 +1,45 @@
 # INDB Query Cookbook
-> **1,732 fused events** · 5 locations · literary corpus
-> All queries: `http://localhost:8000`
+
+> Practical queries against a live INDB API — curl, WUI, and TUI.
+
+**Production API:** `https://api.indb.tech`  
+**Local cluster:** `http://localhost:8888` (HAProxy) or `http://localhost:8000` (single node)
 
 ---
 
-## 📊 Corpus Status
+## How to run these queries
+
+| Method | When to use | How |
+|--------|---------------|-----|
+| **WUI Query tab** | Browser, demos, JSON output | [https://api.indb.tech/wui/](https://api.indb.tech/wui/) → Query → pick mode → Run |
+| **TUI Query tab** | Terminal / SSH | `cd db && ./start_tui.sh` → Query (`p`) |
+| **curl** | Scripts, CI, automation | Examples below — replace base URL |
+| **Script** | Batch demo | `INDB_API_URL=https://api.indb.tech python3 scripts/query_examples.py` |
+
+Full mode reference: [Console Guide — Query Lab](./CONSOLE.md#query-lab--all-modes-with-examples).
+
+Set base URL once:
+
+```bash
+export INDB_API=https://api.indb.tech
+# or: export INDB_API=http://localhost:8000
+```
+
+---
+
+## Corpus status (start here)
+
+```bash
+curl -s "$INDB_API/api/v2/analytics/overview" | jq '.data.database'
+```
+
+Or open **Analytics** tab in WUI/TUI for live counts.
+
+---
+
+## 📊 Example corpus snapshot
+
+The samples below were captured from a literary corpus deployment. Your production numbers will differ.
 
 ```bash
 GET /api/v2/analytics/database
