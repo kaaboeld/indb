@@ -61,12 +61,19 @@ async def create_event(request: Request, event: EventCreate, db: IndbDep):
         event_data = {
             "raw_data_anchor": event.raw_data_anchor,
             "location": event.location,
+            "id": event.id,
+            "timestamp": event.timestamp,
             "ttl": event.ttl,
             "blind_payload": event.blind_payload,
+            "signature": event.signature,
         }
-        
-        # helper returns dict
-        new_event_dict = await db.create_event(event_data, auth)
+
+        try:
+            new_event_dict = await db.create_event(event_data, auth)
+        except ValueError as exc:
+            if "signature" in str(exc).lower():
+                raise HTTPException(status_code=422, detail=str(exc)) from exc
+            raise
 
         response_data = EventResponse(
             id=new_event_dict["id"],
@@ -75,6 +82,7 @@ async def create_event(request: Request, event: EventCreate, db: IndbDep):
             location=new_event_dict["location"],
             ttl=new_event_dict.get("ttl"),
             blind_payload=new_event_dict.get("blind_payload"),
+            signature=new_event_dict.get("signature"),
             is_fused="fusion_count" in new_event_dict,
             fusion_count=new_event_dict.get("fusion_count"),
         )

@@ -35,6 +35,7 @@ class Event:
         source_id: Optional[str] = None,
         fusion_count: int = 0,
         is_fused: bool = False,
+        signature: Optional[Dict[str, Any]] = None,
     ):
         self.id = id if id else str(uuid.uuid4())
         self.timestamp = timestamp if timestamp else time.time()
@@ -47,6 +48,7 @@ class Event:
         self.source_id = source_id
         self.fusion_count = fusion_count
         self.is_fused = is_fused
+        self.signature = signature
 
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -54,7 +56,7 @@ class Event:
         Note: binary_payload is excluded from standard dict/JSON serialization 
         unless handled explicitly by the caller, to prevent JSON errors.
         """
-        return {
+        d = {
             "id": self.id,
             "timestamp": self.timestamp,
             "raw_data_anchor": self.raw_data_anchor,
@@ -67,6 +69,9 @@ class Event:
             "fusion_count": self.fusion_count,
             "is_fused": self.is_fused,
         }
+        if self.signature:
+            d["signature"] = self.signature
+        return d
 
     @staticmethod
     def from_dict(d: Dict[str, Any]) -> "Event":
@@ -90,6 +95,7 @@ class Event:
             source_id=d.get("source_id"),
             fusion_count=d.get("fusion_count", 0),
             is_fused=d.get("is_fused", False),
+            signature=d.get("signature"),
         )
 
     def __repr__(self) -> str:

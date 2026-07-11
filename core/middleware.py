@@ -19,6 +19,7 @@ from cryptography.hazmat.primitives.asymmetric import ed25519
 from cryptography.hazmat.primitives import serialization
 from core.encryption import PayloadEncryptor
 from core.config import config
+from core.signing import compute_key_id
 
 # Prometheus Metrics
 REQUEST_COUNT = Counter(
@@ -136,6 +137,7 @@ class ResponseSigningMiddleware(BaseHTTPMiddleware):
                     "algorithm": "Ed25519",
                     "public_key": self.public_key_b64,
                     "signature": signature_b64,
+                    "key_id": compute_key_id(self.public_key_b64),
                     "timestamp": time.time()
                 }
                 

@@ -44,6 +44,8 @@ Traditional engines resolve contradictions — they pick one reading and discard
 
 **Paradox is not an error. It is a signal about the limits of perception.**
 
+This section describes **Prism paradox** (read-time, after observation). For **Paradox (type)** — pre-observation superposition with generation/collapse modes — see [PARADOX.md](./PARADOX.md).
+
 ---
 
 ## 3. Relational Meaning (Observer Context)
