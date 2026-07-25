@@ -35,8 +35,12 @@ async def send_contact(payload: ContactRequest):
     if not payload.email or not payload.message:
         raise HTTPException(status_code=422, detail="Email and message are required")
 
-    if not payload.consent:
-        raise HTTPException(status_code=422, detail="Consent is required")
+    consent_label = (
+        "Yes — data processing, newsletters, privacy policy"
+        if payload.consent
+        else "Not provided"
+    )
+    consent_color = "#4ade80" if payload.consent else "#666"
 
     html_body = f"""
     <div style="font-family: monospace; background:#0a0a0a; color:#fff; padding:32px; max-width:600px;">
@@ -56,7 +60,7 @@ async def send_contact(payload: ContactRequest):
         </tr>
         <tr>
           <td style="color:#666; font-size:11px; padding:8px 0;">CONSENT</td>
-          <td style="color:#4ade80; font-size:14px; padding:8px 0;">Yes — data processing, newsletters, privacy policy</td>
+          <td style="color:{consent_color}; font-size:14px; padding:8px 0;">{consent_label}</td>
         </tr>
       </table>
       <div style="margin-top:24px; padding:16px; border:1px solid #222; background:#111;">
