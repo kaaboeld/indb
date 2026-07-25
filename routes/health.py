@@ -50,7 +50,7 @@ async def health_check_v2(db: IndbDep):
         oom_prediction=stats.get("oom_prediction"),
         database={
             "total_events": db.get_event_count(),
-            "fused_events": stats["fusion"]["total_fused"],
+            "fused_events": stats["database"]["fused_events"],
             "fusion_rate": f"{stats['fusion']['fusion_rate']}%",
             "storage_efficiency": f"{stats['fusion']['storage_efficiency']}%",
             "events_saved": stats["fusion"]["events_saved"],

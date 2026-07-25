@@ -20,6 +20,7 @@ class ContactRequest(BaseModel):
     name: str
     email: str
     message: str
+    consent: bool = False
 
 
 @router.post("/contact")
@@ -33,6 +34,9 @@ async def send_contact(payload: ContactRequest):
 
     if not payload.email or not payload.message:
         raise HTTPException(status_code=422, detail="Email and message are required")
+
+    if not payload.consent:
+        raise HTTPException(status_code=422, detail="Consent is required")
 
     html_body = f"""
     <div style="font-family: monospace; background:#0a0a0a; color:#fff; padding:32px; max-width:600px;">
@@ -49,6 +53,10 @@ async def send_contact(payload: ContactRequest):
           <td style="color:#E53E3E; font-size:14px; padding:8px 0;">
             <a href="mailto:{payload.email}" style="color:#E53E3E;">{payload.email}</a>
           </td>
+        </tr>
+        <tr>
+          <td style="color:#666; font-size:11px; padding:8px 0;">CONSENT</td>
+          <td style="color:#4ade80; font-size:14px; padding:8px 0;">Yes — data processing, newsletters, privacy policy</td>
         </tr>
       </table>
       <div style="margin-top:24px; padding:16px; border:1px solid #222; background:#111;">
@@ -69,7 +77,7 @@ async def send_contact(payload: ContactRequest):
                 "Content-Type": "application/json",
             },
             json={
-                "from":    "INDB Contact <onboarding@resend.dev>",
+                "from":    "INDB Contact <mail@indb.tech>",
                 "to":      [CONTACT_TO],
                 "reply_to": payload.email,
                 "subject": f"INDB Inquiry from {payload.name}",

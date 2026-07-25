@@ -3,7 +3,8 @@ import time
 import asyncio
 import logging
 import random
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set
+from urllib.parse import urlparse
 from core.raft.state import RaftState, RaftStorage
 from core.raft.transport import RaftTransport
 
@@ -58,6 +59,15 @@ class RaftNode:
 
     def _get_random_timeout(self) -> float:
         return random.uniform(*self.election_timeout_range)
+
+    def _known_node_ids(self) -> Set[str]:
+        """Node IDs allowed to send consensus RPCs to this peer."""
+        ids = {self.node_id}
+        for peer in self.peers:
+            host = urlparse(peer).hostname
+            if host:
+                ids.add(host.split(".")[0])
+        return ids
         
     def start(self):
         """Start background consensus loop."""
@@ -272,6 +282,10 @@ class RaftNode:
     
     def on_request_vote(self, term: int, candidate_id: str, last_log_index: int = -1, last_log_term: int = 0) -> bool:
         """Handle RequestVote RPC."""
+        if candidate_id not in self._known_node_ids():
+            logger.warning("Raft: rejected vote from unknown candidate_id=%s", candidate_id)
+            return False
+
         # 1. Update Term
         if term > self.current_term:
             self.storage.save_state(term, None)
@@ -302,6 +316,10 @@ class RaftNode:
         
     def on_append_entries(self, term: int, leader_id: str, entries: List, prev_log_index: int, prev_log_term: int, leader_commit: int) -> bool:
         """Handle AppendEntries RPC."""
+        if leader_id not in self._known_node_ids():
+            logger.warning("Raft: rejected append from unknown leader_id=%s", leader_id)
+            return False
+
         if term > self.current_term:
             self.storage.save_state(term, None)
             self.state = RaftState.FOLLOWER

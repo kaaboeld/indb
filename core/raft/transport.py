@@ -2,21 +2,31 @@ import httpx
 import asyncio
 from typing import Dict, Any, Optional
 
+from core.config import config
+from core.raft.auth import RAFT_RPC_TOKEN_HEADER
+
 class RaftTransport:
     """Transport layer for Raft communication (HTTP implementation)."""
     
-    def __init__(self, timeout: float = 0.5, max_retries: int = 2):  # Fix #3: 500ms timeout (was 10s)
+    def __init__(self, timeout: float = 0.5, max_retries: int = 2, rpc_token: Optional[str] = None):  # Fix #3: 500ms timeout (was 10s)
         self.timeout = timeout
         self.max_retries = max_retries
+        self.rpc_token = rpc_token if rpc_token is not None else config.RAFT_RPC_TOKEN
+
+    def _rpc_headers(self) -> Dict[str, str]:
+        if not self.rpc_token:
+            return {}
+        return {RAFT_RPC_TOKEN_HEADER: self.rpc_token}
         
     async def _send_rpc(self, method: str, target_url: str, endpoint: str, payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Generic RPC sender with retry logic."""
         url = f"{target_url}/raft/{endpoint}"
+        headers = self._rpc_headers()
         for attempt in range(self.max_retries):
             try:
                 async with httpx.AsyncClient(timeout=self.timeout) as client:
                     if method == "POST":
-                        resp = await client.post(url, json=payload)
+                        resp = await client.post(url, json=payload, headers=headers)
                     else:
                         resp = await client.get(url, params=payload)
                         

@@ -69,6 +69,8 @@ class Settings(BaseSettings):
     # Raft
     RAFT_NODE_ID: Optional[str] = None
     RAFT_PEERS: str = ""
+    # Shared secret for /raft/vote and /raft/append — required when peers > 0.
+    RAFT_RPC_TOKEN: Optional[str] = None
     DATA_DIR: str = "."
     
     # OpenTelemetry

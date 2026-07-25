@@ -86,6 +86,24 @@ class TestRaftConsensus:
         assert node.storage.current_term == 1
         assert node.storage.voted_for == "node2"
         
+    def test_on_request_vote_reject_unknown_candidate(self, node_env):
+        node = node_env
+        granted = node.on_request_vote(term=5, candidate_id="attacker")
+        assert granted is False
+        assert node.voted_for is None
+
+    def test_on_append_entries_reject_unknown_leader(self, node_env):
+        node = node_env
+        success = node.on_append_entries(
+            term=5,
+            leader_id="attacker",
+            entries=[],
+            prev_log_index=-1,
+            prev_log_term=0,
+            leader_commit=0,
+        )
+        assert success is False
+        
     def test_on_request_vote_reject_old_term(self, node_env):
         """Test rejecting vote from old term."""
         node = node_env

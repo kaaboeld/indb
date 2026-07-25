@@ -9,6 +9,7 @@ set -euo pipefail
 APP="${FLY_APP_NAME:-indb}"
 REGION="${FLY_REGION:-fra}"
 STANDALONE=false
+RAFT_RPC_TOKEN="${RAFT_RPC_TOKEN:-$(openssl rand -hex 32)}"
 
 # Parse flags
 for arg in "$@"; do
@@ -139,6 +140,7 @@ fly machine run \
   --env "RAFT_ENABLED=true" \
   --env "RAFT_NODE_ID=indb-node-1" \
   --env "RAFT_PEERS=http://indb-node-2.process.$APP.internal:8000,http://indb-node-3.process.$APP.internal:8000" \
+  --env "RAFT_RPC_TOKEN=$RAFT_RPC_TOKEN" \
   --env "DATA_DIR=/data" \
   --env "PORT=8000" \
   --env "LOG_LEVEL=INFO" \
@@ -159,6 +161,7 @@ fly machine run \
   --env "RAFT_ENABLED=true" \
   --env "RAFT_NODE_ID=indb-node-2" \
   --env "RAFT_PEERS=http://indb-node-1.process.$APP.internal:8000,http://indb-node-3.process.$APP.internal:8000" \
+  --env "RAFT_RPC_TOKEN=$RAFT_RPC_TOKEN" \
   --env "DATA_DIR=/data" \
   --env "PORT=8000" \
   --env "LOG_LEVEL=INFO" \
@@ -179,6 +182,7 @@ fly machine run \
   --env "RAFT_ENABLED=true" \
   --env "RAFT_NODE_ID=indb-node-3" \
   --env "RAFT_PEERS=http://indb-node-1.process.$APP.internal:8000,http://indb-node-2.process.$APP.internal:8000" \
+  --env "RAFT_RPC_TOKEN=$RAFT_RPC_TOKEN" \
   --env "DATA_DIR=/data" \
   --env "PORT=8000" \
   --env "LOG_LEVEL=INFO" \
