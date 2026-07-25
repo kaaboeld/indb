@@ -22,69 +22,33 @@ def get_fusion_stats(db) -> Dict[str, Any]:
         Fusion statistics and metrics
     """
     try:
-        from services.fusion.engine import FusedEvent
+        from services.fusion.metrics import compute_fusion_metrics, is_fused_record
     except ImportError:
         return {"error": "Event Fusion module not available"}
-    
-    total_events = len(db.memory)
-    fused_events = [e for e in db.memory if isinstance(e, FusedEvent)]
-    regular_events = total_events - len(fused_events)
-    
-    # Calculate total fusion count (how many original events were fused)
-    total_fusions = sum(e.fusion_count for e in fused_events)
-    
-    # Pattern distribution
-    patterns = {}
-    for event in fused_events:
-        pattern = event.temporal_span.get("pattern", "unknown")
-        patterns[pattern] = patterns.get(pattern, 0) + 1
-    
-    # Fusion type distribution
-    fusion_types = {}
-    for event in fused_events:
-        fusion_types[event.fusion_type] = fusion_types.get(event.fusion_type, 0) + 1
-    
-    # Top fused events (by fusion count)
-    top_fused = sorted(fused_events, key=lambda e: e.fusion_count, reverse=True)[:5]
-    
-    # Token evolution (most common tokens in fused events)
+
+    metrics = compute_fusion_metrics(db.memory)
+    fused_events = [e for e in db.memory if is_fused_record(e)]
+
     token_frequency = {}
     for event in fused_events:
         for token in event.raw_data_anchor:
             token_frequency[token] = token_frequency.get(token, 0) + 1
-    
+
     top_tokens = sorted(token_frequency.items(), key=lambda x: x[1], reverse=True)[:10]
-    
-    # Calculate fusion rate
-    fusion_rate = (len(fused_events) / total_events * 100) if total_events > 0 else 0
-    
-    # Storage efficiency (how many events saved by fusion)
-    events_saved = total_fusions - len(fused_events)
-    storage_efficiency = (events_saved / total_fusions * 100) if total_fusions > 0 else 0
-    
+
     return {
         "summary": {
-            "total_events": total_events,
-            "fused_events": len(fused_events),
-            "regular_events": regular_events,
-            "total_fusions": total_fusions,
-            "fusion_rate": round(fusion_rate, 2),
-            "storage_efficiency": round(storage_efficiency, 2),
-            "events_saved": events_saved
+            "total_events": metrics["total_events"],
+            "fused_events": metrics["fused_events"],
+            "regular_events": metrics["regular_events"],
+            "total_fusions": metrics["total_fusions"],
+            "fusion_rate": metrics["fusion_rate"],
+            "storage_efficiency": metrics["storage_efficiency"],
+            "events_saved": metrics["events_saved"],
         },
-        "patterns": patterns,
-        "fusion_types": fusion_types,
-        "top_fused_events": [
-            {
-                "id": e.id[:8],
-                "fusion_count": e.fusion_count,
-                "fusion_type": e.fusion_type,
-                "pattern": e.temporal_span.get("pattern", "unknown"),
-                "tokens": e.raw_data_anchor[:5],  # First 5 tokens
-                "location": e.location
-            }
-            for e in top_fused
-        ],
+        "patterns": metrics["patterns"],
+        "fusion_types": metrics["fusion_types"],
+        "top_fused_events": metrics["top_fused"],
         "top_tokens": [
             {"token": token, "frequency": freq}
             for token, freq in top_tokens
@@ -129,12 +93,16 @@ async def top_fused_events(limit: int = 10):
     """
     from main import db
     try:
-        from services.fusion.engine import FusedEvent
+        from services.fusion.metrics import is_fused_record
     except ImportError:
         return {"error": "Event Fusion module not available"}
     
-    fused_events = [e for e in db.memory if isinstance(e, FusedEvent)]
-    top = sorted(fused_events, key=lambda e: e.fusion_count, reverse=True)[:limit]
+    fused_events = [e for e in db.memory if is_fused_record(e)]
+    top = sorted(
+        [e for e in fused_events if int(getattr(e, "fusion_count", 0) or 0) > 0],
+        key=lambda e: int(getattr(e, "fusion_count", 0) or 0),
+        reverse=True,
+    )[:limit]
     
     return {
         "top_fused_events": [

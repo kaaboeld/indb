@@ -9,6 +9,7 @@ from fastapi import APIRouter, Request, HTTPException
 
 from core.deps import IndbDep
 from core.models import StandardResponse
+from services.fusion.metrics import compute_fusion_metrics, is_fused_record
 
 router = APIRouter(prefix="/api/v2", tags=["analytics"])
 
@@ -21,7 +22,7 @@ router = APIRouter(prefix="/api/v2", tags=["analytics"])
 async def fusion_statistics(db: IndbDep):
     """Get Event Fusion statistics (v2)."""
     try:
-        from services.fusion import FusedEvent
+        from services.fusion.metrics import compute_fusion_metrics
     except ImportError:
         return StandardResponse(
             data={},
@@ -30,32 +31,18 @@ async def fusion_statistics(db: IndbDep):
             meta={"error": "Event Fusion module not available"},
         )
 
-    all_events = list(db.iter_events())
-    fused_events = [e for e in all_events if isinstance(e, FusedEvent)]
-    regular_events = [e for e in all_events if not isinstance(e, FusedEvent)]
-
-    total_fusions = sum(e.fusion_count for e in fused_events)
-    total = db.get_event_count()
-    original_count = total + total_fusions - len(fused_events)
-
-    fusion_rate = (len(fused_events) / total * 100) if total else 0
-    storage_efficiency = (
-        ((original_count - total) / original_count * 100)
-        if original_count > 0
-        else 0
-    )
-
+    metrics = compute_fusion_metrics(list(db.iter_events()))
     data = {
         "summary": {
-            "total_events": total,
-            "fused_events": len(fused_events),
-            "regular_events": len(regular_events),
-            "total_fusions": total_fusions,
+            "total_events": metrics["total_events"],
+            "fused_events": metrics["fused_events"],
+            "regular_events": metrics["regular_events"],
+            "total_fusions": metrics["total_fusions"],
         },
         "metrics": {
-            "fusion_rate": round(fusion_rate, 2),
-            "storage_efficiency": round(storage_efficiency, 2),
-            "events_saved": original_count - total,
+            "fusion_rate": metrics["fusion_rate"],
+            "storage_efficiency": metrics["storage_efficiency"],
+            "events_saved": metrics["events_saved"],
         },
     }
 
@@ -72,7 +59,7 @@ async def fusion_patterns(db: IndbDep):
             data={}, status="error", meta={"error": "Event Fusion module not available"}
         )
 
-    fused_events = [e for e in db.iter_events() if isinstance(e, FusedEvent)]
+    fused_events = [e for e in db.iter_events() if is_fused_record(e)]
     patterns: Dict[str, int] = {}
     for event in fused_events:
         pattern = getattr(event, "pattern", "unknown")
@@ -91,8 +78,12 @@ async def top_fused_events(db: IndbDep, limit: int = 10):
             data=[], status="error", meta={"error": "Event Fusion module not available"}
         )
 
-    fused_events = [e for e in db.iter_events() if isinstance(e, FusedEvent)]
-    top = sorted(fused_events, key=lambda e: e.fusion_count, reverse=True)[:limit]
+    fused_events = [e for e in db.iter_events() if is_fused_record(e)]
+    top = sorted(
+        [e for e in fused_events if int(getattr(e, "fusion_count", 0) or 0) > 0],
+        key=lambda e: int(getattr(e, "fusion_count", 0) or 0),
+        reverse=True,
+    )[:limit]
 
     data = [
         {

@@ -290,6 +290,8 @@ docker-compose up -d indb-node-3
 
 ### Security Checklist
 
+- [ ] Set `RAFT_RPC_TOKEN` (shared secret) on every node — protects `/raft/vote` and `/raft/append` from external consensus DoS
+- [ ] Keep `/raft/status` read-only observability; never expose unauthenticated write RPCs on public URLs
 - [ ] Enable TLS for inter-node communication
 - [ ] Use strong encryption keys (rotate regularly)
 - [ ] Restrict network access (firewall rules)

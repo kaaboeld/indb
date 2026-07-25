@@ -72,6 +72,12 @@ def create_app() -> FastAPI:
         logger.info("Raft consensus: initializing node=%s", config.RAFT_NODE_ID)
         cleaned_peers = [p for p in config.raft_peers_list if config.RAFT_NODE_ID not in p]
 
+        if cleaned_peers and not config.RAFT_RPC_TOKEN:
+            raise RuntimeError(
+                "RAFT_RPC_TOKEN is required when Raft runs with peers — "
+                "set a shared secret to protect /raft/vote and /raft/append"
+            )
+
         raft_node = RaftNode(
             node_id=config.RAFT_NODE_ID,
             peers=cleaned_peers,

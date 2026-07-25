@@ -12,6 +12,7 @@ services:
       - RAFT_ENABLED=${RAFT_ENABLED:-true}
       - RAFT_NODE_ID=${RAFT_NODE_1_ID:-indb-node-1}
       - RAFT_PEERS=${RAFT_NODE_1_PEERS:-http://indb-node-2:8000,http://indb-node-3:8000}
+      - RAFT_RPC_TOKEN=${RAFT_RPC_TOKEN:?set RAFT_RPC_TOKEN for multi-node Raft}
       - INDB_USE_SSL=${INDB_USE_SSL:-false}
       - PORT=${INDB_PORT:-8000}
       - DATA_DIR=${DATA_DIR:-/data}
@@ -44,6 +45,7 @@ services:
       - RAFT_ENABLED=${RAFT_ENABLED:-true}
       - RAFT_NODE_ID=${RAFT_NODE_2_ID:-indb-node-2}
       - RAFT_PEERS=${RAFT_NODE_2_PEERS:-http://indb-node-1:8000,http://indb-node-2:8000,http://indb-node-3:8000}
+      - RAFT_RPC_TOKEN=${RAFT_RPC_TOKEN:?set RAFT_RPC_TOKEN for multi-node Raft}
       - INDB_USE_SSL=${INDB_USE_SSL:-false}
       - PORT=${INDB_PORT:-8000}
       - DATA_DIR=${DATA_DIR:-/data}
@@ -78,6 +80,7 @@ services:
       - RAFT_ENABLED=${RAFT_ENABLED:-true}
       - RAFT_NODE_ID=${RAFT_NODE_3_ID:-indb-node-3}
       - RAFT_PEERS=${RAFT_NODE_3_PEERS:-http://indb-node-1:8000,http://indb-node-2:8000,http://indb-node-3:8000}
+      - RAFT_RPC_TOKEN=${RAFT_RPC_TOKEN:?set RAFT_RPC_TOKEN for multi-node Raft}
       - INDB_USE_SSL=${INDB_USE_SSL:-false}
       - PORT=${INDB_PORT:-8000}
       - DATA_DIR=${DATA_DIR:-/data}

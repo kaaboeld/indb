@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 from core.raft.node import RaftNode
+from core.raft.auth import require_raft_rpc_token
 
 router = APIRouter(prefix="/raft", tags=["Raft Consensus"])
 
@@ -22,7 +23,7 @@ class AppendRequest(BaseModel):
     prev_log_term: int = 0
     leader_commit: int = 0
 
-@router.post("/vote")
+@router.post("/vote", dependencies=[Depends(require_raft_rpc_token)])
 async def request_vote(req: VoteRequest):
     if not raft_node:
         raise HTTPException(503, "Raft Node not initialized")
@@ -35,7 +36,7 @@ async def request_vote(req: VoteRequest):
     )
     return {"term": raft_node.current_term, "vote_granted": granted}
 
-@router.post("/append")
+@router.post("/append", dependencies=[Depends(require_raft_rpc_token)])
 async def append_entries(req: AppendRequest):
     if not raft_node:
         raise HTTPException(503, "Raft Node not initialized")

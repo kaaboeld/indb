@@ -5,10 +5,14 @@ Database-level analytics and reporting system.
 Provides insights into events, patterns, fusion, and performance.
 """
 
-from typing import Dict, List, Any, Optional
-from collections import Counter, defaultdict
-from datetime import datetime
+import logging
 import time
+from collections import Counter
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from core.temporal_fields import temporal_fields_from_event
+from services.fusion.metrics import compute_fusion_metrics, is_fused_record
 
 from core.constants import (
     ANALYTICS_SYSTEM_HISTORY_LIMIT,
@@ -179,15 +183,8 @@ class INDBAnalytics:
         """Get basic database statistics."""
         events = self.db.memory
 
-        # Count event types
-        regular_events = []
-        fused_events = []
-
-        for event in events:
-            if hasattr(event, "fusion_count"):
-                fused_events.append(event)
-            else:
-                regular_events.append(event)
+        fused_count = sum(1 for event in events if is_fused_record(event))
+        regular_count = len(events) - fused_count
 
         # Location distribution
         locations = Counter(e.location for e in events)
@@ -198,8 +195,8 @@ class INDBAnalytics:
 
         return {
             "total_events": len(events),
-            "regular_events": len(regular_events),
-            "fused_events": len(fused_events),
+            "regular_events": regular_count,
+            "fused_events": fused_count,
             "unique_locations": len(locations),
             "top_locations": dict(locations.most_common(5)),
             "age_stats": {
@@ -212,12 +209,8 @@ class INDBAnalytics:
 
     def get_fusion_stats(self) -> Dict[str, Any]:
         """Get Event Fusion statistics."""
-        events = self.db.memory
-
-        fused_events = [e for e in events if hasattr(e, "fusion_count")]
-        regular_events = [e for e in events if not hasattr(e, "fusion_count")]
-
-        if not fused_events:
+        metrics = compute_fusion_metrics(self.db.memory)
+        if not metrics["enabled"]:
             return {
                 "enabled": False,
                 "total_fused": 0,
@@ -225,45 +218,7 @@ class INDBAnalytics:
                 "storage_efficiency": 0.0,
                 "events_saved": 0,
             }
-
-        # Calculate metrics
-        total_fusions = sum(e.fusion_count for e in fused_events)
-        original_count = len(events) + total_fusions - len(fused_events)
-
-        fusion_rate = (len(fused_events) / len(events) * 100) if events else 0
-        storage_efficiency = (
-            ((original_count - len(events)) / original_count * 100) if original_count > 0 else 0
-        )
-
-        # Fusion types distribution
-        fusion_types = Counter(e.fusion_type for e in fused_events if hasattr(e, "fusion_type"))
-
-        # Pattern distribution
-        patterns = Counter(e.pattern for e in fused_events if hasattr(e, "pattern"))
-
-        # Top fused events
-        top_fused = sorted(fused_events, key=lambda e: e.fusion_count, reverse=True)[:5]
-
-        return {
-            "enabled": True,
-            "total_fused": len(fused_events),
-            "total_fusions": total_fusions,
-            "fusion_rate": round(fusion_rate, 2),
-            "storage_efficiency": round(storage_efficiency, 2),
-            "events_saved": original_count - len(events),
-            "fusion_types": dict(fusion_types),
-            "patterns": dict(patterns),
-            "top_fused": [
-                {
-                    "id": e.id[:8],
-                    "fusion_count": e.fusion_count,
-                    "pattern": getattr(e, "pattern", "unknown"),
-                    "tokens": e.raw_data_anchor[:5],
-                    "location": e.location,
-                }
-                for e in top_fused
-            ],
-        }
+        return metrics
 
     def get_temporal_stats(self) -> Dict[str, Any]:
         """Get temporal pattern statistics."""
@@ -279,18 +234,11 @@ class INDBAnalytics:
         seasons = []
 
         for event in events:
-            if hasattr(event, "temporal_metadata") and event.temporal_metadata:
-                meta = event.temporal_metadata
-                if "month" in meta:
-                    months.append(meta["month"])
-                if "day_of_week" in meta:
-                    days_of_week.append(meta["day_of_week"])
-                if "season" in meta:
-                    seasons.append(meta["season"])
-
-            # Extract hour from timestamp
-            dt = datetime.fromtimestamp(event.timestamp)
-            hours.append(dt.hour)
+            fields = temporal_fields_from_event(event)
+            months.append(fields["month"])
+            days_of_week.append(fields["day_of_week"])
+            hours.append(fields["hour"])
+            seasons.append(fields["season"])
 
         return {
             "month_distribution": dict(Counter(months)),
@@ -410,7 +358,11 @@ class INDBAnalytics:
             "avg_load": round(avg_load, 2),
             "avg_resonance": round(avg_res, 2),
             "current_load": self.cognitive_history[-1]["load"],
-            "current_resonance": self.cognitive_history[-1]["resonance"]
+            "current_resonance": self.cognitive_history[-1]["resonance"],
+            "units": {
+                "load": "query complexity score (events_scanned × 0.05, unbounded)",
+                "resonance": "mean activation_score of matched results (0.0–1.0)",
+            },
         }
 
     def generate_report(self, format: str = "text") -> str:
@@ -502,21 +454,33 @@ class INDBAnalytics:
         insights = []
         overview = self.get_overview()
 
-        # Fusion insights
+        # Fusion insights — use merge outcomes, not fused-record share (fusion_rate).
         fusion = overview["fusion"]
+        performance = overview["performance"]
         if fusion.get("enabled"):
-            if fusion["fusion_rate"] > 70:
+            events_saved = fusion.get("events_saved", 0)
+            storage_eff = fusion.get("storage_efficiency", 0)
+            compression = performance.get("fusion_compression_rate", 0)
+            total_events = fusion.get("total_events", 0)
+
+            if events_saved > 0 and storage_eff >= 50:
                 insights.append(
-                    f"✅ High fusion rate ({fusion['fusion_rate']}%) - excellent storage efficiency"
+                    f"💾 Saving {events_saved} events through fusion ({storage_eff}% merge efficiency)"
                 )
-            elif fusion["fusion_rate"] < 30:
+            elif events_saved > 0:
                 insights.append(
-                    f"⚠️  Low fusion rate ({fusion['fusion_rate']}%) - consider adjusting similarity threshold"
+                    f"💾 {events_saved} duplicate ingestions merged into existing records"
                 )
 
-            if fusion["storage_efficiency"] > 50:
+            if compression >= 10:
                 insights.append(
-                    f"💾 Saving {fusion['events_saved']} events through fusion ({fusion['storage_efficiency']}% efficiency)"
+                    f"✅ Corpus compression {compression}% — fusion is reducing storage footprint"
+                )
+
+            # Warn only when nothing merged despite a sizable, likely repetitive corpus.
+            if total_events >= 100 and events_saved == 0 and compression < 0.5:
+                insights.append(
+                    "⚠️  No fusion merges detected — consider lowering similarity threshold if ingesting repetitive data"
                 )
 
         # Token insights
