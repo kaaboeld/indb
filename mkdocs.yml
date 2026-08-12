@@ -37,6 +37,7 @@ nav:
     - Authentication: AUTHENTICATION.md
     - Typing System: TYPING.md
     - Paradox Patterns: PARADOX.md
+    - Grain (Identity Tolerance): GRAIN.md
     - Signed Memory Recovery: SIGNED_MEMORY_RECOVERY.md
     - Cognitive Firewall: COGNITIVE_FIREWALL.md
   - Reference:

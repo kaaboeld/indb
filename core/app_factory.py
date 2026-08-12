@@ -203,7 +203,7 @@ def create_app() -> FastAPI:
     # GraphQL
     graphql_app = GraphQLRouter(graphql_schema)
     app.include_router(graphql_app, prefix="/graphql")
-    from routes import events, query, websockets, health, system, analytics, echo, prism, instinct, deduction, what_if, slice, subwave, recovery, paradox
+    from routes import events, query, websockets, health, system, analytics, echo, prism, instinct, deduction, what_if, slice, subwave, recovery, paradox, grain
 
     app.include_router(health.router)
     app.include_router(events.router)
@@ -220,6 +220,7 @@ def create_app() -> FastAPI:
     app.include_router(what_if.router)
     app.include_router(slice.router)
     app.include_router(subwave.router)
+    app.include_router(grain.router)
     app.include_router(lens_router)
     app.include_router(contact_router)
     
