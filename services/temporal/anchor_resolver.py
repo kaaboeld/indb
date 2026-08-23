@@ -63,22 +63,50 @@ class HolidaysLayer(AnchorLayer):
             self._available = False
             logger.info("HolidaysLayer: holidays library not installed, layer disabled")
 
-    def get_holidays(self, year: int, country: str, region: Optional[str]) -> Dict[date, str]:
-        if not self._available:
-            return {}
+    # The library returns names in the country's own language, so a German calendar
+    # answers "Neujahr" and an English query never matches it. Asking for this locale
+    # gives the English names too; plain "en" is silently ignored by the library.
+    _ENGLISH_LOCALE = "en_US"
+
+    def _fetch(
+        self,
+        year: int,
+        country: str,
+        region: Optional[str],
+        language: Optional[str] = None,
+    ) -> Dict[date, str]:
         try:
             kwargs: Dict[str, Any] = {"years": year}
             if region:
                 kwargs["subdiv"] = region
-            cal = self._lib.country_holidays(country, **kwargs)
-            return dict(cal)
+            if language:
+                kwargs["language"] = language
+            return dict(self._lib.country_holidays(country, **kwargs))
         except (KeyError, NotImplementedError):
-            # Country or region not supported by the library
-            logger.debug("HolidaysLayer: %s/%s not supported", country, region)
+            # Country, region or translation not supported by the library
+            logger.debug(
+                "HolidaysLayer: %s/%s (language=%s) not supported", country, region, language
+            )
             return {}
         except Exception as exc:
             logger.warning("HolidaysLayer error: %s", exc)
             return {}
+
+    def get_holidays(self, year: int, country: str, region: Optional[str]) -> Dict[date, str]:
+        if not self._available:
+            return {}
+
+        local = self._fetch(year, country, region)
+        english = self._fetch(year, country, region, language=self._ENGLISH_LOCALE)
+        if not english or english == local:
+            return local
+
+        # Both spellings live in the matched string, so either language resolves.
+        merged = dict(english)
+        for holiday_date, name in local.items():
+            other = english.get(holiday_date)
+            merged[holiday_date] = f"{name} / {other}" if other and other != name else name
+        return merged
 
 
 # ---------------------------------------------------------------------------

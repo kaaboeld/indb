@@ -363,8 +363,8 @@ class INDBKernel:
             
             # Dispatch Webhook (Fire & Forget)
             try:
-                # Ensure we have a loop
-                loop = asyncio.get_event_loop()
+                # ingest() is always awaited, so a loop is running here
+                loop = asyncio.get_running_loop()
                 loop.create_task(self.webhooks.dispatch(event_dict))
             except Exception as e:
                 logger.warning(

@@ -195,7 +195,7 @@ pytest tests/integration/ -v
 
 ```bash
 # Check server is accessible
-curl http://localhost:8003/health
+curl http://localhost:8000/health
 
 # Run with lower concurrency
 # Edit tests/performance/load_test.py

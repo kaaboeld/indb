@@ -22,6 +22,27 @@ class MessagePackResponse(Response):
     def render(self, content: Any) -> bytes:
         return msgpack.packb(content, use_bin_type=True)
 
+def _holds_json_body(response: Any) -> bool:
+    """True for a fully rendered JSON body that can be re-serialised."""
+    if not isinstance(response, Response):
+        return False
+    media_type = response.media_type or response.headers.get("content-type", "")
+    if "application/json" not in media_type:
+        return False
+    return bool(getattr(response, "body", None))
+
+
+def _carried_headers(response: Response) -> dict:
+    """
+    Headers of the original response, minus the ones re-rendering invalidates.
+
+    Rebuilding the response would otherwise drop everything the endpoint set on it —
+    rate limit counters among them — because a fresh Response starts with none.
+    """
+    dropped = {"content-length", "content-type"}
+    return {k: v for k, v in response.headers.items() if k.lower() not in dropped}
+
+
 class ContentNegotiationRoute(APIRoute):
     """
     Custom API Route that handles Content Negotiation.
@@ -40,40 +61,32 @@ class ContentNegotiationRoute(APIRoute):
         async def custom_route_handler(request: Request) -> Response:
             # Execute original handler
             response = await original_route_handler(request)
-            
-            # If interaction failed or returned raw Response, skip negotiation
-            if isinstance(response, Response) and response.media_type != "application/json":
+
+            # Recognised by content type rather than response class: an endpoint that
+            # declares a response_model is served through a fast path that returns a plain
+            # Response holding JSON bytes, so checking for JSONResponse would miss almost
+            # every route. Streams (CSV export, SSE) carry no .body and pass through.
+            if not _holds_json_body(response):
                 return response
-            
-            # Get Accept header
+
+            content = json.loads(response.body)
             accept_header = request.headers.get("accept", "application/json")
-            
-            # Handle MessagePack format
-            if "application/msgpack" in accept_header or "application/x-msgpack" in accept_header:
-                if isinstance(response, JSONResponse):
-                    # Deserialize JSON body to dict
-                    content_dict = json.loads(response.body)
-                    
-                    # Inject format metadata
-                    if isinstance(content_dict, dict) and "meta" in content_dict:
-                        if content_dict["meta"] is None:
-                            content_dict["meta"] = {}
-                        content_dict["meta"]["format"] = "msgpack"
-                    
-                    return MessagePackResponse(content=content_dict)
-            
-            # Default JSON processing
-            if isinstance(response, JSONResponse):
-                content_dict = json.loads(response.body)
-                # Inject format metadata
-                if isinstance(content_dict, dict) and "meta" in content_dict:
-                    if content_dict["meta"] is None:
-                        content_dict["meta"] = {}
-                    content_dict["meta"]["format"] = "json"
-                
-                # Re-render JSON with new metadata
-                return JSONResponse(content=content_dict, status_code=response.status_code)
-                
-            return response
+            wants_msgpack = (
+                "application/msgpack" in accept_header
+                or "application/x-msgpack" in accept_header
+            )
+
+            if isinstance(content, dict) and "meta" in content:
+                if content["meta"] is None:
+                    content["meta"] = {}
+                content["meta"]["format"] = "msgpack" if wants_msgpack else "json"
+
+            response_class = MessagePackResponse if wants_msgpack else JSONResponse
+            return response_class(
+                content=content,
+                status_code=response.status_code,
+                headers=_carried_headers(response),
+                background=response.background,
+            )
 
         return custom_route_handler

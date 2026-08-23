@@ -54,7 +54,7 @@ Updated `load_key()` to use `FileEncryptor.generate_master_key()` instead of `Fe
 ### Migration Required
 
 Users need to:
-1. Export data before upgrade: `GET /api/v2/events/export`
+1. Export data before upgrade: `GET /api/v2/export/json`
 2. Upgrade INDB
 3. Re-import data: `POST /api/v2/events/batch`
 
@@ -73,16 +73,16 @@ To test the new encryption:
 ./start.sh
 
 # Add some events
-curl -X POST http://localhost:8003/api/v2/events \
+curl -X POST http://localhost:8000/api/v2/events \
   -H "Content-Type: application/json" \
-  -d '{"data": {"test": "encrypted"}}'
+  -d '{"raw_data_anchor": ["test", "encrypted"], "location": "lab/encryption"}'
 
 # Check indb.bin is encrypted
 hexdump -C indb.bin | head
 
 # Restart and verify data persists
 ./start.sh
-curl http://localhost:8003/api/v2/events
+curl http://localhost:8000/api/v2/events
 ```
 
 ## Next Steps

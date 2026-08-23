@@ -33,6 +33,14 @@ export INDB_API=https://api.indb.tech
 curl -s "$INDB_API/api/v2/analytics/overview" | jq '.data.database'
 ```
 
+For just the headline count, `/api/v2/analytics` puts `total_events` at the top level. Cache
+hit rates live at `/api/v2/cache/stats` — a low hit rate on repeated identical reads means
+writes are invalidating the page between them:
+
+```bash
+curl -s "$INDB_API/api/v2/cache/stats" | jq '.data.query_cache'
+```
+
 Or open **Analytics** tab in WUI/TUI for live counts.
 
 ---

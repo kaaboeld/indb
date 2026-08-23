@@ -15,6 +15,7 @@ pydantic-settings
 # Security & Crypto
 cryptography
 passlib
+bcrypt  # imported directly by auth/security.py for password hashing
 python-jose[cryptography]
 
 # WebAuthn
@@ -31,6 +32,9 @@ websockets
 rich
 textual
 httpx
+# cli/indb_cli.py and sdk/python/indb_client.py import it directly, so without it the CLI
+# (fsck, tui, query) cannot start in a clean install.
+requests
 
 # Testing
 pytest-asyncio  # For async tests
@@ -63,6 +67,11 @@ aiohttp
 
 # Security & Compliance
 cyclonedx-bom
+
+# Temporal anchors
+# Without it AnchorResolver falls back to the Nager.Date HTTP API, so "before christmas"
+# silently stops resolving whenever that host is unreachable.
+holidays
 
 # Performance (v1.0.0)
 aiofiles  # Async file I/O

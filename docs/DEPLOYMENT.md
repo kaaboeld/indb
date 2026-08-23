@@ -57,7 +57,7 @@ EXPOSE 8003 8004 50051
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8003/api/v2/health || exit 1
+  CMD curl -f http://localhost:8000/api/v2/health || exit 1
 
 # Run with uvicorn (Port 8003 defined in config/cli)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8003", "--workers", "4"]

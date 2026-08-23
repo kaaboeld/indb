@@ -3,6 +3,8 @@ Integration Tests for INDB v1.0.0
 End-to-end protocol testing.
 """
 
+import os
+
 import pytest
 import httpx
 import asyncio
@@ -10,7 +12,9 @@ import msgpack
 from typing import Dict, Any
 
 
-BASE_URL = "http://localhost:8003"
+# 8000 is the port the Dockerfile, fly.toml and the launcher all use, so a suite pinned to
+# another one only passed against a server started by hand.
+BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
 
 
 class TestHTTPProtocol:
@@ -98,7 +102,8 @@ class TestWebSocketProtocol:
         try:
             import websockets
             
-            async with websockets.connect(f"ws://localhost:8003/ws") as ws:
+            ws_url = BASE_URL.replace("http://", "ws://").replace("https://", "wss://")
+            async with websockets.connect(f"{ws_url}/ws") as ws:
                 # Send subscription
                 await ws.send('{"action": "subscribe", "event_type": "fusion"}')
                 
@@ -140,7 +145,8 @@ class TestSecurityFeatures:
         # This test depends on INDB_USE_SSL environment variable
         try:
             async with httpx.AsyncClient(verify=False) as client:
-                response = await client.get("https://localhost:8003/health", timeout=5.0)
+                tls_url = BASE_URL.replace("http://", "https://")
+                response = await client.get(f"{tls_url}/health", timeout=5.0)
                 assert response.status_code == 200
         except Exception:
             pytest.skip("TLS not enabled or not available")

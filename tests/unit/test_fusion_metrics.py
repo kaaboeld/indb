@@ -83,9 +83,14 @@ def test_insights_do_not_warn_on_low_fused_record_share():
         )
     )
 
+    class Memory(list):
+        """Analytics iterates memory and calls get_all(); a bare list cannot carry it."""
+
+        def get_all(self):
+            return list(self)
+
     db = MagicMock()
-    db.memory = events
-    db.memory.get_all = lambda: events
+    db.memory = Memory(events)
     db.cache = MagicMock()
     db.cache.size.return_value = 1000
 

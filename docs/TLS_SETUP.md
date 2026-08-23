@@ -12,7 +12,7 @@ export INDB_USE_SSL=true
 ./start.sh
 ```
 
-Access at: `https://localhost:8003`
+Access at: `https://localhost:8000`
 
 ### Disable SSL (Default)
 ```bash
@@ -20,7 +20,7 @@ export INDB_USE_SSL=false
 ./start.sh
 ```
 
-Access at: `http://localhost:8003`
+Access at: `http://localhost:8000`
 
 ## Certificate Management
 
@@ -74,7 +74,7 @@ server {
     ssl_certificate_key /path/to/key.pem;
     
     location / {
-        proxy_pass http://localhost:8003;
+        proxy_pass http://localhost:8000;
         proxy_set_header X-Forwarded-Proto https;
     }
 }
@@ -110,7 +110,7 @@ For high-security deployments, implement certificate pinning in clients.
 ### Test HTTPS Endpoint
 ```bash
 # With self-signed cert
-curl -k https://localhost:8003/health
+curl -k https://localhost:8000/health
 
 # With valid cert
 curl https://yourdomain.com/health
@@ -118,7 +118,7 @@ curl https://yourdomain.com/health
 
 ### Test WebSocket over TLS
 ```bash
-wscat -c wss://localhost:8003/ws --no-check
+wscat -c wss://localhost:8000/ws --no-check
 ```
 
 ### Verify Certificate

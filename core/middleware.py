@@ -102,9 +102,12 @@ class ResponseSigningMiddleware(BaseHTTPMiddleware):
             
         response = await call_next(request)
         
-        # Only sign JSON responses that are success
+        # Signed on success for both wire formats. Leaving msgpack unsigned would make the
+        # guarantee depend on the Accept header, which is not a guarantee.
         content_type = response.headers.get("content-type", "")
-        if response.status_code == 200 and "application/json" in content_type:
+        is_json = "application/json" in content_type
+        is_msgpack = "msgpack" in content_type
+        if response.status_code == 200 and (is_json or is_msgpack):
             # Consume the response body
             # If the response is a known Starlette Response, it often has .body set
             if hasattr(response, "body") and response.body:
@@ -114,11 +117,10 @@ class ResponseSigningMiddleware(BaseHTTPMiddleware):
                 full_body = b"".join(body_bytes)
 
             try:
-                # Add signature to the JSON payload
-                data = json.loads(full_body)
+                data = json.loads(full_body) if is_json else None
                 
                 # Check if already signed (avoid double signing)
-                if "signature" in data:
+                if isinstance(data, dict) and "signature" in data:
                      return Response(
                         content=full_body,
                         status_code=response.status_code,
@@ -126,29 +128,46 @@ class ResponseSigningMiddleware(BaseHTTPMiddleware):
                         media_type=response.media_type
                     )
 
-                # Create signature
-                # We sign the sorted, compact JSON representation
-                message = json.dumps(data, sort_keys=True, separators=(',', ':')).encode('utf-8')
+                # JSON is signed in canonical form, so a client that reserialises the body
+                # can still recompute the message. msgpack is signed as the exact bytes on
+                # the wire, since there is no second canonical form to agree on.
+                message = (
+                    json.dumps(data, sort_keys=True, separators=(',', ':')).encode('utf-8')
+                    if is_json
+                    else full_body
+                )
                 signature = self.private_key.sign(message)
                 signature_b64 = base64.b64encode(signature).decode('utf-8')
                 
-                # Append signature block
-                data['signature'] = {
-                    "algorithm": "Ed25519",
-                    "public_key": self.public_key_b64,
-                    "signature": signature_b64,
-                    "key_id": compute_key_id(self.public_key_b64),
-                    "timestamp": time.time()
-                }
-                
-                # Re-serialize
-                # Ensure we handle bytes vs str for new body
-                new_body = json.dumps(data).encode('utf-8')
-                
+                key_id = compute_key_id(self.public_key_b64)
+                signed_at = time.time()
+
                 # Prepare new headers
                 new_headers = dict(response.headers)
                 new_headers.pop("content-length", None)
                 new_headers.pop("Content-Length", None)
+
+                if isinstance(data, dict):
+                    data['signature'] = {
+                        "algorithm": "Ed25519",
+                        "public_key": self.public_key_b64,
+                        "signature": signature_b64,
+                        "key_id": key_id,
+                        "timestamp": signed_at
+                    }
+                    new_body = json.dumps(data).encode('utf-8')
+                else:
+                    # Arrays, scalars (e.g. /export/json) and msgpack bodies have nowhere to
+                    # hold a signature block, so the body is left byte-identical and the
+                    # signature travels in headers over the message described above.
+                    new_body = full_body
+                    new_headers.update({
+                        "X-INDB-Signature-Algorithm": "Ed25519",
+                        "X-INDB-Public-Key": self.public_key_b64,
+                        "X-INDB-Signature": signature_b64,
+                        "X-INDB-Key-Id": key_id,
+                        "X-INDB-Signed-At": str(signed_at),
+                    })
                 
                 # Create new response
                 new_response = Response(

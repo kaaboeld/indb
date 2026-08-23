@@ -3,37 +3,40 @@ import logging
 import msgpack
 from typing import List, Dict, Any
 from core.encryption import FileEncryptor
+from core.secrets import load_master_key
 
 logger = logging.getLogger("indb.storage")
 
 # INDB Binary Storage Engine (Encrypted + CRC32)
-# Use DATA_DIR for Docker/production deployments
-DATA_DIR = os.getenv("DATA_DIR", ".")
-KEY_FILE = os.path.join(DATA_DIR, "indb.key")
-DB_FILE = os.path.join(DATA_DIR, "indb.bin")
+# Locations and header constants live in storage.format; re-exported here because
+# callers have always imported them from this module.
+from storage.format import (
+    DATA_DIR,
+    KEY_FILE,
+    DB_FILE,
+    MAGIC,
+    FORMAT_VERSION,
+    ensure_data_dir,
+)
 
 def load_key() -> bytes:
     """
-    Load Master Key from Environment or File.
+    Load Master Key.
     Priority:
-    1. INDB_MASTER_KEY (Env Var) - Recommended for Production
-    2. indb.key (Local File) - Dev/Standalone default
+    1. INDB_MASTER_KEY_B64 (Env Var) - required in production
+    2. INDB_MASTER_KEY (Env Var, legacy plain text)
+    3. indb.key (Local File) - Dev/Standalone default
+    4. Generate a new key file (first run, development only)
     """
-    # 1. Environment Variable
-    env_key = os.environ.get("INDB_MASTER_KEY")
-    if env_key:
-        return env_key.encode() if isinstance(env_key, str) else env_key
+    key = load_master_key(KEY_FILE)
+    if key:
+        return key
 
-    # 2. Local File
-    if os.path.exists(KEY_FILE):
-        with open(KEY_FILE, "rb") as f:
-            return f.read()
-    
-    # 3. Generate New (First Run)
     logger.warning(
         "Generating new Master Key at %s — back up this file!", KEY_FILE
     )
     key = FileEncryptor.generate_master_key()
+    ensure_data_dir()
     with open(KEY_FILE, "wb") as f:
         f.write(key)
     return key
@@ -42,10 +45,6 @@ MASTER_KEY = load_key()
 
 import zlib
 import struct
-
-# Header Format: MAGIC (4b) | VER (1b) | CRC32 (4b)
-MAGIC = b'INDB'
-FORMAT_VERSION = 1
 
 def save_encrypted(events: List[Dict[str, Any]]):
     """Serialize -> Encrypt with AES-256-GCM -> Calculate CRC -> Write Binary Frame (atomic)."""
@@ -64,6 +63,7 @@ def save_encrypted(events: List[Dict[str, Any]]):
 
     # 5. Atomic Write — write to a temp file first, then rename.
     # If the process crashes mid-write the original DB file stays intact.
+    ensure_data_dir()
     tmp_file = DB_FILE + ".tmp"
     try:
         with open(tmp_file, "wb") as f:
@@ -96,21 +96,32 @@ def load_decrypted() -> List:
             logger.debug("DB file is empty")
             return []
 
-        # Check for V1 Header
-        if len(file_data) > 9 and file_data[:4] == MAGIC:
-            header = file_data[:9]
-            magic, ver, stored_crc = struct.unpack('>4sBI', header)
-            
-            if magic != MAGIC:
-                raise ValueError(f"Invalid file format. Expected INDB magic header, got {magic}")
-            
-            payload = file_data[9:]
-            actual_crc = zlib.crc32(payload) & 0xffffffff
-            
-            if actual_crc != stored_crc:
-                raise ValueError(f"CRITICAL: Data Corruption Detected! stored_crc={hex(stored_crc)}, actual={hex(actual_crc)}")
-                
-            encrypted = payload
+        # Check for V1 Header. A file that has content but no header is not "empty" — it is
+        # unreadable, and returning [] here would let the next write replace it. Fail loudly
+        # instead and let fsck decide.
+        if len(file_data) <= 9 or file_data[:4] != MAGIC:
+            raise ValueError(
+                f"CRITICAL: {DB_FILE} is not a readable INDB store "
+                f"(magic header missing, {len(file_data)} bytes). Refusing to start empty, "
+                f"because the next write would overwrite it. Run `indb fsck`."
+            )
+
+        header = file_data[:9]
+        magic, ver, stored_crc = struct.unpack('>4sBI', header)
+
+        if ver != FORMAT_VERSION:
+            raise ValueError(
+                f"CRITICAL: store format version {ver} is not supported by this build "
+                f"(expected {FORMAT_VERSION})"
+            )
+
+        payload = file_data[9:]
+        actual_crc = zlib.crc32(payload) & 0xffffffff
+
+        if actual_crc != stored_crc:
+            raise ValueError(f"CRITICAL: Data Corruption Detected! stored_crc={hex(stored_crc)}, actual={hex(actual_crc)}")
+
+        encrypted = payload
         
         # Decrypt with AES-256-GCM
         decrypted = FileEncryptor.decrypt_file(encrypted, MASTER_KEY)

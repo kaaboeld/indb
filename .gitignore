@@ -11,8 +11,12 @@ venv/
 .env
 .env.*
 !.env.example
+# Master encryption key — production uses Fly secrets (INDB_MASTER_KEY_B64).
 indb.key
-logs-node-*/
+**/indb.key
 data-node-*/
+audit.bin
+indb.bin
+site/
 .vscode/
 .idea/

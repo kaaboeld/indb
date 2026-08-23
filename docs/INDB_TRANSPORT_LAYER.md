@@ -203,19 +203,37 @@ async def _send_rpc(self, method, target_url, endpoint, payload):
 
 **Characteristics**:
 - Synchronous request-response
-- JSON payload
+- JSON or MessagePack payload, chosen by `Accept`
 - Ed25519 signatures
 - CORS support
 
 **Example**:
 ```bash
-curl -X POST http://localhost:8003/api/v2/events \
+curl -X POST http://localhost:8000/api/v2/events \
   -H "Content-Type: application/json" \
   -d '{
     "raw_data_anchor": ["fast", "red"],
     "location": "highway_101"
   }'
 ```
+
+**Content negotiation**: send `Accept: application/msgpack` to any `/api/v2` endpoint and the
+same payload comes back as MessagePack, with `meta.format` naming the format used.
+
+```bash
+curl -s -H "Accept: application/msgpack" http://localhost:8000/api/v2/events -o events.msgpack
+```
+
+A JSON object carries its signature in the body. A MessagePack body — like a JSON array —
+has nowhere to put one, so the signature travels in headers instead and covers the response
+bytes verbatim:
+
+| Header | Meaning |
+|---|---|
+| `X-INDB-Signature` | Ed25519 signature, base64 |
+| `X-INDB-Public-Key` | Public key, base64 |
+| `X-INDB-Key-Id` | Key fingerprint |
+| `X-INDB-Signed-At` | Unix timestamp |
 
 **Latency**: ~2ms
 
@@ -264,6 +282,20 @@ data = msgpack.packb({
 sock.sendto(data, ('localhost', 9001))
 ```
 
+**One answer, one datagram**: a query response has to fit 65507 bytes, so a query without an
+explicit `limit` is capped at 100 events, and a response that still does not fit is trimmed
+until it does. The metadata says what happened:
+
+```python
+{"metadata": {"total_events": 100, "limit": 100, "returned_events": 63, "truncated": True}}
+```
+
+Ask for a narrower slice, or use HTTP when the full result matters more than the latency.
+
+**On Fly.io**: the UDP listener binds `fly-global-services:9001` (required by the platform
+proxy). Reach it via the app's public hostname or IP — `indb.fly.dev:9001` or the allocated
+Fly IPv4 — not `api.indb.tech`, which is HTTP-only.
+
 **Latency**: ~0.4ms
 
 ---
@@ -277,6 +309,9 @@ sock.sendto(data, ('localhost', 9001))
 - Bidirectional streaming
 - For large data volumes
 - Type-safe
+
+**On Fly.io**: connect to `indb.fly.dev:50051` or the app's public IPv4. The custom API
+domain (`api.indb.tech`) terminates HTTPS only — gRPC is plain TCP on a separate port.
 
 **Proto definition**:
 ```protobuf
@@ -342,7 +377,7 @@ class ConnectionManager:
 
 **Client**:
 ```javascript
-const ws = new WebSocket('ws://localhost:8003/ws');
+const ws = new WebSocket('ws://localhost:8000/ws');
 
 // Subscribe
 ws.send(JSON.stringify({

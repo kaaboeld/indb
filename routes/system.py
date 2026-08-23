@@ -3,16 +3,20 @@ System & Protocol Routes (v2)
 
 Handles low-level system configuration, protocols, firewall, and modules status.
 """
+import os
 import time
 from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from core.models import StandardResponse
+from core.fly_network import public_host
 from core.protocols_manager import protocol_manager
 from services.interpretation.emotional_firewall import EmotionalFirewall, FirewallMode
 
-router = APIRouter(prefix="/api/v2", tags=["system"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(prefix="/api/v2", tags=["system"], route_class=ContentNegotiationRoute)
 
 
 @router.get("/modules")
@@ -30,11 +34,23 @@ class ProtocolControl(BaseModel):
 @router.get("/system/protocols")
 async def system_protocols():
     """Return active protocols and their status."""
-    return {
+    body = {
         "status": "online",
         "timestamp": time.time(),
-        "protocols": [p.dict() for p in protocol_manager.get_all_status()]
+        "protocols": [p.dict() for p in protocol_manager.get_all_status()],
     }
+    host = public_host()
+    if host:
+        body["public_hosts"] = {
+            "udp": f"{host}:9001",
+            "grpc": f"{host}:50051",
+            "http": os.getenv("INDB_PUBLIC_HTTP", "https://api.indb.tech"),
+            "note": (
+                "UDP and gRPC are plain sockets on the dedicated IPv4. "
+                "api.indb.tech is HTTPS-only."
+            ),
+        }
+    return body
 
 
 @router.post("/system/protocols/control")

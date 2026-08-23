@@ -25,9 +25,9 @@ ENV/
 .env
 .env.*
 
-# Storage and data files
-# NOTE: *.key intentionally NOT excluded — indb.key is needed by the storage engine
-# In production, provide INDB_MASTER_KEY env var instead (takes priority over the file)
+# Master encryption key — use Fly secrets / env, not baked into the image
+indb.key
+**/indb.key
 *.bin
 *.log
 

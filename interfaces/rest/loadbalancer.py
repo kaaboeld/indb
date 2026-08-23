@@ -10,7 +10,13 @@ import httpx
 import asyncio
 from datetime import datetime
 
-router = APIRouter(prefix="/api/v2/loadbalancer", tags=["Load Balancer"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/loadbalancer",
+    tags=["Load Balancer"],
+    route_class=ContentNegotiationRoute,
+)
 
 # HAProxy stats URL (internal Docker network)
 HAPROXY_STATS_URL = "http://loadbalancer:8080/stats;csv"
@@ -147,9 +153,9 @@ async def check_nodes_directly() -> List[Dict]:
     async with httpx.AsyncClient(timeout=2.0) as client:
         for node_config in nodes_config:
             try:
-                start_time = asyncio.get_event_loop().time()
+                start_time = asyncio.get_running_loop().time()
                 response = await client.get(f"http://{node_config['host']}:{node_config['port']}/health")
-                response_time = (asyncio.get_event_loop().time() - start_time) * 1000  # ms
+                response_time = (asyncio.get_running_loop().time() - start_time) * 1000  # ms
                 
                 nodes.append({
                     "node_id": node_config["id"],

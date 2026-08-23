@@ -6,7 +6,8 @@ Verifies 429 Too Many Requests responses.
 
 import pytest
 from fastapi.testclient import TestClient
-from main import app, RateLimits
+from main import app
+from core.rate_limit import RateLimits
 import time
 
 client = TestClient(app)

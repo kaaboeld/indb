@@ -10,7 +10,13 @@ from core.instinct import (
     InstinctResult
 )
 
-router = APIRouter(prefix="/api/v2/prism", tags=["Prism (Instinct)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/prism",
+    tags=["Prism (Instinct)"],
+    route_class=ContentNegotiationRoute,
+)
 
 class InstinctRequest(BaseModel):
     query: str

@@ -14,6 +14,9 @@ from storage.binary import load_decrypted, MASTER_KEY, DB_FILE, KEY_FILE
 from core.encryption import FileEncryptor
 from core.event import Event
 
+# Same default as the rest of the project: Dockerfile, fly.toml and the launcher use 8000.
+BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
+
 
 class TestDataIntegrity:
     """Test data integrity and consistency"""
@@ -165,7 +168,7 @@ class TestSystemHealth:
         """Verify critical files exist"""
         required_files = [
             'main.py',
-            'launcher.py',
+            'cli/launcher.py',
             'requirements.txt',
             'storage/binary.py',
             'core/encryption.py',
@@ -225,7 +228,7 @@ class TestProtocolHealth:
         
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.get("http://localhost:8003/health", timeout=5.0)
+                response = await client.get(f"{BASE_URL}/health", timeout=5.0)
                 assert response.status_code == 200
                 data = response.json()
                 # Accept "ok" or "healthy"
@@ -248,7 +251,7 @@ class TestProtocolHealth:
         async with httpx.AsyncClient() as client:
             for endpoint in critical_endpoints:
                 try:
-                    response = await client.get(f"http://localhost:8003{endpoint}", timeout=5.0)
+                    response = await client.get(f"{BASE_URL}{endpoint}", timeout=5.0)
                     assert response.status_code in [200, 405], f"Endpoint {endpoint} not accessible"
                 except Exception as e:
                     pytest.fail(f"Endpoint {endpoint} failed: {e}")

@@ -14,7 +14,13 @@ from core.deps import IndbDep
 from core.models import StandardResponse
 from core.paradox import ParadoxEngine
 
-router = APIRouter(prefix="/api/v2/paradox", tags=["Paradox (Pre-Observation Type)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/paradox",
+    tags=["Paradox (Pre-Observation Type)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class ParadoxCreate(BaseModel):

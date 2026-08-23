@@ -16,7 +16,9 @@ async def get_auth(auth_info: dict = Depends(require_auth)) -> AuthContext:
         auth_method=auth_info.get("method", "api_key")
     )
 
-router = APIRouter(prefix="/api/v2/lens", tags=["lens"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(prefix="/api/v2/lens", tags=["lens"], route_class=ContentNegotiationRoute)
 
 
 @router.post("/query")

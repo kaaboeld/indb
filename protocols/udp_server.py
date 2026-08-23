@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import msgpack  # Use msgpack instead of BSON - no MongoDB dependency
 from core.config_schema import get_config
+from core.fly_network import udp_bind_host
 from typing import Optional, Tuple
 from core.indb import INDB
 from core.kernel import INDBKernel, InterpretRequest, QueryRequest
@@ -38,6 +39,9 @@ config = get_config()
 UDP_MAGIC = b'INDB'
 UDP_VERSION = 1
 UDP_MAX_PACKET_SIZE = 65507  # Max UDP packet size
+# Roughly 200 interpreted events fit in one datagram; the cap leaves headroom for wide
+# events and applies only when the client names no limit of its own.
+UDP_DEFAULT_QUERY_LIMIT = 100
 
 
 class UDPProtocol(asyncio.DatagramProtocol):
@@ -47,11 +51,14 @@ class UDPProtocol(asyncio.DatagramProtocol):
         self.kernel = kernel
         self.auth_manager = auth_manager
         self.transport = None
-        self.udp_port = config.server_port + 1  # UDP on port+1
     
     def connection_made(self, transport):
         """Called when protocol is initialized"""
         self.transport = transport
+        # Reported from the socket rather than recomputed: deriving it as "HTTP port + 1"
+        # printed a port the server was not bound to.
+        sock = transport.get_extra_info("socket")
+        self.udp_port = sock.getsockname()[1] if sock else None
         print(f"✅ UDP server listening on port {self.udp_port}")
     
     def datagram_received(self, data: bytes, addr: Tuple[str, int]):
@@ -85,6 +92,15 @@ class UDPProtocol(asyncio.DatagramProtocol):
             # Execute query via kernel
             try:
                 # Determine query type and execute
+                if self._is_ingest(query):
+                    # Ingestion is what UDP exists for: a sensor fires a datagram and moves
+                    # on. Kernel ingestion is async, so it runs as a task and the ack is
+                    # sent from there — the socket is never blocked on a write to disk.
+                    asyncio.create_task(
+                        self._ingest(addr, request_id, self._ingest_payload(query), auth_context)
+                    )
+                    return
+
                 if "context" in query:
                     # Interpret request
                     request = InterpretRequest(**query)
@@ -104,7 +120,12 @@ class UDPProtocol(asyncio.DatagramProtocol):
                     
                     if filters:
                         query_params['filters'] = filters
-                    
+
+                    # A datagram cannot grow, so an unbounded query over a real store
+                    # eventually exceeds the packet limit and comes back as a bare error.
+                    # Capping it keeps the answer useful and says so in the metadata.
+                    query_params.setdefault('limit', UDP_DEFAULT_QUERY_LIMIT)
+
                     request = QueryRequest(**query_params)
                     events = self.kernel.query(request, auth_context)
                     # Wrap in standard response format
@@ -114,7 +135,8 @@ class UDPProtocol(asyncio.DatagramProtocol):
                             "events": events
                         },
                         "metadata": {
-                            "total_events": len(events)
+                            "total_events": len(events),
+                            "limit": query_params['limit']
                         },
                         "signature": ""
                     }
@@ -133,6 +155,50 @@ class UDPProtocol(asyncio.DatagramProtocol):
             if 'request_id' in locals():
                 self._send_error(addr, request_id, str(e))
     
+    @staticmethod
+    def _is_ingest(query: dict) -> bool:
+        """
+        An ingest carries an anchor; a query never does.
+
+        Both spellings are accepted: the flat event published in the transport docs, and an
+        explicit {"operation": "ingest", "data": {...}} for clients that prefer to say so.
+        """
+        if str(query.get("operation", "")).lower() in {"ingest", "inhale"}:
+            return True
+        return "raw_data_anchor" in query
+
+    @staticmethod
+    def _ingest_payload(query: dict) -> dict:
+        payload = query.get("data") if isinstance(query.get("data"), dict) else query
+        return {k: v for k, v in payload.items() if k != "operation"}
+
+    async def _ingest(self, addr, request_id: int, payload: dict, auth_context) -> None:
+        """Store one event and acknowledge it. Errors come back as errors, not as success."""
+        try:
+            # An unauthenticated datagram writes under the same identity the REST route uses
+            # for an unauthenticated POST. RBAC maps "anonymous" to a reader, so without this
+            # every sensor packet came back as a permission error while the same event over
+            # HTTP was accepted. A verified mTLS context is used as-is.
+            if getattr(auth_context, "auth_method", None) == "anonymous":
+                from core.kernel import AuthContext
+
+                auth_context = AuthContext(user_id="api_writer", auth_method="anonymous")
+
+            event = await self.kernel.create_event(payload, auth_context)
+            event_id = event.get("id") if isinstance(event, dict) else getattr(event, "id", None)
+            self._send_response(
+                addr,
+                request_id,
+                {
+                    "data": {"status": "success", "id": event_id},
+                    "metadata": {"operation": "ingest"},
+                    "signature": "",
+                },
+            )
+        except Exception as exc:
+            print(f"❌ UDP ingest error: {exc}")
+            self._send_error(addr, request_id, f"Ingest failed: {exc}")
+
     def _parse_packet(self, data: bytes) -> Tuple[Optional[int], Optional[bytes], Optional[bytes]]:
         """
         Parse UDP packet
@@ -175,6 +241,34 @@ class UDPProtocol(asyncio.DatagramProtocol):
             print(f"❌ Packet parse error: {e}")
             return None, None, None
     
+    @staticmethod
+    def _shrink_to_fit(result: dict, budget: int) -> Optional[dict]:
+        """
+        Drop trailing events until the packed response fits a single datagram.
+
+        Event width varies a lot — a fused record carries its own history — so no fixed
+        limit can guarantee a fit. Returns None when even one event is too wide, which is
+        the only case that genuinely belongs on HTTP.
+        """
+        data = result.get("data")
+        events = data.get("events") if isinstance(data, dict) else None
+        if not isinstance(events, list) or not events:
+            return None
+
+        kept = len(events) // 2
+        while kept > 0:
+            candidate = dict(result)
+            candidate["data"] = {**data, "events": events[:kept]}
+            candidate["metadata"] = {
+                **result.get("metadata", {}),
+                "returned_events": kept,
+                "truncated": True,
+            }
+            if len(msgpack.packb(candidate, use_bin_type=True)) <= budget:
+                return candidate
+            kept //= 2
+        return None
+
     def _send_response(self, addr: Tuple[str, int], request_id: int, result: dict):
         """Send successful response"""
         try:
@@ -182,9 +276,21 @@ class UDPProtocol(asyncio.DatagramProtocol):
             response_data = msgpack.packb(result, use_bin_type=True)
             
             # Check size limit
-            if len(response_data) > UDP_MAX_PACKET_SIZE - 9:
-                self._send_error(addr, request_id, "Response too large")
-                return
+            budget = UDP_MAX_PACKET_SIZE - 9
+            if len(response_data) > budget:
+                trimmed = self._shrink_to_fit(result, budget)
+                if trimmed is None:
+                    print(
+                        f"❌ Response too large for UDP: {len(response_data)} bytes "
+                        f"(max {budget}) and not reducible — use HTTP"
+                    )
+                    self._send_error(addr, request_id, "Response too large")
+                    return
+                print(
+                    f"⚠️  Response truncated to {trimmed['metadata']['returned_events']} "
+                    f"event(s) to fit one datagram"
+                )
+                response_data = msgpack.packb(trimmed, use_bin_type=True)
             
             # Build response packet
             packet = (
@@ -226,18 +332,19 @@ async def run_udp_server(kernel: INDBKernel, auth_manager: AuthManager, port: in
         auth_manager: Authentication manager
         port: UDP port (default from config)
     """
-    port = port or (config.server_port + 1)  # UDP on port+1
+    port = port or config.udp_port
+    bind_host = udp_bind_host()
     
     print(f"\n{'='*60}")
-    print(f"🚀 Starting UDP Server on port {port}")
+    print(f"🚀 Starting UDP Server on {bind_host}:{port}")
     print(f"{'='*60}")
     
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     
     # Create UDP endpoint
     transport, protocol = await loop.create_datagram_endpoint(
         lambda: UDPProtocol(kernel, auth_manager),
-        local_addr=('0.0.0.0', port)
+        local_addr=(bind_host, port)
     )
     
     try:
@@ -255,4 +362,4 @@ if __name__ == "__main__":
     kernel = INDBKernel()
     auth_manager = AuthManager()
     
-    asyncio.run(run_udp_server(kernel, auth_manager, port=8001))
+    asyncio.run(run_udp_server(kernel, auth_manager))

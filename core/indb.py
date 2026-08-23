@@ -4,7 +4,7 @@ import threading
 import asyncio
 from typing import Iterator, List, Dict, Any, Optional
 from core.event import Event
-from core.cache import TTLCache
+from core.cache import TTLCache, invalidate_query_cache
 from core.memory import MemoryManager
 from core.resonance_index import ResonanceIndex
 from core.resonance_graph import ResonanceGraph
@@ -243,6 +243,9 @@ class INDB:
         logger.debug("Persisting %d events to storage", len(self.memory))
         data = [e.to_dict() for e in self.memory]
         save_encrypted(data)
+        # Every mutation funnels through here, which makes it the one honest place to drop
+        # cached reads: a cached page must never outlive the memory it described.
+        invalidate_query_cache()
 
     def update_event(self, updated_event):
         """Update existing event (used for fusion)"""
@@ -400,6 +403,15 @@ class INDB:
         If Standalone:
           - Directly stores.
         """
+        # Location is one of the two mandatory fields, so it is checked here rather than in a
+        # request schema: HTTP validated it, UDP and gRPC did not, and an event without a
+        # spatial anchor cannot take part in Echo, Slice or Subwave — it just sits there.
+        if not isinstance(location, str) or not location.strip():
+            raise ValueError(
+                "location is required — with timestamp it is one of the two mandatory fields "
+                "of an event, and resonance is computed against it"
+            )
+
         # Create Event object tentatively
         if signature:
             from core.signing import verify_event_signature, normalize_signature_block

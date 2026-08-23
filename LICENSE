@@ -1,0 +1,192 @@
+INDB SOFTWARE LICENSE AGREEMENT
+Version 1.0, effective 2026-08-23
+
+Copyright (c) 2026 <LICENSOR_LEGAL_NAME>. All rights reserved.
+
+INDB is proprietary software. It is not open source and it is not free
+software. This Agreement grants a limited right to run the Software; it does
+not transfer ownership of anything.
+
+By downloading, installing, running or otherwise using the Software, you
+("Licensee") accept this Agreement. If you do not accept it, do not use the
+Software.
+
+
+1. DEFINITIONS
+
+1.1 "Software" means the INDB database engine, including its source code,
+    container images, binaries, command line interface, terminal interface
+    (TUI), web interface (WUI), SDKs, configuration files and any updates
+    supplied by the Licensor.
+
+1.2 "Documentation" means the material published at docs.indb.tech and the
+    Markdown files distributed in the docs/ directory.
+
+1.3 "Licensor" means <LICENSOR_LEGAL_NAME>, the copyright holder.
+
+1.4 "Internal Use" means use by Licensee, and by Licensee's employees and
+    contractors acting on Licensee's behalf, for Licensee's own purposes,
+    including production workloads that serve Licensee's own end users.
+
+1.5 "Hosted Service" means making the Software, or a substantial part of its
+    functionality, available to third parties as a managed, hosted or
+    multi-tenant service, whether or not for a fee.
+
+
+2. GRANT OF RIGHTS
+
+Subject to Licensee's compliance with this Agreement, the Licensor grants
+Licensee a worldwide, non-exclusive, non-transferable, non-sublicensable,
+royalty-free and revocable licence to:
+
+2.1 download, install and run any number of instances of the Software for
+    Internal Use, including self-hosted single-node and Raft cluster
+    deployments;
+
+2.2 evaluate, test and benchmark the Software;
+
+2.3 develop applications that communicate with the Software through its
+    documented interfaces (HTTP, GraphQL, WebSocket, gRPC, UDP, MCP);
+
+2.4 make a reasonable number of copies of the Software for backup and
+    disaster recovery.
+
+
+3. RIGHTS EXPRESSLY PRESERVED
+
+The Licensor will not treat the following as a breach of this Agreement, and
+Licensee needs no permission for them:
+
+3.1 publishing performance measurements, benchmarks and comparisons against
+    other systems, including unfavourable results;
+
+3.2 publishing the results of security research on the Software, subject to
+    the coordinated disclosure process in SECURITY.md;
+
+3.3 describing, criticising or teaching the architecture and the interfaces
+    of the Software.
+
+
+4. RESTRICTIONS
+
+Except as permitted in Sections 2 and 3, Licensee shall not:
+
+4.1 distribute, sublicense, sell, rent, lease or lend the Software to any
+    third party, in source or binary form;
+
+4.2 operate the Software as a Hosted Service;
+
+4.3 create or distribute a derivative work of the Software, or incorporate
+    the Software into another product offered to third parties;
+
+4.4 reverse engineer, decompile or disassemble the Software, except to the
+    limited extent that such an act cannot lawfully be prohibited under
+    applicable law and only after a written request for interoperability
+    information has gone unanswered for thirty (30) days;
+
+4.5 remove, obscure or alter any copyright, licence or attribution notice,
+    or any cryptographic signature or identifier produced by the Software;
+
+4.6 use the name "INDB", the Licensor's other trademarks, logos or product
+    names to endorse or promote products, except for factual and accurate
+    references to interoperability with the Software.
+
+
+5. OWNERSHIP
+
+The Software is licensed, not sold. The Licensor retains all right, title
+and interest in and to the Software, including all intellectual property
+rights. No rights are granted other than those expressly stated in this
+Agreement. Data that Licensee ingests into the Software remains the property
+of Licensee; the Licensor claims no rights in it and receives no copy of it.
+
+
+6. DOCUMENTATION AND INTERFACES
+
+The Documentation and the specifications of the network interfaces of the
+Software are published so that they can be implemented and audited. Nothing
+in this Agreement prevents a third party from writing an independent client,
+connector or verifier against the documented interfaces or against the
+signature formats used by the Software.
+
+
+7. FEEDBACK
+
+If Licensee sends the Licensor suggestions, bug reports or other feedback,
+the Licensor may use it without restriction and without obligation to
+Licensee. Feedback is provided voluntarily and is not confidential unless
+Licensee marks it as such in advance.
+
+
+8. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND
+NON-INFRINGEMENT. THE LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL BE
+UNINTERRUPTED, ERROR-FREE, OR THAT ANY DATA WILL BE PRESERVED WITHOUT LOSS.
+
+Licensee is responsible for its own key management. Encryption of
+blind_payload happens on the client side and the Licensor never receives the
+corresponding keys; consequently the Licensor cannot recover data whose keys
+Licensee has lost, and cannot be liable for keys that Licensee's own client
+code exposes.
+
+
+9. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSOR SHALL NOT BE
+LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY OR
+PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, REVENUE, DATA, GOODWILL OR
+BUSINESS INTERRUPTION, ARISING OUT OF OR RELATED TO THE SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE LICENSOR'S TOTAL AGGREGATE
+LIABILITY UNDER THIS AGREEMENT SHALL NOT EXCEED THE GREATER OF (A) THE
+AMOUNTS PAID BY LICENSEE TO THE LICENSOR FOR THE SOFTWARE IN THE TWELVE (12)
+MONTHS PRECEDING THE CLAIM, OR (B) ONE HUNDRED EUROS (EUR 100).
+
+Nothing in this Agreement limits liability that cannot be limited under
+applicable law, including liability for wilful misconduct or for death or
+personal injury caused by negligence.
+
+
+10. NO SUPPORT OBLIGATION
+
+This Agreement includes no obligation to provide support, maintenance,
+updates or migration assistance. Commercial support and separate terms,
+including terms permitting a Hosted Service, are available by agreement with
+the Licensor.
+
+
+11. TERM AND TERMINATION
+
+11.1 This Agreement takes effect when Licensee first uses the Software and
+      continues until terminated.
+
+11.2 It terminates automatically if Licensee breaches any of its terms and
+      does not cure the breach within thirty (30) days of written notice.
+
+11.3 On termination Licensee shall stop using the Software and delete all
+      copies of it. Data that Licensee ingested remains Licensee's own, and
+      Section 5, 7, 8, 9 and 12 survive termination.
+
+
+12. GENERAL
+
+12.1 This Agreement is governed by the laws of <JURISDICTION>, excluding its
+      conflict of law rules and excluding the United Nations Convention on
+      Contracts for the International Sale of Goods.
+
+12.2 If any provision is held unenforceable, it shall be modified to the
+      minimum extent necessary and the remaining provisions stay in force.
+
+12.3 This Agreement is the entire agreement between the parties about the
+      Software and supersedes prior discussions, unless a signed commercial
+      agreement between the parties states otherwise, in which case that
+      agreement prevails.
+
+12.4 Third-party components distributed with the Software are governed by
+      their own licences, listed in THIRD_PARTY_NOTICES.md. Nothing in this
+      Agreement limits the rights granted by those licences.
+
+
+Contact for licensing questions: legal@indb.tech

@@ -10,7 +10,13 @@ from typing import Optional, List
 
 from core.deduction import DeductionEngine, DeductionResult
 
-router = APIRouter(prefix="/api/v2/deduction", tags=["Deduction (Inference)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/deduction",
+    tags=["Deduction (Inference)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class DeduceRequest(BaseModel):

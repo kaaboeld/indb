@@ -1,7 +1,8 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from main import app, StandardResponse
+from main import app
+from core.models import StandardResponse
 
 client = TestClient(app)
 

@@ -1,8 +1,9 @@
+import os
 import requests
 import time
 import json
 
-BASE_URL = "http://localhost:8003"
+BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
 
 def run_test():
     print("--- Verifying Phase 18: Distributed Consensus (Raft) ---\n")

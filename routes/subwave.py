@@ -13,7 +13,13 @@ from core.observer_profiles import resolve_observer
 from core.prism import ObserverContext
 from core.subwave import SubwaveEngine, SubwaveResult
 
-router = APIRouter(prefix="/api/v2/subwave", tags=["Subwave (Unified Resonance)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/subwave",
+    tags=["Subwave (Unified Resonance)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class SubwaveBroadcastRequest(BaseModel):

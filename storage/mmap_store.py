@@ -9,7 +9,9 @@ import struct
 from typing import Optional, List, Dict, Any
 import msgpack
 
-DB_FILE = "indb.bin"
+# Same location as every other store: a relative "indb.bin" here pointed at the working
+# directory instead of DATA_DIR, so it mapped a different file than the engine writes.
+from storage.format import DB_FILE
 
 
 class MemoryMappedStore:

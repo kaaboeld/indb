@@ -10,7 +10,9 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
 
-router = APIRouter(prefix="/api/v2", tags=["contact"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(prefix="/api/v2", tags=["contact"], route_class=ContentNegotiationRoute)
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 CONTACT_TO    = os.getenv("CONTACT_EMAIL", "")    # Set as Fly secret
