@@ -35,8 +35,11 @@ PROTOCOL_VERSION = 1
 DEFAULT_HTTP_PORT = 8000
 """Default port for HTTP/REST API server"""
 
-DEFAULT_UDP_PORT = 9000
-"""Default port for UDP protocol server"""
+DEFAULT_UDP_PORT = 9001
+"""Default port for UDP protocol server.
+
+9001 is the port fly.toml forwards, docker-compose maps and the transport docs publish, so
+a different default here meant datagrams arrived at a port nothing was bound to."""
 
 DEFAULT_WS_PORT = 9001
 """Default port for WebSocket server"""

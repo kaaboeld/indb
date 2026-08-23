@@ -4,7 +4,13 @@ from typing import Optional, List
 from core.prism import PrismEngine, PrismResult, ObserverContext
 from core.echo import ResonanceEngine
 
-router = APIRouter(prefix="/api/v2/prism", tags=["Prism (Cognitive)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/prism",
+    tags=["Prism (Cognitive)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class SynthesizeRequest(BaseModel):

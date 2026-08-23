@@ -42,6 +42,11 @@ except ImportError:
 from services.fusion.penalty import PenaltyEngine, PenaltyConfig
 
 
+def is_signed(event: Any) -> bool:
+    """True when the event carries a client signature, which makes it unfusable."""
+    return bool(getattr(event, "signature", None))
+
+
 @dataclass
 class FusedEvent:
     """
@@ -57,6 +62,10 @@ class FusedEvent:
     ttl: Optional[int] = None
     temporal_metadata: Dict[str, Any] = field(default_factory=dict)
     blind_payload: Optional[str] = None
+    # Kept only when every merged observation agrees on the owner; a fusion of two
+    # sources has no single one, and modules that fire owner reflexes must see None
+    # rather than an arbitrary winner.
+    source_id: Optional[str] = None
     
     # Fusion-specific fields
     fusion_count: int = 1
@@ -92,6 +101,7 @@ class FusedEvent:
             "ttl": self.ttl,
             "temporal_metadata": self.temporal_metadata,
             "blind_payload": self.blind_payload,
+            "source_id": self.source_id,
             "fusion_count": self.fusion_count,
             "fusion_type": self.fusion_type,
             "source_events": self.source_events,
@@ -115,6 +125,7 @@ class FusedEvent:
             ttl=d.get("ttl"),
             temporal_metadata=d.get("temporal_metadata", {}),
             blind_payload=d.get("blind_payload"),
+            source_id=d.get("source_id"),
             fusion_count=d.get("fusion_count", 1),
             fusion_type=d.get("fusion_type", "original"),
             source_events=d.get("source_events", []),
@@ -258,6 +269,13 @@ class EventFusion:
         
         return round(penalty_result.final_score, 3)
     
+    @staticmethod
+    def _merged_source_id(base: Any, new: Any) -> Optional[str]:
+        """Owner of a fusion, or None when the merged observations disagree."""
+        base_source = getattr(base, "source_id", None)
+        new_source = getattr(new, "source_id", None)
+        return base_source if base_source and base_source == new_source else None
+
     def full_merge(self, base: Any, new: Any) -> FusedEvent:
         """
         Full merge strategy for nearly identical events.
@@ -292,6 +310,7 @@ class EventFusion:
             ttl=base.ttl,
             temporal_metadata=base.temporal_metadata,
             blind_payload=getattr(base, "blind_payload", None) or getattr(new, "blind_payload", None),
+            source_id=self._merged_source_id(base, new),
             
             fusion_count=base_count + 1,
             fusion_type="full_merge",
@@ -358,6 +377,7 @@ class EventFusion:
             ttl=base.ttl,
             temporal_metadata=base.temporal_metadata,
             blind_payload=getattr(base, "blind_payload", None) or getattr(new, "blind_payload", None),
+            source_id=self._merged_source_id(base, new),
             
             fusion_count=base_count + 1,
             fusion_type="weighted_merge",
@@ -453,10 +473,22 @@ class EventFusion:
             
         Returns:
             List of similar events with metadata
+
+        Signed events take no part in fusion, on either side. A signature attests to one
+        observation; a merge produces a record that no key ever signed, so verification
+        fails and recovery by key_id no longer finds it. Grain's redundant tier promises
+        that N of M signed events survive damage, which only holds while each stays a
+        record of its own.
         """
+        if is_signed(target):
+            return []
+
         similarities = []
         
         for event in event_pool:
+            if is_signed(event):
+                continue
+
             # Skip if target is already part of this fusion
             if isinstance(event, FusedEvent) and target.id in event.source_events:
                 continue

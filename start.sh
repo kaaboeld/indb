@@ -16,5 +16,5 @@ fi
 echo "✅ Starting server..."
 echo ""
 
-# Start launcher
-python3 launcher.py "$@"
+# Start launcher (module form, so package imports resolve)
+python3 -m cli.launcher "$@"

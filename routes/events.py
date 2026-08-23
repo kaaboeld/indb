@@ -20,7 +20,9 @@ from core.models import (
     WebhookRequest
 )
 
-router = APIRouter(prefix="/api/v2", tags=["events"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(prefix="/api/v2", tags=["events"], route_class=ContentNegotiationRoute)
 
 
 @router.post("/events", response_model=StandardResponse[EventResponse])

@@ -141,10 +141,10 @@ class TestRaftConsensus:
         # 3. Apply Commits
         await node._apply_commits()
         
-        # 4. Verify Kernel Ingest Called
-        node.kernel.db.ingest.assert_called_once()
-        call_args = node.kernel.db.ingest.call_args[1]
-        assert call_args['location'] == cmd.get('location') # None in this case
+        # 4. Verify the state machine applied the committed entry.
+        # ingest() is the client path that goes through Raft; a committed entry is
+        # applied with apply_event(), otherwise replication would loop back on itself.
+        node.kernel.db.apply_event.assert_called_once_with(cmd)
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

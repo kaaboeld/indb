@@ -16,7 +16,13 @@ from core.observer_profiles import list_profile_ids, resolve_observer
 from core.prism import ObserverContext
 from core.context_slice import ContextSliceResult
 
-router = APIRouter(prefix="/api/v2/slice", tags=["Slice (Horizontal Context)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/slice",
+    tags=["Slice (Horizontal Context)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class SliceRequest(BaseModel):

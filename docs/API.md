@@ -243,7 +243,34 @@ Given evidence (events), infers chains and conclusions.
 
 ---
 
-### 2.4 Signed Memory Recovery
+### 2.4 Grain (Identity Tolerance)
+Prefix: `/api/v2/grain`
+
+Verification across the noise-tolerance spectrum. See [GRAIN.md](./GRAIN.md).
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /grain/tiers` | Catalog: exact → redundant → resonant → statistical |
+| `POST /grain/verify` | Verify candidate identity against reference event(s) |
+
+**Verify request:**
+```json
+{
+  "reference_event_id": "<seed-uuid>",
+  "candidate": {
+    "raw_data_anchor": ["partial", "rewrite", "summer"],
+    "location": "books/test"
+  },
+  "tier": "auto",
+  "tolerance": 0.5
+}
+```
+
+**Response fields:** `tier_used`, `match_score`, `verdict`, `false_accept_risk`, `false_reject_risk`, `p_value` (statistical tier), `insufficient_signal`.
+
+---
+
+### 2.5 Signed Memory Recovery
 
 Prefix: `/api/v2/recovery`
 
@@ -284,7 +311,7 @@ Implementation examples for each pattern: [SIGNED_MEMORY_RECOVERY.md](./SIGNED_M
 
 ---
 
-### 2.5 Paradox (type) — contract
+### 2.6 Paradox (type) — contract
 
 > **Status:** API contract (v0.8). Prism read-time paradox (`is_paradoxical`) is live — see §1.3.
 
@@ -316,7 +343,7 @@ Per-pattern curl and Python examples: [PARADOX.md](./PARADOX.md).
 
 ---
 
-### 2.6 Webhooks
+### 2.7 Webhooks
 
 Register a webhook to receive outbound notifications (e.g., new Axioms).
 

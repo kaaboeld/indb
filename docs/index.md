@@ -142,6 +142,36 @@ curl -X POST http://localhost:8000/api/v2/deduction/deduce \
 
 ---
 
+### **Grain** — Identity Tolerance Spectrum
+
+Unified verification across the noise-tolerance axis: **exact → redundant → resonant → statistical**.
+
+Maps known approaches onto one kernel module:
+
+| Tier | Analog | Tolerance |
+|------|--------|-----------|
+| **exact** | EAN-13 barcode | ~0–5% (Ed25519) |
+| **redundant** | QR Reed–Solomon | ~30% (N-of-M signatures) |
+| **resonant** | Handwritten signature | ~30–50% (Echo × reputation) |
+| **statistical** | SynthID watermark | p-value (n-gram fingerprint) |
+
+```bash
+curl -X POST https://api.indb.tech/api/v2/grain/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reference_event_id": "<seed-uuid>",
+    "candidate": {"raw_data_anchor": ["partial", "rewrite"], "location": "test"},
+    "tier": "auto",
+    "tolerance": 0.5
+  }'
+```
+
+Full reference: [GRAIN.md](./GRAIN.md)
+
+**Status:** ✅ Production (kernel-native)
+
+---
+
 ## 🏗️ Architecture
 
 ### Distributed Raft Cluster
@@ -189,6 +219,7 @@ graph TD
 | **Echo** | 100% | <30ms | ✅ Production |
 | **Instinct** | 100% (50/50) | ~25ms | ✅ Production |
 | **Deduction** | 100% | <50ms | ✅ Production |
+| **Grain** | 4 tiers | kernel-native | ✅ Production |
 | **Fusion** | Real-time | N/A | ✅ Production |
 
 ### Standalone Performance

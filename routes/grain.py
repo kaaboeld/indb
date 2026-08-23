@@ -11,7 +11,13 @@ from core.grain import GrainConfig, GrainEngine, GrainResult, TIER_CATALOG
 from core.grain.models import GrainTierInput
 from core.models import StandardResponse
 
-router = APIRouter(prefix="/api/v2/grain", tags=["Grain (Identity Tolerance)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/grain",
+    tags=["Grain (Identity Tolerance)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class GrainVerifyRequest(BaseModel):

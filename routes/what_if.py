@@ -27,7 +27,13 @@ from services.sources.hermes.config import HermesConfig
 from services.what_if.base_runner import run_base_query
 from services.what_if.runner import run_what_if
 
-router = APIRouter(prefix="/api/v2/what-if", tags=["What-If (Hypothetical)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/what-if",
+    tags=["What-If (Hypothetical)"],
+    route_class=ContentNegotiationRoute,
+)
 
 
 class WhatIfRequest(BaseModel):

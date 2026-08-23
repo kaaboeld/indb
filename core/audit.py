@@ -6,6 +6,8 @@ import json
 import hashlib
 from typing import Dict, Any
 
+from core.secrets import require_secret
+
 class AuditLogger:
     """
     Secure Audit Logging with HMAC signing (Phase 0.6).
@@ -14,8 +16,10 @@ class AuditLogger:
     
     def __init__(self, log_file: str = "audit.log"):
         self.log_file = log_file
-        # Use existing key or generate specific audit key
-        self.secret_key = os.environ.get("INDB_AUDIT_KEY", "default-audit-secret").encode()
+        # HMAC key for tamper-evident log entries — env only, never a literal
+        self.secret_key = require_secret(
+            "INDB_AUDIT_KEY", "signs audit log entries so tampering is detectable"
+        ).encode()
         
     def _sign_entry(self, entry_str: str) -> str:
         """Create HMAC-SHA256 signature."""

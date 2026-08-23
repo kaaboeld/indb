@@ -14,6 +14,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHea
 from typing import Optional
 import os
 
+from core.secrets import require_secret
+
 
 # Security schemes
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -41,7 +43,7 @@ class AuthManager:
         """
         self.mode = os.getenv("AUTH_MODE", mode)
         self.api_keys = self._load_api_keys()
-        self.jwt_secret = os.getenv("JWT_SECRET", "dev-secret-change-in-production")
+        self.jwt_secret = require_secret("JWT_SECRET", "verifies JWT bearer tokens")
     
     def _load_api_keys(self) -> set:
         """Load valid API keys from env."""

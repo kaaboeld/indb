@@ -16,6 +16,10 @@ primary_region = 'fra'
   LOG_LEVEL = 'INFO'
   PORT = '8000'
   RAFT_ENABLED = 'false'
+  # Dedicated Fly IPv4 for UDP/gRPC (shared ingress is HTTP-only).
+  INDB_PUBLIC_HOST = '137.66.0.37'
+  INDB_PUBLIC_HTTP = 'https://api.indb.tech'
+  UDP_PORT = '9001'
 
 [[mounts]]
   source = 'indb_data'
@@ -40,6 +44,8 @@ primary_region = 'fra'
   [[services.ports]]
     port = 9001
 
+# gRPC is plain TCP on 50051. Clients reach it via the app's public IP or
+# indb.fly.dev — not api.indb.tech, which is HTTP-only.
 [[services]]
   protocol = 'tcp'
   internal_port = 50051

@@ -1,20 +1,11 @@
-# INDB Launch — Post These
+# Launch materials moved
 
-Copy-paste and submit. See what feedback you get.
+**Canonical location:** [`../../growth/`](../../growth/)
 
-## Order of operations
+All promotion playbooks, channel copy, and angles live in `db/growth/`.
 
-1. **Hacker News** — https://news.ycombinator.com/submit — highest signal, post first
-2. **Lobste.rs** — https://lobste.rs/submit — technical audience
-3. **Reddit r/selfhosted** — https://www.reddit.com/r/selfhosted/submit
-4. **DEV.to** — https://dev.to/new — full article, paste from DEV_TO_ARTICLE.md
+This folder is kept for backwards links only.
 
-## Links (use these everywhere)
-
-- https://indb.tech
-- https://docs.indb.tech
-- https://api.indb.tech/docs
-
-## After posting
-
-Check the contact form at https://indb.tech/#contact. Reply within 48h.
+- [growth/README.md](../../growth/README.md)
+- [growth/CONCEPT.md](../../growth/CONCEPT.md) — «Сигнал сквозь шум»
+- [growth/PLAYBOOK.md](../../growth/PLAYBOOK.md)

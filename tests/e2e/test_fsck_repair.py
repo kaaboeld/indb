@@ -1,6 +1,7 @@
 
 import os
 import struct
+import sys
 import pytest
 import subprocess
 from storage.binary import DB_FILE, save_encrypted, load_decrypted
@@ -19,11 +20,11 @@ class TestFsckRepair:
             os.remove(DB_FILE)
             
     def run_fsck(self, repair=False):
-        """Run fsck command."""
-        cmd = ["./venv/bin/python3", "-m", "cli.indb_cli", "fsck"]
+        """Run fsck command with the interpreter running the tests, which has the deps."""
+        cmd = [sys.executable, "-m", "cli.indb_cli", "fsck"]
         if repair:
             cmd.append("--repair")
-        return subprocess.run(cmd, capture_output=True, text=True)
+        return subprocess.run(cmd, capture_output=True, text=True, env=os.environ.copy())
         
     def test_repair_header_corruption(self):
         """Test repairing a file with corrupted CRC but valid payload."""

@@ -8,6 +8,8 @@ from typing import List, Optional
 from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator, ConfigDict
 
+from core.secrets import require_secret
+
 
 class INDBConfig(BaseSettings):
     """Main INDB configuration with validation"""
@@ -41,7 +43,8 @@ class INDBConfig(BaseSettings):
 
     # Authentication Configuration
     jwt_secret: str = Field(
-        default="your-secret-key-change-in-production", validation_alias="JWT_SECRET"
+        default_factory=lambda: require_secret("JWT_SECRET", "signs access tokens"),
+        validation_alias="JWT_SECRET",
     )
     jwt_algorithm: str = Field(default="HS256", validation_alias="JWT_ALGORITHM")
     jwt_expiration_minutes: int = Field(default=30, validation_alias="JWT_EXPIRATION_MINUTES")
@@ -59,7 +62,7 @@ class INDBConfig(BaseSettings):
 
     # Protocol Configuration
     udp_enabled: bool = Field(default=True, validation_alias="UDP_ENABLED")
-    udp_port: int = Field(default=9000, validation_alias="UDP_PORT")
+    udp_port: int = Field(default=9001, validation_alias="UDP_PORT")
     ws_enabled: bool = Field(default=True, validation_alias="WS_ENABLED")
     ws_port: int = Field(default=9001, validation_alias="WS_PORT")
     bson_enabled: bool = Field(default=True, validation_alias="BSON_ENABLED")

@@ -201,13 +201,15 @@ For ease of use (`ingest`), INDB includes an inference engine (`infer_type`) tha
 
 ### Image Storage
 ```python
-# Store image with event
+# Store image with event. The anchor and the location are the two required fields;
+# the bytes themselves ride along in binary_payload and are never serialised to JSON.
 with open("photo.jpg", "rb") as f:
     image_data = f.read()
 
 event = Event(
-    data={"description": "Sunset photo"},
-    binary_payload=image_data
+    raw_data_anchor=["sunset", "photo"],
+    location="camera/roof",
+    binary_payload=image_data,
 )
 ```
 
@@ -223,9 +225,18 @@ def upload_file(filename):
             )
 ```
 
-### HTTP Multipart Upload
+### Over HTTP
+
+There is no multipart upload. `POST /api/v2/events` takes JSON, and raw bytes have no field
+there — binary reaches the store through gRPC, or as `blind_payload`: base64 of a payload
+the client encrypted itself, which the server indexes by metadata and never reads.
+
 ```bash
-curl -X POST http://localhost:8003/api/v2/events/binary \
-  -F "data={\"type\":\"document\"}" \
-  -F "file=@document.pdf"
+curl -X POST http://localhost:8000/api/v2/events \
+  -H "Content-Type: application/json" \
+  -d '{
+    "raw_data_anchor": ["document", "invoice"],
+    "location": "archive/2026",
+    "blind_payload": "'"$(base64 -i encrypted.bin | tr -d '\n')"'"
+  }'
 ```

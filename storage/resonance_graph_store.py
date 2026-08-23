@@ -14,12 +14,19 @@ from typing import Any, Dict, List
 import msgpack
 
 from core.encryption import FileEncryptor
-from storage.binary import DATA_DIR, MAGIC, FORMAT_VERSION, MASTER_KEY
+from storage.format import DATA_DIR, MAGIC, FORMAT_VERSION
 
 logger = logging.getLogger("indb.storage.resonance_graph")
 
 EDGES_FILE = os.path.join(DATA_DIR, "resonance_edges.bin")
 GRAPH_FORMAT_VERSION = 1
+
+
+def _master_key() -> bytes:
+    """Resolved on use: importing storage.binary at module level closes an import cycle."""
+    from storage.binary import MASTER_KEY
+
+    return MASTER_KEY
 
 
 def load_edges() -> Dict[str, List[Dict[str, Any]]]:
@@ -42,7 +49,7 @@ def load_edges() -> Dict[str, List[Dict[str, Any]]]:
             encrypted = payload
         else:
             encrypted = file_data
-        decrypted = FileEncryptor.decrypt_file(encrypted, MASTER_KEY)
+        decrypted = FileEncryptor.decrypt_file(encrypted, _master_key())
         doc = msgpack.unpackb(decrypted, raw=False)
         if isinstance(doc, dict) and doc.get("version") == GRAPH_FORMAT_VERSION:
             edges = doc.get("edges", {})
@@ -57,7 +64,7 @@ def save_edges(edges: Dict[str, List[Dict[str, Any]]]) -> None:
     """Atomic write of edge adjacency."""
     doc = {"version": GRAPH_FORMAT_VERSION, "edges": edges}
     serialized = msgpack.packb(doc)
-    encrypted = FileEncryptor.encrypt_file(serialized, MASTER_KEY)
+    encrypted = FileEncryptor.encrypt_file(serialized, _master_key())
     crc = zlib.crc32(encrypted) & 0xFFFFFFFF
     header = struct.pack(">4sBI", MAGIC, FORMAT_VERSION, crc)
     tmp = EDGES_FILE + ".tmp"

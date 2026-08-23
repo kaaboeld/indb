@@ -11,7 +11,9 @@ from core.deps import IndbDep
 from core.models import StandardResponse
 from services.fusion.metrics import compute_fusion_metrics, is_fused_record
 
-router = APIRouter(prefix="/api/v2", tags=["analytics"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(prefix="/api/v2", tags=["analytics"], route_class=ContentNegotiationRoute)
 
 
 # ============================================================================
@@ -122,6 +124,22 @@ async def neural_pattern_analysis(db: IndbDep):
 # General Analytics
 # ============================================================================
 
+@router.get("/analytics", response_model=StandardResponse[Dict[str, Any]])
+async def get_analytics_summary(db: IndbDep):
+    """Analytics overview with the headline event count at the top level (v2)."""
+    overview = db.db.get_stats()
+    # cli/load_books.py and the protocol suite read data.total_events directly, so the
+    # count is promoted out of the nested database block instead of only living there.
+    return StandardResponse(
+        data={
+            "total_events": overview.get("database", {}).get(
+                "total_events", db.get_event_count()
+            ),
+            **overview,
+        }
+    )
+
+
 @router.get("/analytics/overview", response_model=StandardResponse[Dict[str, Any]])
 async def get_analytics_overview(db: IndbDep):
     """Get comprehensive analytics overview (v2)."""
@@ -166,6 +184,14 @@ async def get_temporal_analytics(db: IndbDep):
 async def get_token_analytics(db: IndbDep):
     """Get token analysis (v2)."""
     return StandardResponse(data=db.db.analytics.get_token_stats())
+
+
+@router.get("/cache/stats", response_model=StandardResponse[Dict[str, Any]])
+async def get_cache_statistics():
+    """Hit rates and sizes of the query, fusion and event caches (v2)."""
+    from core.cache import get_cache_stats
+
+    return StandardResponse(data=get_cache_stats())
 
 
 @router.get("/analytics/performance", response_model=StandardResponse[Dict[str, Any]])

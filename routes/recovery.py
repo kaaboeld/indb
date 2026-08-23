@@ -23,7 +23,13 @@ from core.signing import (
     verify_event_signature,
 )
 
-router = APIRouter(prefix="/api/v2/recovery", tags=["Recovery (Signed Memory)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/recovery",
+    tags=["Recovery (Signed Memory)"],
+    route_class=ContentNegotiationRoute,
+)
 
 _FORBIDDEN_SECRET_FIELDS = frozenset({
     "private_key",

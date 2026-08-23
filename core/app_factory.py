@@ -3,6 +3,7 @@ Application Factory (v2).
 
 Centralizes FastAPI application creation, middleware configuration, and initializing services.
 """
+import asyncio
 import os
 import time
 import logging
@@ -34,7 +35,7 @@ from core.middleware import (
     BrotliMiddleware, 
     metrics_endpoint
 )
-from core.startup import register_startup_handlers
+from core.startup import start_background_protocols, stop_background_protocols
 from core.models import HealthStatus
 
 # Router Imports
@@ -56,6 +57,24 @@ from interfaces.rest.loadbalancer import router as loadbalancer_router
 from core.raft.node import RaftNode
 from core.raft.api import router as raft_router
 import core.raft.api
+
+def _warm_embeddings() -> None:
+    """
+    Load the embedding model ahead of the first request that needs it.
+
+    Absence of sentence-transformers is a supported configuration — semantic similarity
+    falls back to token overlap — so failure here is logged and nothing more.
+    """
+    try:
+        from services.ml.embeddings import SemanticEmbeddings
+
+        SemanticEmbeddings().get_embedding(["warmup"])
+        logger.info("Embedding model ready")
+    except ImportError:
+        logger.info("sentence-transformers not installed — semantic similarity uses token overlap")
+    except Exception as exc:
+        logger.warning("Embedding warmup failed (%s); first semantic query will be slow", exc)
+
 
 def create_app() -> FastAPI:
     """
@@ -111,8 +130,18 @@ def create_app() -> FastAPI:
             logger.info("Starting Raft consensus node...")
             raft_node.start()
 
+        # gRPC and UDP live here, not in an on_event handler: FastAPI ignores those once a
+        # lifespan is given, which is why both protocols were silently absent.
+        await start_background_protocols()
+
         from services.sources import source_manager
         await source_manager.start_all(kernel)
+
+        # The embedding model loads on first use, and that first use is a user request:
+        # Prism, Instinct and semantic neighbours all wait tens of seconds for it while the
+        # weights come off disk. Loading it in a background thread means the process is
+        # serving immediately and only the requests that arrive during warmup pay anything.
+        warmup = asyncio.create_task(asyncio.to_thread(_warm_embeddings))
 
         streamable_lifespan = get_streamable_lifespan()
         if streamable_lifespan is not None:
@@ -122,6 +151,8 @@ def create_app() -> FastAPI:
             yield  # ── Application runs here ─────────────────────────────────────
 
         # ── SHUTDOWN ──────────────────────────────────────────────────────────
+        warmup.cancel()
+        await stop_background_protocols()
         if raft_node:
             await raft_node.stop()
         from services.sources import source_manager  # noqa: F811 (reimport for clarity)
@@ -144,7 +175,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
     
-    # Set Global Route Class
+    # Routes defined on the app itself. Included routers keep the class they were built
+    # with, so each one sets route_class=ContentNegotiationRoute where it is declared.
     app.router.route_class = ContentNegotiationRoute
     
     # Inject Kernel into State
@@ -303,6 +335,4 @@ def create_app() -> FastAPI:
     # --------------------------------------------------------------------------
     # Lifecycle Handlers
     # --------------------------------------------------------------------------
-    register_startup_handlers(app)
-
     return app

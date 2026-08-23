@@ -25,8 +25,9 @@ class TestSystemStability:
         self.kernel.db = INDB(raft_node=None)
         self.kernel.initialize(self.kernel.db)
         
-        # Patch main.kernel so app uses our test kernel
-        monkeypatch.setattr("main.kernel", self.kernel)
+        # The app resolves its kernel through app.state.indb (see core.deps.IndbDep), so the
+        # test kernel has to be installed there rather than as a module attribute.
+        monkeypatch.setattr(app.state, "indb", self.kernel)
         
         # Verify Zero Legacy (no compat.py usage)
         import sys
@@ -126,7 +127,10 @@ class TestSystemStability:
         from core.kernel import AuthContext
         auth = AuthContext(user_id="api_writer")
         
-        await self.kernel.create_event({"raw_data_anchor": ["stress", "test"]}, auth=auth)
+        await self.kernel.create_event(
+            {"raw_data_anchor": ["stress", "test"], "location": "stability/lab"},
+            auth=auth,
+        )
         
         # Assert Threshold Increased due to High CPU
         assert self.kernel.db.fusion_engine.config["threshold"] > 0.75
@@ -138,9 +142,17 @@ class TestSystemStability:
         """
         Verify that documentation builds correctly.
         """
+        import shutil
         import subprocess
-        # Use venv path
-        mkdocs_bin = "./venv/bin/mkdocs"
+
+        # Wherever mkdocs happens to live: the docs image installs it globally, a local
+        # checkout usually inside a virtualenv. Absence of the tool is not a docs defect.
+        mkdocs_bin = shutil.which("mkdocs") or (
+            "./venv/bin/mkdocs" if os.path.exists("./venv/bin/mkdocs") else None
+        )
+        if mkdocs_bin is None:
+            pytest.skip("mkdocs is not installed in this environment")
+
         result = subprocess.run(
             [mkdocs_bin, "build", "--strict"], 
             capture_output=True, 

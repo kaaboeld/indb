@@ -30,9 +30,6 @@ try:
 except ImportError:
     pass
 
-# MCP Server Instance
-mcp_server = Server("indb-mcp")
-
 # Transport with permissive security for localhost (Hermes, Cursor, etc.)
 _security = TransportSecuritySettings(
     enable_dns_rebinding_protection=False,
@@ -44,51 +41,49 @@ _security = TransportSecuritySettings(
 )
 sse_transport = SseServerTransport("/messages/", security_settings=_security)
 
-
-@mcp_server.list_tools()
-async def handle_list_tools() -> list[types.Tool]:
-    return [
-        types.Tool(
-            name="query_events",
-            description="Query events from INDB. filter_key='location' + filter_value for location substring. filter_key=word (e.g. epistemology, memory) with filter_value='' to search event content by token.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "filter_key": {"type": "string", "description": "location, temporal, or a token word to search in content"},
-                    "filter_value": {"type": "string", "description": "Filter value; empty for token search"},
-                    "mood": {"type": "string", "description": "Context mood (e.g. Fear, Joy, Neutral)"},
-                    "limit": {"type": "integer", "default": 20},
-                    "offset": {"type": "integer", "default": 0}
-                }
-            }
-        ),
-        types.Tool(
-            name="ingest_event",
-            description="Store a fact or summary in INDB. Use meaningful tokens: key words from the content. Location format: source/context (e.g. hermes://fetch/wikipedia-summary, hermes://user/request).",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "content": {"type": "string", "description": "Content tokens space separated (e.g. epistemology branch philosophy knowledge truth)"},
-                    "location": {"type": "string", "description": "Event location e.g. hermes://source/context"},
-                    "blind_payload": {"type": "string", "description": "Confidential payload (optional)"}
-                },
-                "required": ["content", "location"]
-            }
-        ),
-        types.Tool(
-            name="get_stats",
-            description="Get database statistics",
-            inputSchema={"type": "object"}
-        )
-    ]
+_MCP_TOOLS: List[types.Tool] = [
+    types.Tool(
+        name="query_events",
+        description="Query events from INDB. filter_key='location' + filter_value for location substring. filter_key=word (e.g. epistemology, memory) with filter_value='' to search event content by token.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "filter_key": {"type": "string", "description": "location, temporal, or a token word to search in content"},
+                "filter_value": {"type": "string", "description": "Filter value; empty for token search"},
+                "mood": {"type": "string", "description": "Context mood (e.g. Fear, Joy, Neutral)"},
+                "limit": {"type": "integer", "default": 20},
+                "offset": {"type": "integer", "default": 0},
+            },
+        },
+    ),
+    types.Tool(
+        name="ingest_event",
+        description="Store a fact or summary in INDB. Use meaningful tokens: key words from the content. Location format: source/context (e.g. hermes://fetch/wikipedia-summary, hermes://user/request).",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "content": {"type": "string", "description": "Content tokens space separated (e.g. epistemology branch philosophy knowledge truth)"},
+                "location": {"type": "string", "description": "Event location e.g. hermes://source/context"},
+                "blind_payload": {"type": "string", "description": "Confidential payload (optional)"},
+            },
+            "required": ["content", "location"],
+        },
+    ),
+    types.Tool(
+        name="get_stats",
+        description="Get database statistics",
+        inputSchema={"type": "object"},
+    ),
+]
 
 
-@mcp_server.call_tool()
-async def handle_call_tool(
-    name: str, arguments: dict | None
-) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
-    if not arguments:
-        arguments = {}
+async def _handle_list_tools(_ctx, _params) -> types.ListToolsResult:
+    return types.ListToolsResult(tools=_MCP_TOOLS)
+
+
+async def _handle_call_tool(_ctx, params: types.CallToolRequestParams) -> types.CallToolResult:
+    name = params.name
+    arguments: Dict[str, Any] = dict(params.arguments or {})
 
     if name == "query_events":
         query = QueryRequest(
@@ -96,7 +91,7 @@ async def handle_call_tool(
             filter_value=arguments.get("filter_value"),
             context_mood=arguments.get("mood") or INTERPRET_MOOD_DEFAULT,
             limit=arguments.get("limit", 10),
-            offset=arguments.get("offset", 0)
+            offset=arguments.get("offset", 0),
         )
         events = indb.query(query, AuthContext(user_id="mcp-agent", auth_method="mcp"))
 
@@ -106,9 +101,9 @@ async def handle_call_tool(
             serialized.append(f"- ID: {d.get('id')}\n  Loc: {d.get('location')}\n  Data: {d.get('raw_data_anchor')}")
 
         text = "\n".join(serialized) if serialized else "No events found."
-        return [types.TextContent(type="text", text=text)]
+        return types.CallToolResult(content=[types.TextContent(type="text", text=text)])
 
-    elif name == "ingest_event":
+    if name == "ingest_event":
         content = arguments.get("content", "").split()
         location = arguments.get("location")
         blind = arguments.get("blind_payload")
@@ -116,18 +111,28 @@ async def handle_call_tool(
         event_data = {
             "raw_data_anchor": content,
             "location": location,
-            "blind_payload": blind
+            "blind_payload": blind,
         }
 
         res = await indb.create_event(event_data, AuthContext(user_id="mcp-agent"))
-        return [types.TextContent(type="text", text=f"Ingested Event ID: {res['id']}")]
+        return types.CallToolResult(content=[types.TextContent(type="text", text=f"Ingested Event ID: {res['id']}")])
 
-    elif name == "get_stats":
-        stats = indb.db.get_stats()  # Full analytics (kernel.get_stats is minimal)
+    if name == "get_stats":
+        stats = indb.db.get_stats()
         clean_stats = {k: str(v) for k, v in stats.items()}
-        return [types.TextContent(type="text", text=json.dumps(clean_stats, indent=2))]
+        return types.CallToolResult(
+            content=[types.TextContent(type="text", text=json.dumps(clean_stats, indent=2))]
+        )
 
     raise ValueError(f"Unknown tool: {name}")
+
+
+# MCP Server Instance (MCP SDK 2.x constructor-based handlers)
+mcp_server = Server(
+    "indb-mcp",
+    on_list_tools=_handle_list_tools,
+    on_call_tool=_handle_call_tool,
+)
 
 
 async def handle_sse(request: Request) -> Response:

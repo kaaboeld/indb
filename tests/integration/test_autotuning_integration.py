@@ -37,7 +37,7 @@ async def test_autotuning_integration(tmp_path, monkeypatch):
     from core.kernel import AuthContext
     auth = AuthContext("api_writer")
     
-    await k.create_event({"raw_data_anchor": ["test"]}, auth)
+    await k.create_event({"raw_data_anchor": ["test"], "location": "tuning/lab"}, auth)
     
     # Check if threshold increased (High CPU > 80% -> +0.05 capped at 0.95)
     # 0.85 -> 0.90

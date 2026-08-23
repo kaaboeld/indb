@@ -12,6 +12,7 @@ from fastapi import APIRouter, Request, HTTPException, Query
 from fastapi.responses import StreamingResponse
 
 from core.kernel import AuthContext, QueryRequest
+from core.cache import cache_query, get_cached_query
 from core.deps import IndbDep
 from core.constants import INTERPRET_MOOD_DEFAULT, EVENT_RESPONSE_MISSING_ID, EVENT_RESPONSE_MISSING_LOCATION
 from core.rate_limit import limiter, RateLimits
@@ -22,11 +23,12 @@ from core.models import (
     InterpretationResponse
 )
 from services.interpretation.emotional_firewall import EmotionalFirewall, FirewallMode
-from services.ml.emotion_classifier import EmotionClassifier
 from services.query.advanced_filter import AdvancedFilter, FilterCriteria
 from services import ML_AVAILABLE
 
-router = APIRouter(prefix="/api/v2", tags=["query"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(prefix="/api/v2", tags=["query"], route_class=ContentNegotiationRoute)
 
 
 @router.get("/events", response_model=StandardResponse[List[EventResponse]])
@@ -40,6 +42,22 @@ async def list_events(
 ):
     """List all events with pagination and filtering (v2)."""
     mood = context_mood or INTERPRET_MOOD_DEFAULT
+
+    # Interpretation runs over the whole page on every read, so identical pages are served
+    # from the query cache. _persist() drops the cache on any write, which keeps a cached
+    # page from outliving the memory it describes.
+    cache_key = f"events:{limit}:{offset}:{filter_key}:{filter_value}:{mood}"
+    cached = get_cached_query(cache_key)
+    if cached is not None:
+        data, total = cached
+        return StandardResponse(
+            data=data,
+            meta={
+                "pagination": {"total": total, "limit": limit, "offset": offset},
+                "filters": {"key": filter_key, "value": filter_value, "mood": mood},
+                "cached": True,
+            },
+        )
 
     query = QueryRequest(
         limit=limit,
@@ -74,11 +92,14 @@ async def list_events(
             fusion_count=e_dict.get("fusion_count"),
         ))
 
+    total = db.get_event_count()
+    cache_query(cache_key, (data, total))
+
     return StandardResponse(
         data=data,
         meta={
             "pagination": {
-                "total": db.get_event_count(),
+                "total": total,
                 "limit": limit,
                 "offset": offset
             },
@@ -86,7 +107,8 @@ async def list_events(
                 "key": filter_key,
                 "value": filter_value,
                 "mood": mood
-            }
+            },
+            "cached": False,
         }
     )
 
@@ -232,9 +254,11 @@ async def interpret_events(request: Request, payload: InterpretationRequest, db:
     """
     Interpret events based on context (v2).
     """
+    start_time = time.time()
+
     context = payload.context
     temporal_query = payload.temporal_query
-    # limit = payload.limit # Unused directly in logic below?
+    limit = payload.limit
     firewall_mode = payload.firewall_mode
 
     # Get context mood (input from request)
@@ -246,6 +270,13 @@ async def interpret_events(request: Request, payload: InterpretationRequest, db:
     # Apply temporal filter BEFORE interpretation
     if temporal_query:
         raw_events = db.db.filter_by_temporal_query(raw_events, temporal_query)
+
+    # The most recent slice, and only that slice, is interpreted. Memory keeps insertion
+    # order, so the tail is the present; interpreting everything meant a request for ten
+    # events rendered the entire store on every call.
+    matched_count = len(raw_events)
+    if limit and limit > 0:
+        raw_events = raw_events[-limit:]
 
     # Now scan/interpret the filtered events
     try:
@@ -264,25 +295,6 @@ async def interpret_events(request: Request, payload: InterpretationRequest, db:
         }
         firewall = EmotionalFirewall(mode=mode_map.get(firewall_mode, FirewallMode.BLOCK))
 
-        # Initialize classifier
-        classifier = EmotionClassifier()
-        
-        # Convert events to dict format for firewall
-        events_for_fw = []
-        for e in events:
-            # Handle both dict and object
-            anchor = e.get("raw_data_anchor", []) if isinstance(e, dict) else e.raw_data_anchor
-            # Basic conversion for firewall check
-            events_for_fw.append({
-                "id": e.get("id") if isinstance(e, dict) else e.id,
-                "raw_data_anchor": anchor,
-                "derived_emotion": INTERPRET_MOOD_DEFAULT  # Placeholder, updated by classifier
-            })
-
-        # Process through firewall
-        # Note: EmotionalFirewall.process expects a list of event dicts
-        # We need to recreate the logic from main.py where it iterates and classifies
-        
         filtered_events = []
         blocked_count = 0
         redacted_count = 0
@@ -290,11 +302,10 @@ async def interpret_events(request: Request, payload: InterpretationRequest, db:
 
         for evt in events:
             evt_dict = evt if isinstance(evt, dict) else evt.to_dict()
-            
-            # Classify emotion
-            tokens = evt_dict.get("raw_data_anchor", [])
-            emotion = classifier.classify(tokens)
-            evt_dict["derived_emotion"] = emotion.value
+
+            # scan() renders every event through the interpretation engine, so the emotion
+            # is already derived from mood and tokens — re-deriving it here would ignore mood.
+            evt_dict.setdefault("derived_emotion", INTERPRET_MOOD_DEFAULT)
 
             # Check firewall
             allowed, action, reason = firewall.check(evt_dict)
@@ -329,7 +340,16 @@ async def interpret_events(request: Request, payload: InterpretationRequest, db:
             events=[e if isinstance(e, dict) else e.to_dict() for e in events],
             context_mood=mood,
             firewall_report=firewall_report
-        )
+        ),
+        meta={
+            "performance": {
+                "processing_time_ms": round((time.time() - start_time) * 1000, 2),
+                "total_events": matched_count,
+                "interpreted_count": len(events),
+            },
+            "temporal_query": temporal_query,
+            "limit": limit,
+        }
     )
 
 

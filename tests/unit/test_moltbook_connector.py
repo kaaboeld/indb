@@ -190,7 +190,7 @@ def test_connector_disabled_without_key():
     connector = MoltbookConnector(kernel=MagicMock(), config=cfg)
     # start() should return immediately without running
     import asyncio
-    asyncio.get_event_loop().run_until_complete(connector.start())
+    asyncio.run(connector.start())
     assert not connector._running
 
 
@@ -200,5 +200,5 @@ def test_connector_disabled_by_flag():
     cfg = MoltbookConfig(api_key="somekey", enabled=False)
     connector = MoltbookConnector(kernel=MagicMock(), config=cfg)
     import asyncio
-    asyncio.get_event_loop().run_until_complete(connector.start())
+    asyncio.run(connector.start())
     assert not connector._running

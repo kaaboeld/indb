@@ -4,12 +4,13 @@ Benchmark 100k events/sec ingestion performance.
 """
 
 import asyncio
+import os
 import time
 import httpx
 from typing import List, Dict, Any
 import statistics
 
-BASE_URL = "http://localhost:8003"
+BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
 TARGET_EVENTS = 100_000
 CONCURRENT_REQUESTS = 100
 
@@ -148,7 +149,7 @@ async def run_load_test():
 
 if __name__ == "__main__":
     print("Starting INDB Load Test...")
-    print("Make sure INDB is running on http://localhost:8003")
+    print(f"Make sure INDB is running on {BASE_URL}")
     print()
     
     try:

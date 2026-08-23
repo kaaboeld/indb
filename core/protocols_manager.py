@@ -1,10 +1,27 @@
 import asyncio
 import logging
+import os
 import threading
 from typing import Dict, Any, Optional, Callable
 from pydantic import BaseModel
 
 logger = logging.getLogger("indb.protocols")
+
+DEFAULT_HTTP_PORT = 8000
+
+
+def http_port() -> int:
+    """
+    The port the HTTP interface is actually served on.
+
+    Reported by /api/v2/system/protocols and shown in the WUI, so a hardcoded value here
+    made the API describe a port it was not listening on: containers and fly.toml set PORT.
+    """
+    for var in ("PORT", "INDB_PORT"):
+        raw = os.getenv(var, "").strip()
+        if raw.isdigit():
+            return int(raw)
+    return DEFAULT_HTTP_PORT
 
 class ProtocolStatus(BaseModel):
     name: str
@@ -23,10 +40,11 @@ class ProtocolManager:
         self._status: Dict[str, ProtocolStatus] = {}
         
         # Register known protocols (initial state)
-        self.register("HTTP/REST", 8003, "Interface", "Active", "Bearer Token + Signature")
-        self.register("WebSocket", 8003, "Realtime", "Active", "JWT/Bearer") # Shared port
+        port = http_port()
+        self.register("HTTP/REST", port, "Interface", "Active", "Bearer Token + Signature")
+        self.register("WebSocket", port, "Realtime", "Active", "JWT/Bearer") # Shared port
 
-        self.register("Prometheus", 8003, "Observability", "Active", "None")
+        self.register("Prometheus", port, "Observability", "Active", "None")
 
     def register(self, name: str, port: int, p_type: str, status: str, auth: str):
         self._status[name] = ProtocolStatus(

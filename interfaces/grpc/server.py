@@ -105,10 +105,13 @@ class INDBServiceServicer(indb_pb2_grpc.INDBServiceServicer):
             )
 
 def serve(port=50051):
+    from core.fly_network import grpc_bind_host
+
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     indb_pb2_grpc.add_INDBServiceServicer_to_server(INDBServiceServicer(), server)
-    server.add_insecure_port(f'[::]:{port}')
-    print(f"gRPC Server starting on port {port}...")
+    # [::] only listens on IPv6; Fly Proxy reaches the VM over private IPv4.
+    server.add_insecure_port(f"{grpc_bind_host()}:{port}")
+    print(f"gRPC Server starting on {grpc_bind_host()}:{port}...")
     server.start()
     server.wait_for_termination()
     return server

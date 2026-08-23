@@ -17,7 +17,7 @@
       - `POST /webhooks`
       - `gRPC IngestStream` on `:50051`.
   - Updated the **Base URL** in the docs to match the Docker compose mapping:
-    - From `http://localhost:8003/api/v2`
+    - From `http://localhost:8000/api/v2`
     - To   `http://localhost:8000/api/v2`.
   - Expanded the top of the document with a short reminder of the **concept**:
     - Events as memories that can age, fuse, decay, and carry blind payloads.

@@ -21,6 +21,11 @@ theme:
     - search.highlight
     - content.code.copy
 
+extra:
+  analytics:
+    provider: google
+    property: G-VM2EFYWCD6
+
 extra_css:
   - stylesheets/indb.css
 

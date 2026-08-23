@@ -3,9 +3,14 @@ Data Flow Tests for INDB
 Validates all data paths through the system.
 """
 
+import os
+
 import pytest
 import asyncio
 from typing import Dict, Any
+
+# Same default as the rest of the project: Dockerfile, fly.toml and the launcher use 8000.
+BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
 
 from core.kernel import INDBKernel
 from core.event import Event
@@ -207,7 +212,7 @@ class TestProtocolFlow:
         async with httpx.AsyncClient() as client:
             # Send event via HTTP
             response = await client.post(
-                "http://localhost:8003/api/v2/events",
+                f"{BASE_URL}/api/v2/events",
                 json={
                     "raw_data_anchor": ["protocol:http", "test:flow"],
                     "location": "TestClient"
@@ -230,7 +235,7 @@ class TestProtocolFlow:
         async with httpx.AsyncClient() as client:
             # Query events
             response = await client.get(
-                "http://localhost:8003/api/v2/events?limit=5",
+                f"{BASE_URL}/api/v2/events?limit=5",
                 timeout=5.0
             )
             

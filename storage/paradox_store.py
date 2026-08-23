@@ -8,11 +8,18 @@ import msgpack
 
 from core.encryption import FileEncryptor
 from core.paradox import Paradox
-from storage.binary import DATA_DIR, MASTER_KEY
+from storage.format import DATA_DIR
 
 logger = logging.getLogger("indb.storage.paradox")
 
 PARADOX_FILE = os.path.join(DATA_DIR, "paradox.bin")
+
+
+def _master_key() -> bytes:
+    """Resolved on use: importing storage.binary at module level closes an import cycle."""
+    from storage.binary import MASTER_KEY
+
+    return MASTER_KEY
 
 
 def load_paradoxes() -> Dict[str, Paradox]:
@@ -23,7 +30,7 @@ def load_paradoxes() -> Dict[str, Paradox]:
             raw = f.read()
         if not raw:
             return {}
-        decrypted = FileEncryptor.decrypt_file(raw, MASTER_KEY)
+        decrypted = FileEncryptor.decrypt_file(raw, _master_key())
         items = msgpack.unpackb(decrypted, raw=False)
         return {
             item["id"]: Paradox.from_dict(item)
@@ -39,7 +46,7 @@ def save_paradoxes(paradoxes: Dict[str, Paradox]) -> None:
     try:
         items: List[dict] = [p.to_dict() for p in paradoxes.values()]
         packed = msgpack.packb(items, use_bin_type=True)
-        encrypted = FileEncryptor.encrypt_file(packed, MASTER_KEY)
+        encrypted = FileEncryptor.encrypt_file(packed, _master_key())
         os.makedirs(DATA_DIR, exist_ok=True)
         with open(PARADOX_FILE, "wb") as f:
             f.write(encrypted)

@@ -76,15 +76,22 @@ curl http://localhost:8000/api/v2/events?limit=3
 Some sentences from the same book are semantically similar. After loading, check fusion stats:
 
 ```bash
-curl http://localhost:8000/api/v2/stats
+curl http://localhost:8000/api/v2/fusion/stats
 ```
 
 ```json
 {
-  "total_events": 712,
-  "fused_events": 135,
-  "fusion_ratio": 0.16,
-  "fusion_threshold": 0.95
+  "summary": {
+    "total_events": 712,
+    "fused_events": 135,
+    "regular_events": 577,
+    "total_fusions": 168
+  },
+  "metrics": {
+    "fusion_rate": 0.23,
+    "storage_efficiency": 80.36,
+    "events_saved": 33
+  }
 }
 ```
 

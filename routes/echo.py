@@ -3,7 +3,13 @@ from pydantic import BaseModel
 from typing import List, Optional
 from core.echo import ResonanceEngine, ResonanceResult
 
-router = APIRouter(prefix="/api/v2/echo", tags=["Echo (Resonance)"])
+from core.routing import ContentNegotiationRoute
+
+router = APIRouter(
+    prefix="/api/v2/echo",
+    tags=["Echo (Resonance)"],
+    route_class=ContentNegotiationRoute,
+)
 
 class ResonateRequest(BaseModel):
     seed_id: str

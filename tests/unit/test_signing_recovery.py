@@ -14,6 +14,7 @@ from core.signing import (
     sign_event,
     verify_event_signature,
 )
+from services.fusion import FusedEvent
 
 
 @pytest.fixture
@@ -116,3 +117,49 @@ def test_restore_rejects_wrong_key_id(indb_instance, writer_key):
     )
     assert result["verified_count"] == 0
     assert result["failed_count"] == 1
+
+
+def _signed_observation(writer_key, tokens, location, timestamp):
+    payload = {
+        "id": str(uuid.uuid4()),
+        "timestamp": timestamp,
+        "raw_data_anchor": tokens,
+        "location": location,
+    }
+    payload["signature"] = sign_event(payload, writer_key)
+    return payload
+
+
+def test_identical_signed_events_are_not_fused(indb_instance, writer_key):
+    """
+    Two attestations of the same observation stay two records.
+
+    Fusing them would yield a record no key signed: verification breaks and recovery by
+    key_id loses the pair, which is exactly what Grain's redundant tier relies on.
+    """
+    pub_b64 = base64.b64encode(writer_key.public_key().public_bytes_raw()).decode()
+    key_id = compute_key_id(pub_b64)
+
+    first = _signed_observation(writer_key, ["quay", "fog"], "harbour/berth-9", 1770018600.0)
+    second = _signed_observation(writer_key, ["quay", "fog"], "harbour/berth-9", 1770018601.0)
+
+    indb_instance._store_event(Event.from_dict(first))
+    indb_instance._store_event(Event.from_dict(second))
+
+    found = indb_instance.events_by_key_id(key_id)
+    assert {e.id for e in found} == {first["id"], second["id"]}
+
+    for event in found:
+        valid, recovered_key_id, err = verify_event_signature(event.to_dict())
+        assert valid is True, err
+        assert recovered_key_id == key_id
+
+
+def test_identical_unsigned_events_still_fuse(indb_instance):
+    """Control for the guard above: fusion itself must keep working for plain events."""
+    common = dict(raw_data_anchor=["quay", "fog"], location="harbour/berth-9")
+    indb_instance._store_event(Event(timestamp=1770018600.0, **common))
+    stored = indb_instance._store_event(Event(timestamp=1770018601.0, **common))
+
+    assert isinstance(stored, FusedEvent)
+    assert stored.fusion_count >= 1
