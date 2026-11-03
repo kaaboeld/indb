@@ -21,6 +21,7 @@ indb.key
 auth/certificates/*.crt
 auth/certificates/*.key
 data-node-*/
+logs-node-*/
 audit.bin
 indb.bin
 cold.bin
