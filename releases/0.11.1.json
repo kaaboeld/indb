@@ -9,5 +9,7 @@
     "The embedding path still sees the whole hot tier",
     "A fused body is replaced by id"
   ],
-  "packed_at": "2026-11-03T21:40:00Z"
+  "packed_at": "2026-11-03T21:40:00Z",
+  "download": "https://indb.tech/releases/indb-0.11.1.tar.gz",
+  "latest": "https://indb.tech/releases/indb-latest.tar.gz"
 }

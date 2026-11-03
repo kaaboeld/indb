@@ -17,6 +17,7 @@ import argparse
 import gzip
 import hashlib
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -29,6 +30,7 @@ SITE = ROOT.parent / "site"
 CONSTANTS = ROOT / "core" / "constants.py"
 MANIFEST = ROOT / "releases" / "manifest.json"
 DIST = ROOT / "dist"
+PUBLIC = "https://indb.tech/releases"
 VERSION_RE = re.compile(r'^(VERSION\s*=\s*")([^"]+)(")', re.M)
 
 
@@ -83,6 +85,55 @@ def sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def same_file(left: Path, right: Path) -> bool:
+    try:
+        a, b = left.stat(), right.stat()
+    except OSError:
+        return False
+    return a.st_dev == b.st_dev and a.st_ino == b.st_ino
+
+
+def link_or_copy(src: Path, dest: Path) -> None:
+    if same_file(src, dest):
+        return
+    if dest.exists() or dest.is_symlink():
+        dest.unlink()
+    try:
+        os.link(src, dest)
+    except OSError:
+        shutil.copy2(src, dest)
+
+
+def write_latest(ver: str, archive: Path) -> dict:
+    """Public names for one cut: indb-X.Y.Z.tar.gz and indb-latest.tar.gz.
+
+    latest is the same bytes. The next pack replaces that name.
+    """
+    checksum = sha256(archive)
+    DIST.mkdir(parents=True, exist_ok=True)
+    versioned = DIST / f"indb-{ver}.tar.gz"
+    latest = DIST / "indb-latest.tar.gz"
+    link_or_copy(archive, versioned)
+    link_or_copy(archive, latest)
+    (DIST / f"indb-{ver}.sha256").write_text(f"{checksum}  indb-{ver}.tar.gz\n")
+    (DIST / "indb-latest.sha256").write_text(f"{checksum}  indb-latest.tar.gz\n")
+    payload = {
+        "version": ver,
+        "image": f"indb:{ver}",
+        "also": "indb:latest",
+        "archive": f"{PUBLIC}/indb-{ver}.tar.gz",
+        "latest": f"{PUBLIC}/indb-latest.tar.gz",
+        "checksum": f"{PUBLIC}/indb-latest.sha256",
+        "sha256": checksum,
+        "bytes": archive.stat().st_size,
+    }
+    (DIST / "latest.json").write_text(json.dumps(payload, indent=2) + "\n")
+    print(f"image: latest  indb-latest.tar.gz  is  indb:{ver}")
+    print(f"  {payload['latest']}")
+    print(f"  {payload['archive']}")
+    return payload
 
 
 def export(ver: str) -> Path:
@@ -156,6 +207,7 @@ echo "same cut as https://api.indb.tech"
     print(f"image: portable bundle {bundle.relative_to(ROOT)}")
     print(f"  {archive.name}  {archive.stat().st_size} bytes")
     print(f"  sha256  {checksum}")
+    write_latest(ver, archive)
     return bundle
 
 
