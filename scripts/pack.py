@@ -93,6 +93,36 @@ def write_json(path: Path, data: Dict[str, Any]) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
 
+def stamp_latest(version: str, dry: bool) -> Dict[str, Any]:
+    """Point the catalog at the latest alias image.py just wrote."""
+    info_path = ROOT / "dist" / "latest.json"
+    if dry:
+        print(f"  latest indb-latest.tar.gz → {version}")
+        return load_manifest()
+    if not info_path.is_file():
+        die("dist/latest.json missing after export")
+    info = json.loads(info_path.read_text())
+    if info.get("version") != version:
+        die(f"latest.json is {info.get('version')} — expected {version}")
+    manifest = load_manifest()
+    manifest["published"] = version
+    manifest["latest"] = info["latest"]
+    for release in manifest.get("releases", []):
+        if release.get("version") == version:
+            release["download"] = info["archive"]
+            release["latest"] = info["latest"]
+            write_json(ROOT / "releases" / f"{version}.json", release)
+    ordered = {
+        "current": manifest.get("current", version),
+        "published": manifest["published"],
+        "latest": manifest["latest"],
+        "releases": manifest.get("releases", []),
+    }
+    write_json(MANIFEST, ordered)
+    print(f"  latest {info['latest']}")
+    return ordered
+
+
 def publish_site(manifest: Dict[str, Any], dry: bool) -> None:
     if not SITE.is_dir():
         die(f"sibling site not found at {SITE}")
@@ -134,9 +164,19 @@ def pack(args: argparse.Namespace) -> None:
         "packed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
-    manifest = load_manifest()
-    others = [r for r in manifest.get("releases", []) if r.get("version") != version]
+    previous = load_manifest()
+    others = [r for r in previous.get("releases", []) if r.get("version") != version]
     manifest = {"current": version, "releases": [release, *others]}
+    if previous.get("published"):
+        manifest["published"] = previous["published"]
+    if previous.get("latest"):
+        manifest["latest"] = previous["latest"]
+    manifest = {
+        "current": manifest["current"],
+        **({"published": manifest["published"]} if "published" in manifest else {}),
+        **({"latest": manifest["latest"]} if "latest" in manifest else {}),
+        "releases": manifest["releases"],
+    }
 
     print(f"pack {current} → {version}" + (" (dry-run)" if args.dry_run else ""))
     print(f"  title  {release['title']}")
@@ -149,9 +189,6 @@ def pack(args: argparse.Namespace) -> None:
         write_version(version)
         write_json(MANIFEST, manifest)
         write_json(ROOT / "releases" / f"{version}.json", release)
-
-    if args.publish_site or args.deploy_site:
-        publish_site(manifest, args.dry_run)
 
     if args.docker or args.export:
         run(
@@ -173,6 +210,10 @@ def pack(args: argparse.Namespace) -> None:
     if args.export:
         export_cmd = [sys.executable, str(ROOT / "scripts" / "image.py"), "--export-only"]
         run(export_cmd, ROOT, args.dry_run)
+        manifest = stamp_latest(version, args.dry_run)
+
+    if args.publish_site or args.deploy_site:
+        publish_site(manifest, args.dry_run)
 
     if args.deploy:
         run(["fly", "deploy", "--app", "indb"], ROOT, args.dry_run)
@@ -204,7 +245,7 @@ def main() -> None:
     parser.add_argument(
         "--export",
         action="store_true",
-        help="write portable dist/indb-VERSION/ (docker save + run.sh)",
+        help="write dist/indb-VERSION/ and indb-latest.tar.gz (same bytes)",
     )
     parser.add_argument("--deploy", action="store_true", help="fly deploy --app indb")
     parser.add_argument("--docs", action="store_true", help="fly deploy docs")

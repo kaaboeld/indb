@@ -34,7 +34,7 @@ It does **not** `git commit`, `git push`, or `--force` Fly. `--tag` only creates
 | `--bump major\|minor\|patch` | from current VERSION |
 | `--title` / `--note` | catalog copy (`--note` repeatable) |
 | `--docker` | `docker build -t indb:VERSION -t indb:latest` |
-| `--export` | portable `dist/indb-VERSION/` (`scripts/image.py`) |
+| `--export` | `dist/indb-VERSION/` plus `dist/indb-latest.tar.gz` (same bytes) |
 | `--deploy` | `fly deploy --app indb` |
 | `--docs` | `fly deploy` docs |
 | `--publish-site` | write the two site JSON files |
@@ -45,6 +45,7 @@ It does **not** `git commit`, `git push`, or `--force` Fly. `--tag` only creates
 ## Order for a real cut
 
 1. `--dry-run` and read the notes
-2. pack with `--docker --publish-site`
-3. `--deploy --docs --deploy-site` when the image is the one you want live
-4. commit and push when you decide the cut is the commit
+2. pack with `--docker --export`. That writes the numbered archive and replaces `indb-latest.tar.gz` with those same bytes
+3. put both files on the releases volume, then `--publish-site --docs --deploy-site`. The site and the self-host page offer **latest**
+4. `--deploy` when that image is the one you want on the public API
+5. commit and push when you decide the cut is the commit

@@ -34,6 +34,7 @@ plugins:
 
 nav:
   - Home: index.md
+  - Changelog: changelog.md
   - Concepts:
     - Conceptual Alignment: CONCEPTUAL_ALIGNMENT.md
     - Philosophy & Use Cases: PHILOSOPHY.md
@@ -59,6 +60,7 @@ nav:
     - Workflow: HERMES_INDB_WORKFLOW.md
     - Integration Scenarios: HERMES_INTEGRATION_SCENARIOS.md
   - Guides:
+    - Self-host: SELFHOST.md
     - Console (TUI + WUI): CONSOLE.md
     - CLI & TUI: cli.md
     - Web Console (WUI): wui.md
@@ -72,5 +74,6 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path: ["."]
   - tables

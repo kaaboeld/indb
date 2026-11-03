@@ -1,5 +1,6 @@
 # Docs image is only MkDocs — keep the context tiny.
 *
 !mkdocs.yml
+!CHANGELOG.md
 !docs/
 !docs/**

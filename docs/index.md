@@ -6,10 +6,12 @@
 **INDB** = **I**nterpretational **D**ata**b**ase. See [INTERPRETATIONAL_DATABASE.md](./INTERPRETATIONAL_DATABASE.md).
 
 **Version:** 0.11.1 — Inhale looks sideways  
+**Changelog:** [changelog.md](./changelog.md)  
+**Self-host:** [SELFHOST.md](./SELFHOST.md) — the file named latest  
 **Status:** ✅ Local tree  
 **Released:** November 3, 2026  
 **Previous:** 0.11.0 Edges fade · 0.10.0 Cold stays cold · 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain  
-**Packed file:** 0.8.0 (`indb:0.8.0`). Later cuts are in this tree and are not that file.
+**Packed file:** [latest](https://indb.tech/releases/indb-latest.tar.gz) is 0.11.1 until the next pack. The pinned file for this cut is [indb-0.11.1.tar.gz](https://indb.tech/releases/indb-0.11.1.tar.gz).
 
 ---
 
