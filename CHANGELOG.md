@@ -2,7 +2,7 @@
 
 Current release: **0.11.1**. Source of truth for the running version is `VERSION` in `core/constants.py`. Packed notes live in `releases/manifest.json`.
 
-1.0.0 has not been cut. Work stays local until this tree is packed.
+The file the docs and the site offer is https://indb.tech/releases/indb-latest.tar.gz. That name is this cut until the next pack. 1.0.0 has not been cut.
 
 ---
 
@@ -11,6 +11,10 @@ Current release: **0.11.1**. Source of truth for the running version is `VERSION
 **Date:** 2026-11-03
 
 A new event is scored against hot events that share a token. The rest of the life is not walked. Embeddings, when present, still see the whole hot tier. Fusion no longer prints a debug line on every comparison. Replacing a fused body uses the id map.
+
+Latest: https://indb.tech/releases/indb-latest.tar.gz  
+Archive: https://indb.tech/releases/indb-0.11.1.tar.gz  
+Self-host: https://docs.indb.tech/SELFHOST/
 
 ---
 
