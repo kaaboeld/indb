@@ -310,5 +310,5 @@ To add more nodes:
 ---
 
 **Status**: ✅ Production-ready for MVP deployment  
-**Version**: 0.10.0  
+**Version**: 0.11.1  
 **Last Updated**: 2026-03-04

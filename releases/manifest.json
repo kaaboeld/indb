@@ -1,6 +1,33 @@
 {
-  "current": "0.10.0",
+  "current": "0.11.1",
+  "published": "0.8.0",
   "releases": [
+    {
+      "version": "0.11.1",
+      "title": "Inhale looks sideways",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.11.1",
+      "notes": [
+        "Heuristic fusion scores hot events that share a token",
+        "The embedding path still sees the whole hot tier",
+        "A fused body is replaced by id"
+      ],
+      "packed_at": "2026-11-03T21:40:00Z"
+    },
+    {
+      "version": "0.11.0",
+      "title": "Edges fade",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.11.0",
+      "notes": [
+        "An edge that touches a weak sleeper is marked stale and kept",
+        "That edge does not wake and does not answer Echo. Token overlap still can",
+        "A sleeper that still carries mass holds the edge past the seven-day clock"
+      ],
+      "packed_at": "2026-11-03T21:30:00Z"
+    },
     {
       "version": "0.10.0",
       "title": "Cold stays cold",

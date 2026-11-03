@@ -1,6 +1,6 @@
 # INDB Semantic Type System
 
-INDB 0.10.0 treats data types not just as storage formats, but as **semantic primitives**. The type system models the complexity of "Thought Processing" — where data has location, structure, and varying levels of transparency.
+INDB 0.11.1 treats data types not just as storage formats, but as **semantic primitives**. The type system models the complexity of "Thought Processing" — where data has location, structure, and varying levels of transparency.
 
 This system is strictly enforced in `core/types.py` and extends beyond standard JSON.
 

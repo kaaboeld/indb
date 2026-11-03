@@ -4,6 +4,7 @@ Event Fusion Engine for INDB
 Intelligent event merging with semantic similarity.
 """
 
+import logging
 import time
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple, Union
@@ -40,6 +41,8 @@ except ImportError:
 
 # Import Penalty Engine
 from services.fusion.penalty import PenaltyEngine, PenaltyConfig
+
+logger = logging.getLogger("indb.fusion")
 
 
 def is_signed(event: Any) -> bool:
@@ -167,13 +170,12 @@ class EventFusion:
             try:
                 self.embeddings = SemanticEmbeddings()
                 self.pattern_recognizer = PatternRecognizer()
-                print("Neural Fusion: ENABLED (Sentence Transformers + DBSCAN)")
+                logger.info("Neural fusion enabled")
             except Exception as e:
-                print(f"Neural Fusion: DISABLED ({e})")
-        
-        # Initialize Penalty Engine
+                logger.info("Neural fusion disabled: %s", e)
+
         self.penalty_engine = PenaltyEngine(PenaltyConfig())
-        print("Penalty System: ENABLED (Frequency, Isolation, Context Gap)")
+        logger.info("Penalty system enabled")
     
     def detect_global_patterns(self, events: List[Any]) -> Dict[str, Any]:
         """
@@ -260,9 +262,6 @@ class EventFusion:
             event1.location,
             event2.location
         )
-        
-        # DEBUG PRINT
-        print(f"DEBUG: Sim Calc. Raw={raw_similarity:.3f} Final={penalty_result.final_score:.3f} Decision={penalty_result.decision}")
         
         if penalty_result.decision == "drop":
             return 0.0

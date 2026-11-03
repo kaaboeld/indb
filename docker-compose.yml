@@ -2,7 +2,7 @@
 services:
   indb-node-1:
     build: .
-    image: indb:${INDB_VERSION:-0.10.0}
+    image: indb:${INDB_VERSION:-0.11.1}
     container_name: indb-node-1
     hostname: indb-node-1
     ports:
@@ -30,7 +30,7 @@ services:
 
   indb-node-2:
     build: .
-    image: indb:${INDB_VERSION:-0.10.0}
+    image: indb:${INDB_VERSION:-0.11.1}
     container_name: indb-node-2
     hostname: indb-node-2
     ports:
@@ -60,7 +60,7 @@ services:
 
   indb-node-3:
     build: .
-    image: indb:${INDB_VERSION:-0.10.0}
+    image: indb:${INDB_VERSION:-0.11.1}
     container_name: indb-node-3
     hostname: indb-node-3
     ports:
@@ -105,7 +105,7 @@ services:
       - indb-node-3
 
   tui:
-    image: indb:${INDB_VERSION:-0.10.0}
+    image: indb:${INDB_VERSION:-0.11.1}
     profiles:
       - tools
     environment:

@@ -12,7 +12,7 @@ python3 scripts/pack.py --bump minor \
 
 ## Why it exists
 
-Before the packer, `VERSION` lived only in `core/constants.py`, the landing hardcoded `v0.7.0`, and `CHANGELOG.md` had drifted to a fictional 1.0.0. The current cut is **0.10.0** (Cold stays cold). 0.9.1 is Direct recall. 0.9.0 is Sleep & Wake. The packer makes one write and three surfaces agree: API `/health`, `/api/v2/system/release`, and https://indb.tech/#releases.
+Before the packer, `VERSION` lived only in `core/constants.py`, the landing hardcoded `v0.7.0`, and `CHANGELOG.md` had drifted to a fictional 1.0.0. The current cut is **0.11.1** (Inhale looks sideways). 0.11.0 is Edges fade. 0.10.0 is Cold stays cold. 0.9.1 is Direct recall. 0.9.0 is Sleep & Wake. The packer makes one write and three surfaces agree: API `/health`, `/api/v2/system/release`, and https://indb.tech/#releases.
 
 ## What it touches
 

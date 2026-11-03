@@ -782,9 +782,22 @@ python3 scripts/test_lens.py
 
 ## 🎯 Current Status
 
-**Version:** 0.10.0 — Cold stays cold (2026-11-03)  
+**Version:** 0.11.1 — Inhale looks sideways (2026-11-03)  
 **Status:** ✅ **Local tree**  
-**Image tag when packed:** `indb:0.10.0`
+**This tree, when packed:** `indb:0.11.1`  
+**File on indb.tech today:** `indb:0.8.0`
+
+### **0.11.1 — Inhale looks sideways**
+
+- Heuristic fusion scores hot events that share a token
+- The embedding path still sees the whole hot tier
+- A fused body is replaced by id
+
+### **0.11.0 — Edges fade**
+
+- An edge that touches a weak sleeper is marked stale and kept
+- That edge no longer wakes and no longer answers Echo. Token overlap still can
+- A sleeper that still carries mass holds the edge past the seven-day clock
 
 ### **0.10.0 — Cold stays cold**
 
@@ -838,10 +851,12 @@ Prism, Echo, Instinct, Fusion, Lens, Paradox, signed memory, Raft, AES-256-GCM a
 
 ## 🗺️ Roadmap
 
-Current cut is **0.10.0**. 1.0.0 is not cut. Local only.
+Current cut is **0.11.1**. 1.0.0 is not cut. Local only.
 
 | Version | What landed |
 |---------|-------------|
+| 0.11.1 | Fusion scores shared tokens |
+| 0.11.0 | Weak edges fade and stay |
 | 0.10.0 | Cold body stays on disk |
 | 0.9.1 | Direct recall by id |
 | 0.9.0 | Sleep & Wake |

@@ -3,7 +3,7 @@
 > Alignment of code, documentation, and philosophy. Inhale — Exhale — Axiom.
 
 **Date:** 2026-09-22  
-**Version:** 0.10.0
+**Version:** 0.11.1
 
 ---
 

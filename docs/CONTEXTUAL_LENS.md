@@ -296,5 +296,5 @@ def _calculate_importance(self, event, refraction):
 ---
 
 **Status**: ✅ Implemented (Phase 1)  
-**Version**: 0.10.0  
+**Version**: 0.11.1  
 **Last Updated**: 2026-03-04

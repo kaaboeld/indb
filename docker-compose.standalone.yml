@@ -6,8 +6,8 @@ services:
     build:
       context: .
       args:
-        VERSION: ${INDB_VERSION:-0.10.0}
-    image: indb:${INDB_VERSION:-0.10.0}
+        VERSION: ${INDB_VERSION:-0.11.1}
+    image: indb:${INDB_VERSION:-0.11.1}
     container_name: indb
     ports:
       - "8000:8000"
