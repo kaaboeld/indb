@@ -76,6 +76,16 @@ Reddit: выбрать flair `Software` или `Show and Tell`.
 
 ---
 
+## Неделя 3: Psycho story (Phase 3)
+
+Когда Psycho на prod + docs + site:
+
+Тексты: [POSTS_PSYCHO.md](./POSTS_PSYCHO.md) · угол [angles/psycho.md](./angles/psycho.md)
+
+Порядок тот же, что Plan B: Lobsters → Reddit → DEV.to / HABR → X / Telegram. HN — если аккаунт прогрет.
+
+---
+
 ## Ongoing: monthly angle rotation
 
 | Месяц | Угол | Файл |

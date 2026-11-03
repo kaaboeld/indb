@@ -1,0 +1,14 @@
+{
+  "version": "0.9.0",
+  "title": "Sleep & Wake",
+  "date": "2026-11-03",
+  "git": "",
+  "image": "indb:0.9.0",
+  "notes": [
+    "Low-salience events exhale into encrypted cold.bin instead of being deleted",
+    "Signed events and the recent tail stay hot",
+    "A strong seed wakes a sleeper back into the resonance index",
+    "Health reports hot_events, cold_events, and wake_count"
+  ],
+  "packed_at": "2026-11-03T20:48:00Z"
+}

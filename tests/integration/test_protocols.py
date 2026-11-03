@@ -1,5 +1,5 @@
 """
-Integration Tests for INDB v1.0.0
+Integration Tests for INDB 0.10.0
 End-to-end protocol testing.
 """
 
@@ -15,6 +15,9 @@ from typing import Dict, Any
 # 8000 is the port the Dockerfile, fly.toml and the launcher all use, so a suite pinned to
 # another one only passed against a server started by hand.
 BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
+
+# Writes need a credential unless the target server runs with AUTH_MODE=OPEN.
+API_HEADERS = {"X-API-Key": os.environ["INDB_API_KEY"]} if os.environ.get("INDB_API_KEY") else {}
 
 
 class TestHTTPProtocol:
@@ -35,7 +38,8 @@ class TestHTTPProtocol:
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{BASE_URL}/api/v2/events",
-                json={"raw_data_anchor": ["test", "integration"], "location": "TestLab"}
+                json={"raw_data_anchor": ["test", "integration"], "location": "TestLab"},
+                headers=API_HEADERS,
             )
             assert response.status_code == 200
             data = response.json()

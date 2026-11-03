@@ -1,4 +1,4 @@
-# INDB API Reference (v0.7.0)
+# INDB API Reference (v0.10.0)
 
 **Base URL** (Docker compose): `http://localhost:8000/api/v2`  
 **Note:** INDB is an **interpretational database** (memory, not archive). Engine: Inhale → Exhale → Axiom. Events are anchors; meaning comes from interpret, prism, echo, subwave.
@@ -270,6 +270,35 @@ Verification across the noise-tolerance spectrum. See [GRAIN.md](./GRAIN.md).
 
 ---
 
+### 2.4.1 Psycho (weight ablation)
+
+Prefix: `/api/v2/psycho`
+
+Echo finds neighbours. Psycho finds one route and prices what the observer's valuation did to it. See [PSYCHO.md](./PSYCHO.md).
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /psycho/profiles` | Profiles and what each one removes from the cost |
+| `POST /psycho/path` | Route between two anchors, then compare against a baseline |
+
+**Path request:**
+
+```json
+{
+  "from": "<event-id or free text>",
+  "to": "<event-id or free text>",
+  "profile": "psychopath",
+  "compare_to": "neutral",
+  "token_weights": {"harm": -6.0}
+}
+```
+
+`from` / `to` accept an event id or free text. Negative `token_weights` are the barrier a profile may ignore.
+
+**Ablation fields:** `detour_cost`, `barrier_walked_into`, `identical_route`. `identical_route: true` means the weights did not change the route.
+
+---
+
 ### 2.5 Signed Memory Recovery
 
 Prefix: `/api/v2/recovery`
@@ -313,7 +342,7 @@ Implementation examples for each pattern: [SIGNED_MEMORY_RECOVERY.md](./SIGNED_M
 
 ### 2.6 Paradox (type) — contract
 
-> **Status:** API contract (v0.8). Prism read-time paradox (`is_paradoxical`) is live — see §1.3.
+> **Status:** API contract, live in 0.10.0. Prism read-time paradox (`is_paradoxical`) is live — see §1.3.
 
 Paradox is **not** an Event flag. Separate store, empty anchor until observation.
 

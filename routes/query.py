@@ -8,9 +8,10 @@ import csv
 import io
 import time
 from typing import List, Dict, Any, Optional, Tuple, Type
-from fastapi import APIRouter, Request, HTTPException, Query
+from fastapi import APIRouter, Depends, Request, HTTPException, Query
 from fastapi.responses import StreamingResponse
 
+from auth.flexible_auth import optional_identity, require_identity
 from core.kernel import AuthContext, QueryRequest
 from core.cache import cache_query, get_cached_query
 from core.deps import IndbDep
@@ -39,6 +40,7 @@ async def list_events(
     filter_key: Optional[str] = None,
     filter_value: Optional[str] = None,
     context_mood: Optional[str] = None,
+    auth: AuthContext = Depends(optional_identity),
 ):
     """List all events with pagination and filtering (v2)."""
     mood = context_mood or INTERPRET_MOOD_DEFAULT
@@ -68,7 +70,10 @@ async def list_events(
     )
     
     try:
-        events = db.query(query, AuthContext(user_id="api_reader"))
+        events = db.query(query, auth)
+    except PermissionError as exc:
+        # The blanket handler below would turn a denial into an empty page.
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
     except Exception:
         events = []
 
@@ -182,6 +187,7 @@ async def search_events(
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     fuzzy: bool = Query(False, description="Enable fuzzy matching"),
+    auth: AuthContext = Depends(optional_identity),
 ):
     """
     Full-text search across events (v2).
@@ -250,7 +256,12 @@ async def search_events(
 
 @router.post("/interpret", response_model=StandardResponse[InterpretationResponse])
 @limiter.limit(RateLimits.BURST)
-async def interpret_events(request: Request, payload: InterpretationRequest, db: IndbDep):
+async def interpret_events(
+    request: Request,
+    payload: InterpretationRequest,
+    db: IndbDep,
+    auth: AuthContext = Depends(optional_identity),
+):
     """
     Interpret events based on context (v2).
     """
@@ -367,7 +378,11 @@ def _event_to_response(e) -> EventResponse:
 
 
 @router.post("/events/query", response_model=StandardResponse[List[EventResponse]])
-async def query_events_advanced(criteria: FilterCriteria, db: IndbDep):
+async def query_events_advanced(
+    criteria: FilterCriteria,
+    db: IndbDep,
+    auth: AuthContext = Depends(optional_identity),
+):
     """
     Advanced event filtering (v2).
     
@@ -400,7 +415,11 @@ async def query_events_advanced(criteria: FilterCriteria, db: IndbDep):
 
 
 @router.get("/export/json")
-async def export_json(db: IndbDep, filters: Optional[str] = Query(None, description="URL-encoded JSON FilterCriteria")):
+async def export_json(
+    db: IndbDep,
+    filters: Optional[str] = Query(None, description="URL-encoded JSON FilterCriteria"),
+    auth: AuthContext = Depends(require_identity),
+):
     """
     Export events to JSON with optional filtering.
     """
@@ -443,7 +462,11 @@ async def export_json(db: IndbDep, filters: Optional[str] = Query(None, descript
 
 
 @router.get("/export/csv")
-async def export_csv(db: IndbDep, filters: Optional[str] = Query(None, description="URL-encoded JSON FilterCriteria")):
+async def export_csv(
+    db: IndbDep,
+    filters: Optional[str] = Query(None, description="URL-encoded JSON FilterCriteria"),
+    auth: AuthContext = Depends(require_identity),
+):
     """
     Export events to CSV with optional filtering.
     """
@@ -523,7 +546,13 @@ def _find_similar_by_tokens(source_event, all_events, exclude_id, threshold, lim
 
 
 @router.get("/events/{event_id}/associations", response_model=StandardResponse[Dict[str, Any]])
-async def get_event_associations(event_id: str, db: IndbDep, limit: int = 10, threshold: float = 0.3):
+async def get_event_associations(
+    event_id: str,
+    db: IndbDep,
+    limit: int = 10,
+    threshold: float = 0.3,
+    auth: AuthContext = Depends(optional_identity),
+):
     """
     Get semantically similar events using ML embeddings (v2).
     """

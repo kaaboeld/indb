@@ -16,6 +16,8 @@ FORMAT_VERSION = 1
 DATA_DIR = os.getenv("DATA_DIR", ".")
 KEY_FILE = os.path.join(DATA_DIR, "indb.key")
 DB_FILE = os.path.join(DATA_DIR, "indb.bin")
+COLD_FILE = os.path.join(DATA_DIR, "cold.bin")
+"""Events exhaled out of hot memory. Same frame as indb.bin. Not a second database."""
 
 
 def ensure_data_dir() -> None:

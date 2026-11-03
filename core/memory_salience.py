@@ -46,6 +46,23 @@ def is_hot(salience: float) -> bool:
     return salience >= MEMORY_HOT_SALIENCE_THRESHOLD
 
 
+def token_overlap(left: Any, right: Any) -> float:
+    """Jaccard overlap of two token lists. 1.0 is the same set."""
+    def keys(tokens: Any) -> set:
+        out = set()
+        for token in tokens or []:
+            text = str(token).lower().strip()
+            if text:
+                out.add(text)
+        return out
+
+    a = keys(left)
+    b = keys(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
 def should_wake(
     echo_score: float = 0.0,
     lock_score: float = 0.0,

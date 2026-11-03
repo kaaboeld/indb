@@ -9,7 +9,7 @@ All hardcoded values should be defined here for easy maintenance.
 # Application Version
 # ==============================================================================
 
-VERSION = "0.7.0"
+VERSION = "0.10.0"
 """INDB application version. Used in health, OpenAPI, and responses."""
 
 INDB_PRODUCT_NAME = "Interpretational Database"
@@ -434,6 +434,8 @@ MEMORY_RECENCY_TAU_SEC = 86_400.0
 MEMORY_HOT_SALIENCE_THRESHOLD = 0.15
 MEMORY_WAKE_ECHO_THRESHOLD = 0.85
 MEMORY_WAKE_LOCK_THRESHOLD = 0.75
+MEMORY_WAKE_MAX_PER_QUERY = 8
+"""A single seed may wake at most this many sleeping events."""
 MEMORY_TOUCH_PERSIST_ON_RESONANCE = False
 """If True, Echo/Subwave persist last_resonance_at to disk (one update_event per touch)."""
 

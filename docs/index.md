@@ -5,9 +5,10 @@
 
 **INDB** = **I**nterpretational **D**ata**b**ase. See [INTERPRETATIONAL_DATABASE.md](./INTERPRETATIONAL_DATABASE.md).
 
-**Version:** 0.7.0  
-**Status:** ✅ Production-Ready  
-**Last Updated:** July 11, 2026
+**Version:** 0.10.0 — Cold stays cold  
+**Status:** ✅ Local tree  
+**Released:** November 3, 2026  
+**Previous:** 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain
 
 ---
 
@@ -53,7 +54,7 @@ What remains is cryptographically signed, immutable truth.
 
 ## 🧠 Intelligence Modules
 
-Ways of *recalling*: Prism interprets, Echo resonates, Instinct reflexes, Deduction chains — Blind is what we store but never read.
+Ways of *recalling*: Prism interprets, Echo resonates, Instinct reflexes, Deduction chains, Psycho prices a route, Grain checks identity. Blind is what we store but never read.
 
 ### **Prism** — Paradox-aware Synthesis
 Transforms raw events into meaning. Returns not a single answer — returns its confidence and all competing readings.
@@ -172,6 +173,36 @@ Full reference: [GRAIN.md](./GRAIN.md)
 
 ---
 
+### **Psycho** — Pathfinding Under Weight Ablation
+
+Echo radiates. Psycho picks one route and prices what the observer's values did to it.
+
+```
+cost(a → b) = -log R(a, b) + barrier(b)
+```
+
+The search runs twice: valuation honoured, valuation removed. If the routes match, the weights were decoration.
+
+```bash
+curl -X POST https://api.indb.tech/api/v2/psycho/path \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "<event-id or free text>",
+    "to": "<event-id or free text>",
+    "profile": "psychopath",
+    "compare_to": "neutral",
+    "token_weights": {"harm": -6.0}
+  }'
+```
+
+Headline fields: `detour_cost`, `barrier_walked_into`, `identical_route`.
+
+Full reference: [PSYCHO.md](./PSYCHO.md)
+
+**Status:** ✅ Production (0.8.0)
+
+---
+
 ## 🏗️ Architecture
 
 ### Distributed Raft Cluster
@@ -220,6 +251,7 @@ graph TD
 | **Instinct** | 100% (50/50) | ~25ms | ✅ Production |
 | **Deduction** | 100% | <50ms | ✅ Production |
 | **Grain** | 4 tiers | kernel-native | ✅ Production |
+| **Psycho** | ablation vs baseline | path on the resonance graph | ✅ Production |
 | **Fusion** | Real-time | N/A | ✅ Production |
 
 ### Standalone Performance
@@ -444,7 +476,44 @@ pytest --cov=core --cov-report=html
 
 ---
 
-## 🏆 Recent Achievements (March 2026 · v0.7.0)
+## 🏆 Current release — 0.10.0 Cold stays cold (November 3, 2026)
+
+### **Cold stays cold** ✅
+- The sleeper's body stays in `cold.bin`
+- RAM keeps the id and the tokens
+- Wake, or a lookup by id, reads that one body
+
+### **0.9.1 Direct recall** ✅
+- Hot memory resolves an id without walking the stream
+- Raft commit wait uses the same map
+- A sleeper is still returned by id from the cold tier
+
+### **0.9.0 Sleep & Wake** ✅
+- Low-salience events go to encrypted `cold.bin`
+- A strong seed wakes one back into the resonance index
+- See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md)
+
+## 🏆 0.8.0 Psycho & Grain (September 22, 2026)
+
+### **Psycho** ✅
+- Factor-1 weight ablation on the resonance graph
+- `GET /api/v2/psycho/profiles`, `POST /api/v2/psycho/path`
+- See [PSYCHO.md](./PSYCHO.md)
+
+### **Grain** ✅
+- Barcode-to-SynthID identity verification in the kernel
+- Tiers: exact, redundant, resonant, statistical
+- See [GRAIN.md](./GRAIN.md)
+
+### **Auth** ✅
+- `AUTH_MODE`, RBAC roles, API keys
+- No anonymous writes
+
+### **Product image** ✅
+- `indb:0.8.0` ships the API, modules, WUI, and TUI
+- The landing site is a separate app
+
+These landed in 0.7.0 and are still in the engine.
 
 ### **Paradox of Perception** ✅
 - Prism no longer resolves contradictions — it surfaces them
@@ -492,24 +561,16 @@ Russian summary report:
 
 ## 🗺️ Roadmap
 
-### **Q1 2026** (Current)
-- ✅ Raft stability fixes
-- ✅ Prism/Echo/Instinct modules
-- ✅ Production deployment
-- ✅ Monitoring dashboard (WUI + TUI)
-- 🔄 Performance optimization
+**Current:** 0.10.0. 1.0.0 is not cut. Local only.
 
-### **Q2 2026**
-- Advanced fusion patterns
-- ML-based pattern detection
-- Multi-region replication
-- Real-time analytics
+| Version | Cut |
+|---------|-----|
+| 0.10.0 | Cold body stays on disk |
+| 0.9.1 | Direct recall by id |
+| 0.9.0 | Sleep & Wake — [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md) |
+| 0.8.0 | Psycho, Grain, authenticated writes, product image |
 
-### **Q3 2026**
-- Blockchain integration (optional)
-- Advanced encryption modes
-- Federated learning
-- Edge deployment
+Detail: [ROADMAP.md](./ROADMAP.md).
 
 ---
 
@@ -537,7 +598,7 @@ Proprietary - All Rights Reserved
 **INDB is:**
 - ✅ A distributed epistemological engine
 - ✅ Production-ready (verified under load)
-- ✅ Semantically intelligent (Prism/Echo/Instinct)
+- ✅ Semantically intelligent (Prism/Echo/Instinct/Psycho/Grain)
 - ✅ Fault-tolerant (Raft consensus)
 - ✅ Secure (encryption + signatures)
 - ✅ Fast (<1ms ingestion, <30ms queries)

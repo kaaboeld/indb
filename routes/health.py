@@ -55,6 +55,9 @@ async def health_check_v2(db: IndbDep):
             "storage_efficiency": f"{stats['fusion']['storage_efficiency']}%",
             "events_saved": stats["fusion"]["events_saved"],
             "unique_locations": stats["database"]["unique_locations"],
+            "hot_events": stats["database"].get("hot_events", db.get_event_count()),
+            "cold_events": stats["database"].get("cold_events", 0),
+            "wake_count": stats["database"].get("wake_count", 0),
         },
         components={
             "event_fusion": {

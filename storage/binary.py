@@ -46,8 +46,9 @@ MASTER_KEY = load_key()
 import zlib
 import struct
 
-def save_encrypted(events: List[Dict[str, Any]]):
+def save_encrypted(events: List[Dict[str, Any]], path: str = None):
     """Serialize -> Encrypt with AES-256-GCM -> Calculate CRC -> Write Binary Frame (atomic)."""
+    target = path or DB_FILE
     # 1. Serialize
     serialized = msgpack.packb(events)
 
@@ -64,11 +65,11 @@ def save_encrypted(events: List[Dict[str, Any]]):
     # 5. Atomic Write — write to a temp file first, then rename.
     # If the process crashes mid-write the original DB file stays intact.
     ensure_data_dir()
-    tmp_file = DB_FILE + ".tmp"
+    tmp_file = target + ".tmp"
     try:
         with open(tmp_file, "wb") as f:
             f.write(header + encrypted)
-        os.replace(tmp_file, DB_FILE)  # atomic on POSIX; near-atomic on Windows
+        os.replace(tmp_file, target)  # atomic on POSIX; near-atomic on Windows
     except Exception:
         # Clean up orphaned temp file on failure
         if os.path.exists(tmp_file):
@@ -78,18 +79,19 @@ def save_encrypted(events: List[Dict[str, Any]]):
                 pass
         raise
 
-def load_decrypted() -> List:
+def load_decrypted(path: str = None) -> List:
     """Read -> Verify CRC -> Decrypt -> Deserialize"""
-    logger.debug("Loading DB from %s", DB_FILE)
-    if not os.path.exists(DB_FILE):
-        logger.debug("DB file %s not found — starting with empty state", DB_FILE)
+    target = path or DB_FILE
+    logger.debug("Loading DB from %s", target)
+    if not os.path.exists(target):
+        logger.debug("DB file %s not found — starting with empty state", target)
         return []
 
     try:
-        size = os.path.getsize(DB_FILE)
+        size = os.path.getsize(target)
         logger.debug("DB file size=%d bytes", size)
 
-        with open(DB_FILE, "rb") as f:
+        with open(target, "rb") as f:
             file_data = f.read()
 
         if not file_data:
@@ -101,7 +103,7 @@ def load_decrypted() -> List:
         # instead and let fsck decide.
         if len(file_data) <= 9 or file_data[:4] != MAGIC:
             raise ValueError(
-                f"CRITICAL: {DB_FILE} is not a readable INDB store "
+                f"CRITICAL: {target} is not a readable INDB store "
                 f"(magic header missing, {len(file_data)} bytes). Refusing to start empty, "
                 f"because the next write would overwrite it. Run `indb fsck`."
             )

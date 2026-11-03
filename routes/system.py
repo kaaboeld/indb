@@ -3,12 +3,16 @@ System & Protocol Routes (v2)
 
 Handles low-level system configuration, protocols, firewall, and modules status.
 """
+import json
 import os
 import time
 from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from pathlib import Path
+
+from core.constants import VERSION
 from core.models import StandardResponse
 from core.fly_network import public_host
 from core.protocols_manager import protocol_manager
@@ -17,6 +21,26 @@ from services.interpretation.emotional_firewall import EmotionalFirewall, Firewa
 from core.routing import ContentNegotiationRoute
 
 router = APIRouter(prefix="/api/v2", tags=["system"], route_class=ContentNegotiationRoute)
+
+_RELEASES = Path(__file__).resolve().parent.parent / "releases" / "manifest.json"
+
+
+@router.get("/system/release")
+async def system_release() -> Dict[str, Any]:
+    """Current packed version and the catalog the site publishes."""
+    catalog: Dict[str, Any] = {"current": VERSION, "releases": []}
+    if _RELEASES.is_file():
+        try:
+            catalog = json.loads(_RELEASES.read_text())
+        except json.JSONDecodeError:
+            pass
+    current = next((r for r in catalog.get("releases", []) if r.get("version") == catalog.get("current")), None)
+    return {
+        "status": "success",
+        "version": catalog.get("current", VERSION),
+        "release": current,
+        "releases": catalog.get("releases", []),
+    }
 
 
 @router.get("/modules")

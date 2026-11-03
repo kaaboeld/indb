@@ -17,6 +17,10 @@ cryptography
 passlib
 bcrypt  # imported directly by auth/security.py for password hashing
 python-jose[cryptography]
+pyjwt
+# auth/flexible_auth.py imports `jwt` directly. Without it bearer authentication is
+# unavailable — and before the import was made explicit, it failed silently and let
+# tokened requests through as anonymous.
 
 # WebAuthn
 webauthn

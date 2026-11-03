@@ -1,0 +1,5 @@
+# Docs image is only MkDocs — keep the context tiny.
+*
+!mkdocs.yml
+!docs/
+!docs/**

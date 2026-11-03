@@ -1,70 +1,105 @@
-# Git
+# Build context is the database. Nothing that sells it, documents it,
+# or demos it belongs here.
+
 .git/
-.gitignore
 .gitattributes
-
-# Python cache
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-
-# Virtual environments
-venv/
-env/
-ENV/
-.venv/
-
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+.DS_Store
 
-# Environment files
-.env
-.env.*
-
-# Master encryption key — use Fly secrets / env, not baked into the image
-indb.key
-**/indb.key
-*.bin
-*.log
-
-# Testing
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
-# NOTE: tests/ is NOT excluded — app_factory.py imports tests.integrity_check at startup
-test_*.py
-*_test.py
+.mypy_cache/
+.ruff_cache/
 
-# Documentation (excluded from main app image, but needed for Dockerfile.docs)
-# Un-ignore docs/ and mkdocs.yml for the docs build:
-!docs/
-!mkdocs.yml
+venv/
+env/
+ENV/
+.venv/
+.env
+.env.*
+indb.key
+**/indb.key
+auth/certificates/*.crt
+auth/certificates/*.key
+**/certs/
 
-# CI/CD
-.github/
-.gitlab-ci.yml
-.travis.yml
+*.bin
+*.log
+data-node-*/
+logs-node-*/
+data/
+logs/
 
-# Development tools
-Makefile
-run_tests.py
-conftest.py
-
-# Examples
+# Not the database
+growth/
+helm/
+docs/
+mkdocs.yml
 examples/
-# Temporary files
+site/
+../site/
+scripts/
+sdk/
+reality_guard/
+monitoring/
+workflow/
+reports/
+clients/
+utils/
 *.tmp
 *.temp
 .cache/
 
-# macOS
-.DS_Store
+# Repo paper, not the server
+*.md
+!LICENSE
+CHANGELOG.md
+CONTRIBUTING.md
+SECURITY.md
+FLY_DEPLOY.md
+fly.toml
+fly.docs.toml
+fly-deploy.sh
+Dockerfile.docs
+Dockerfile.docs.dockerignore
+docker-compose.yml
+docker-compose.standalone.yml
+haproxy.cfg
+start.sh
+start_tui.sh
+stress_test.sh
+stress_test_results.json
+pytest.ini
+requirements.txt
+requirements-ml.txt
+requirements-test.txt
 
-# WUI — built inside Docker multi-stage; skip local artifacts
+# Tests except the boot integrity hook
+tests/unit/
+tests/integration/
+tests/e2e/
+tests/api/
+tests/performance/
+tests/protocols/
+tests/security/
+tests/integrity/
+test_*.py
+*_test.py
+conftest.py
+run_tests.py
+
+# WUI source is used only in the Node stage; dist is built there
 wui/node_modules/
 wui/dist/
+
+# Portable export lives next to the repo, never inside the image
+dist/

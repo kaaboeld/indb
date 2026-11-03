@@ -1,4 +1,4 @@
-# Cognitive Firewall (v1.0.0)
+# Cognitive Firewall (v0.10.0)
 
 The **Cognitive Firewall** is an active defense layer that filters, redacts, or blocks events based on the current Context. Unlike a standard network firewall which filters by IP/Port, the Cognitive Firewall filters by **Meaning** and **State**.
 

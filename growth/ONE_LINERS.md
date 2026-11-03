@@ -8,6 +8,9 @@ Copy-paste. Mix with angles/.
 - Inhale the chaos. Exhale the noise. Remember the Axiom.
 - Memory, not archive.
 - Inhale identity. Tolerate noise. Verify the grain.
+- Echo radiates in every direction. Psycho picks one and pays for it.
+- Same seed. Same graph. The difference is the finding.
+- Every ranking carries your weights. Psycho measures them.
 
 ## HN titles
 
@@ -16,6 +19,7 @@ Show HN: INDB – Interpretational database, signed memory, zero-knowledge stora
 Show HN: INDB – Epistemological engine (Prism, Echo, Grain, Blind)
 Show HN: INDB Grain – barcode to SynthID verification in one kernel
 Show HN: A database that cannot read your blind_payload (architecturally)
+Show HN: INDB Psycho – measure what your ranking weights actually change
 ```
 
 ## Lobsters titles
@@ -23,6 +27,7 @@ Show HN: A database that cannot read your blind_payload (architecturally)
 ```
 INDB – Interpretational database: signed memory, Grain identity spectrum
 INDB Grain – unified noise-tolerance verification in the kernel
+INDB Psycho – weight ablation on a resonance graph (dual-run pathfinding)
 ```
 
 ## Reddit titles
@@ -38,6 +43,7 @@ INDB – signed memory + Grain verification (barcode → SynthID axis in one API
 We Built a Database That Cannot Read Your Data
 INDB Grain: When Verification Is Signal Detection in Noise
 Why We Put Barcode-to-SynthID Identity Inside the Database Kernel
+Same Graph. Two Rankings. The Difference Is the Finding.
 ```
 
 ## Tweet / thread hooks (EN)
@@ -58,3 +64,7 @@ https://docs.indb.tech/GRAIN/
 ## Elevator (30 sec, RU)
 
 INDB — это не классическая БД, а interpretational database: память, где смысл при чтении. Inhale, exhale, axiom. Подписанные события, blind storage без ключа на сервере, и Grain — единая ось верификации от Ed25519 до статистического отпечатка. Live на indb.tech.
+
+## Elevator Psycho (30 sec, RU)
+
+Echo светит во все стороны. Psycho выбирает один маршрут и платит за него. Один граф, два прогона: оценка на месте и оценка снята. Находка — detour_cost, не сам путь. Имя psychopath — абляция, не диагноз. https://indb.tech/#psycho

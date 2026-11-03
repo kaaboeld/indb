@@ -8,13 +8,7 @@ import uuid
 from core.lens import ContextualLens, LensQueryEngine, LensMode
 from core.deps import IndbDep
 from core.kernel import AuthContext
-from auth.flexible_auth import require_auth
-
-async def get_auth(auth_info: dict = Depends(require_auth)) -> AuthContext:
-    return AuthContext(
-        user_id=auth_info.get("user_id", "api_user"),
-        auth_method=auth_info.get("method", "api_key")
-    )
+from auth.flexible_auth import require_identity as get_auth
 
 from core.routing import ContentNegotiationRoute
 

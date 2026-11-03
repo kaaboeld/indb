@@ -1,4 +1,7 @@
-# INDB v2.0: "Swiss Watch" 🇨🇭
+# Swiss Watch — design sketch
+
+The shipped product is **0.10.0**. This file is a design sketch. Version labels inside it (`v1.0`, `v2.0`) are not releases.
+
 **Precision Engineering for Cognitive Systems**
 
 > *"Like a Swiss watch, every component must work in perfect harmony."*
@@ -7,9 +10,8 @@
 
 ## Mission Statement
 
-INDB v2.0 "Swiss Watch" transforms a database into a **cognitive system** with the precision and reliability of Swiss engineering.
+The sketch describes a cognitive system with the precision of a watch movement. It is not scheduled as a version number.
 
-**Release Target**: Q3-Q4 2026  
 **Code Name**: Swiss Watch  
 **Philosophy**: Precision, Reliability, Elegance
 
@@ -940,14 +942,12 @@ class SwissHomomorphicEngine:
 
 ## Conclusion
 
-**INDB v2.0 "Swiss Watch"** is not just an upgrade. It's a transformation:
+This sketch is not a release. The product in this tree is 0.10.0.
 
 ```
-Database (v1.0)
+0.10.0 (this tree)
     ↓
-Cognitive System (v2.0)
-    ↓
-Precision Engineering
+this sketch (not cut)
 ```
 
 Like a Swiss watch, every component works in perfect harmony:
@@ -962,8 +962,7 @@ Like a Swiss watch, every component works in perfect harmony:
 
 ---
 
-*Swiss Watch Roadmap v1.0*  
-*Created: January 31, 2026*  
-*Target Release: Q4 2026*  
+*Design sketch. Shipped product in this tree: 0.10.0 (2026-11-03).*  
+*Sketch written: January 31, 2026.*  
 
 🇨🇭 **Made with Swiss precision**

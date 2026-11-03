@@ -8,7 +8,8 @@
 
 ## Быстрый старт
 
-**→ [POSTS_READY.md](./POSTS_READY.md) — готовые тексты copy-paste по шагам (HN, Reddit, DEV.to, ответы)**
+**→ [POSTS_READY.md](./POSTS_READY.md) — готовые тексты copy-paste по шагам (HN, Reddit, DEV.to, ответы)**  
+**→ [POSTS_PSYCHO.md](./POSTS_PSYCHO.md) — модуль Psycho: HN, Lobsters, Reddit, DEV.to, X, LinkedIn, Telegram, HABR**
 
 1. Прочитать [CONCEPT.md](./CONCEPT.md) и [PLAYBOOK.md](./PLAYBOOK.md)
 2. Пройти [CHECKLIST.md](./CHECKLIST.md) перед публикацией
@@ -33,14 +34,16 @@ growth/
 │   ├── 04-dev-to.md
 │   ├── 05-follow-up-replies.md
 │   ├── DEV_TO_UNIQUE.md   ← опубликовано, только текст статьи
-│   └── HABR.md            ← RU longread, только текст статьи
+│   ├── HABR.md            ← RU longread, только текст статьи
+│   └── HABR_PSYCHO.md     ← RU longread про weight ablation
 └── angles/             ← углы подачи (миксуем с каналами)
     ├── grain.md
     ├── signed-memory.md
     ├── blind-black-box.md
     ├── reality-guard.md
     ├── interpretational-db.md
-    └── agent-idle-audit.md
+    ├── agent-idle-audit.md
+    └── psycho.md
 ```
 
 ## Связь с остальным репо

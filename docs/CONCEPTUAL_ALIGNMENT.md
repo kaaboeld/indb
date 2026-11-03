@@ -2,8 +2,8 @@
 
 > Alignment of code, documentation, and philosophy. Inhale — Exhale — Axiom.
 
-**Date:** 2026-03  
-**Version:** 0.7.0
+**Date:** 2026-09-22  
+**Version:** 0.10.0
 
 ---
 
@@ -59,6 +59,8 @@ All modules follow this principle: **enable/disable without breaking core.**
 | `HERMES_INDB_WORKFLOW.md` | MCP ingest/query, HermesConnector | ✅ |
 | `HERMES_INTEGRATION_SCENARIOS.md` | Scenarios 1–5 | ✅ |
 | `QUERY_COOKBOOK.md` | /events, /search, /interpret | ✅ |
+| `PSYCHO.md` | Weight ablation, `POST /psycho/path` | ✅ 0.8.0 |
+| `GRAIN.md` | exact → statistical identity | ✅ 0.8.0 |
 
 ---
 
@@ -116,6 +118,7 @@ Hermes → MCP get_stats     → stats
 - [x] No hardcoding — in constants.py
 - [x] Interpret ≠ Lens — in API.md
 - [x] Inhale/Exhale/Resonate — in API.md, index.md
+- [x] Psycho and Grain — in PSYCHO.md, GRAIN.md, API.md, release 0.8.0
 
 ---
 
