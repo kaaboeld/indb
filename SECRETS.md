@@ -16,10 +16,41 @@ them from the environment, and behaviour depends on `INDB_ENV`:
 | `INDB_AUDIT_KEY` | `core/audit.py` | HMAC over audit log entries — tamper evidence. |
 | `SIGNING_PRIVATE_KEY` | `core/signing.py` | Ed25519 response signing. Absent = a throwaway key per process, so signatures cannot be verified across restarts or nodes. |
 | `RAFT_RPC_TOKEN` | `core/raft/auth.py` | Shared secret for `/raft/vote` and `/raft/append`. Startup already refuses to run with peers without it. |
+| `API_KEYS` | `auth/flexible_auth.py` | HTTP ingest and bulk export. Without it nothing can write over HTTP — see below. |
 
-Optional, only if the feature is on: `API_KEYS` (comma-separated, `AUTH_MODE`
-`API_KEY`/`MIXED`), `RESEND_API_KEY` and `CONTACT_EMAIL` (`routes/contact.py`),
+Optional: `RESEND_API_KEY` and `CONTACT_EMAIL` (`routes/contact.py`),
 `MOLTBOOK_API_KEY` (source connector), `MTLS_*` (paths, not secrets themselves).
+
+## API keys and auth modes
+
+`AUTH_MODE` decides how much of the HTTP surface is public:
+
+| Mode | Reads | Writes and exports |
+|------|-------|--------------------|
+| `OPEN` | public | public — development only, logs a warning at startup |
+| `MIXED` (default) | public | require a credential |
+| `API_KEY` / `JWT` | require a credential | require a credential |
+
+`API_KEYS` is a comma-separated list. Each entry is `secret`, `secret:role`, or
+`secret:role:user_id`, where role is `admin`, `writer`, `reader` or `auditor`. A bare
+secret is a writer. The role travels with the credential and is what the kernel's RBAC
+check actually uses, so a `reader` key gets 403 on ingest.
+
+```bash
+python3 -c "import secrets;print(secrets.token_urlsafe(32))"   # per key
+
+fly secrets set --app indb \
+  API_KEYS="<ingest-secret>:writer:ingest-bot,<ops-secret>:admin:ops"
+```
+
+Registering a webhook needs `admin`: it forwards every future event to a URL you name.
+
+JWT callers get their identity from the `sub` claim and their role from a `role` claim;
+a token with no `role` is a reader.
+
+**Deploying this without setting `API_KEYS` will break HTTP ingest** — the endpoints
+answer 401. Set the keys in the same `fly secrets set` call as the rest, and update any
+client that posts events. UDP and gRPC ingest are unaffected.
 
 ## Where to get the current values
 
@@ -73,7 +104,8 @@ fly secrets set --app indb \
   JWT_SECRET="<new random>" \
   INDB_AUDIT_KEY="<new random>" \
   SIGNING_PRIVATE_KEY="<base64 of 32 bytes>" \
-  RAFT_RPC_TOKEN="<new random>"
+  RAFT_RPC_TOKEN="<new random>" \
+  API_KEYS="<ingest-secret>:writer:ingest-bot,<ops-secret>:admin:ops"
 ```
 
 One `fly secrets set` call with all values triggers a single restart. Verify after:

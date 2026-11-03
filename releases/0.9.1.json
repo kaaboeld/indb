@@ -1,0 +1,13 @@
+{
+  "version": "0.9.1",
+  "title": "Direct recall",
+  "date": "2026-11-03",
+  "git": "",
+  "image": "indb:0.9.1",
+  "notes": [
+    "Hot memory resolves an event by id without walking the stream",
+    "get_event, get_event_by_id, and the Raft commit wait use that map",
+    "A sleeping event is still returned by id from the cold tier"
+  ],
+  "packed_at": "2026-11-03T20:48:00Z"
+}

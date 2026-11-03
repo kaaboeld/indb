@@ -1,0 +1,13 @@
+{
+  "version": "0.10.0",
+  "title": "Cold stays cold",
+  "date": "2026-11-03",
+  "git": "",
+  "image": "indb:0.10.0",
+  "notes": [
+    "A sleeper's body stays in encrypted cold.bin",
+    "RAM keeps the id and the tokens needed to notice a strong seed",
+    "The body is read on wake, or when the id is asked for by name"
+  ],
+  "packed_at": "2026-11-03T20:52:00Z"
+}

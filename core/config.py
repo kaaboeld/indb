@@ -60,8 +60,10 @@ class Settings(BaseSettings):
     LOG_FILE: Optional[str] = None
     
     # CORS
+    # No "*" by default: combined with CORS_ALLOW_CREDENTIALS it lets any site read
+    # authenticated responses. The WUI is served same-origin from /wui and needs no entry.
     CORS_ENABLED: bool = True
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173,*"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: str = "*"
     CORS_ALLOW_HEADERS: str = "*"

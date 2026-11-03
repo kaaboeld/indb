@@ -2,11 +2,27 @@
 import os
 import json
 import base64
-from typing import Dict, Any, Tuple
+import threading
+from collections import OrderedDict
+from typing import Dict, Any, Optional, Tuple
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305, AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
+
+# PBKDF2 at 100k iterations costs ~18ms. Every persist rewrites the whole database and
+# re-derives from a fresh salt, so that cost lands on every single write and caps write
+# throughput at roughly 50/sec regardless of how much data there is.
+#
+# The master key is 32 random bytes, so the salt's job here — stopping precomputation
+# against a guessable password — is already moot. Caching derived keys and reusing one
+# salt per process is therefore safe, and keeps writes hitting the cache. Nonces stay
+# random per write, which is the property AES-GCM actually depends on. Files written by
+# older builds carry their own salt and still decrypt: they simply miss the cache once.
+_DERIVED_KEY_CACHE_SIZE = 8
+_derived_keys: "OrderedDict[Tuple[bytes, bytes], bytes]" = OrderedDict()
+_derived_keys_lock = threading.Lock()
+_encrypt_salt: Optional[bytes] = None
 
 class PayloadEncryptor:
     """
@@ -78,6 +94,13 @@ class FileEncryptor:
         Returns:
             Derived 32-byte key
         """
+        cache_key = (master_key, salt)
+        with _derived_keys_lock:
+            cached = _derived_keys.get(cache_key)
+            if cached is not None:
+                _derived_keys.move_to_end(cache_key)
+                return cached
+
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=FileEncryptor.KEY_SIZE,
@@ -85,7 +108,13 @@ class FileEncryptor:
             iterations=FileEncryptor.ITERATIONS,
             backend=default_backend()
         )
-        return kdf.derive(master_key)
+        key = kdf.derive(master_key)
+
+        with _derived_keys_lock:
+            _derived_keys[cache_key] = key
+            while len(_derived_keys) > _DERIVED_KEY_CACHE_SIZE:
+                _derived_keys.popitem(last=False)
+        return key
     
     @staticmethod
     def encrypt_file(data: bytes, master_key: bytes) -> bytes:
@@ -101,8 +130,13 @@ class FileEncryptor:
         Returns:
             Encrypted data with salt and nonce prepended
         """
-        # Generate random salt and nonce
-        salt = os.urandom(FileEncryptor.SALT_SIZE)
+        # One salt per process keeps derive_key on its cache; the nonce stays per-write.
+        global _encrypt_salt
+        if _encrypt_salt is None:
+            with _derived_keys_lock:
+                if _encrypt_salt is None:
+                    _encrypt_salt = os.urandom(FileEncryptor.SALT_SIZE)
+        salt = _encrypt_salt
         nonce = os.urandom(FileEncryptor.NONCE_SIZE)
         
         # Derive encryption key

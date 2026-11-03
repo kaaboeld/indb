@@ -1,7 +1,7 @@
 # INDB Strategic Roadmap
 
 > **Vision**: Autonomous, High-Performance Interpretative Database.
-> **Current Status**: v1.0.0 (Production)
+> **Current release**: **0.11.1 — Inhale looks sideways** (2026-11-03). Previous cuts in this tree: **0.11.0 — Edges fade**, **0.10.0 — Cold stays cold**, **0.9.1 — Direct recall**, **0.9.0 — Sleep & Wake**.
 
 ---
 
@@ -35,7 +35,7 @@
 
 - [x] **Immutable Audit**: Merkle Tree-backed audit logs for tamper evidence.
 - [x] **RBAC**: Role-Based Access Control enforcing Least Privilege.
-- [x] **Hardware Ops**: (Deferred to v1.0)
+- [x] **Hardware Ops**: Deferred. Not part of 0.8.0.
 - [x] **Defense-in-Depth**: Application-layer permission boundaries.
 
 ---
@@ -63,129 +63,98 @@
  
 ---
 
-## 🟢 v0.8.0: Autonomous Security (Completed)
-**Focus**: Encryption & Zero Dependencies.
-*Released: Q1 2026*
+## 🟢 v0.8.0: Psycho & Grain
+**Focus**: Weight ablation, identity tolerance, authenticated writes.
+*Released: September 22, 2026 · image `indb:0.8.0` · git `e3e5882`*
 
-- [x] **At-Rest Encryption**: AES-256-GCM for `indb.bin` storage (upgraded from Fernet).
-- [x] **PBKDF2 Key Derivation**: 100,000 iterations for master key.
-- [x] **TLS/SSL Transport**: Self-signed certificate generation and Uvicorn SSL support.
-- [x] **Certificate Management**: Automatic generation, validation, and renewal.
-- [x] **Zero External Databases**: Removed pymongo/BSON, replaced with msgpack.
-- [x] **Autonomy Principle**: NO Redis, NO PostgreSQL, NO MongoDB - pure binary storage.
+- [x] **Psycho**: Factor-1 weight ablation on the resonance graph. Cost is `-log R + barrier`. The route is compared with the valuation and without it (`detour_cost`, `barrier_walked_into`, `identical_route`). `GET /api/v2/psycho/profiles`, `POST /api/v2/psycho/path`. See [PSYCHO.md](./PSYCHO.md).
+- [x] **Grain**: Identity verification in the kernel, barcode to SynthID. Tiers: exact, redundant, resonant, statistical. `GET /api/v2/grain/tiers`, `POST /api/v2/grain/verify`. See [GRAIN.md](./GRAIN.md).
+- [x] **Auth**: `AUTH_MODE`, RBAC roles, API keys. No anonymous writes.
+- [x] **Product image**: API, cognitive modules, WUI, and TUI ship in `indb:0.8.0`. The landing site is a separate app.
 
----
+### Already in this engine (not a separate version)
 
-## 🟢 v0.9.0: Performance & Caching (Completed)
-**Focus**: In-Memory Optimization & Speed.
-*Released: Q1 2026*
+These are part of the engine. An earlier draft filed them under a 1.0.0 that was never cut.
 
-- [x] **TTL Cache**: Time-to-live in-memory cache with LRU eviction.
-- [x] **Bloom Filters**: Probabilistic duplicate detection (0.1% false positive rate).
-- [x] **Weak References**: Memory-efficient object caching.
-- [x] **Query Cache**: Automatic caching of expensive queries (5-10 min TTL).
-- [x] **Cache Statistics**: Real-time hit/miss ratio monitoring.
-- [x] **MessagePack Protocol**: Binary content negotiation (autonomous alternative to BSON).
+- [x] AES-256-GCM at rest, TLS in transit, Ed25519 signatures
+- [x] No external database: `indb.bin`, msgpack, in-process cache
+- [x] Raft cluster, HAProxy compose, Fly deploy
+- [x] WUI at `/wui/`, TUI, Prometheus `/metrics`
+- [x] Optional embeddings (`sentence-transformers`); token overlap when the model is absent
 
 ---
 
-## 🟢 v1.0.0: Stable-Cognitive Edition (Completed)
-**Focus**: Autonomous Optimization, Zero-CPU Reality.
-*Released: January 12, 2026*
+## 🟢 v0.9.0: Sleep & Wake
+**Focus**: Exhale keeps the event.
+*Released: 2026-11-03*
 
-### Core Features
-- [x] **Async Optimization**: Convert all blocking I/O to async/await.
-- [x] **Memory-Mapped Storage**: Fast binary access for large datasets.
-- [x] **Object Pooling**: Reusable Event objects for reduced GC pressure.
-- [x] **LZ4 Compression**: Optional storage compression.
-
-### Documentation
-- [x] **Reality Guard Demo**: Interactive Inhale-Exhale-Axiom visualization.
-- [x] **Comprehensive README**: All startup commands for all components.
-- [x] **MkDocs Site**: Full API reference and guides.
-- [x] **Type System Docs**: Complete with binary type.
-- [x] **CHANGELOG**: Complete release history.
-
-### Developer Experience
-- [x] **Version Updates**: All files updated to v1.0.0.
-- [ ] **SDKs**: Official Python, TypeScript, and Go clients.
-- [ ] **CLI Improvements**: Interactive mode, better error messages.
-- [ ] **TUI Enhancements**: Real-time metrics dashboard.
-
-### Testing & Quality
-- [x] **Load Testing**: 100k events/sec benchmark.
-- [ ] **Security Audit**: Penetration testing and vulnerability scan.
-- [ ] **Performance Profiling**: Memory and CPU optimization.
-- [x] **Integration Tests**: End-to-end protocol testing.
-
-### Deployment
-- [x] **Docker Compose**: Multi-node Raft cluster setup.
-- [x] **Prometheus Monitoring**: Metrics collection configured.
-- [x] **Kubernetes Helm**: Production-ready charts.
-- [x] **Grafana Dashboards**: Visualization templates.
-- [ ] **LTS**: Long Term Support release with 2-year maintenance.
+- [x] Low-salience events leave hot memory for encrypted `cold.bin`.
+- [x] Signed events and the recent tail stay hot.
+- [x] A strong seed wakes a sleeper back into the resonance index.
+- [x] `hot_events`, `cold_events`, `wake_count` on `/api/v2/health`.
+- [x] See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md).
 
 ---
 
-## 🔵 v2.0.0: The Neural Layer (Planned)
-**Focus**: Machine Learning & Cognitive Processing.
-*Target: Q3-Q4 2026*
+## 🟢 v0.9.1: Direct recall
+**Focus**: One id, no walk of the life.
+*Released: 2026-11-03*
 
-- [ ] **Embedding Engine**: Automatic vector embeddings for events.
-- [ ] **Semantic Search**: Similarity-based retrieval.
-- [ ] **Pattern Recognition**: ML-based anomaly detection.
-- [ ] **Predictive Fusion**: AI-assisted deduplication.
-- [ ] **Neural Interpreter**: Context-aware event interpretation using transformers.
+- [x] Hot memory keeps an id map.
+- [x] `get_event`, `get_event_by_id`, and the Raft commit wait use that map.
+- [x] A sleeping event is still returned by id from the cold tier.
 
 ---
 
-## 🔵 v3.0.0: The Marketplace (Planned)
-**Focus**: Extensibility & Community.
-*Target: 2027*
+## 🟢 v0.10.0: Cold stays cold
+**Focus**: The sleeper is the file.
+*Released: 2026-11-03*
 
-- [ ] **Plugin System**: Custom interpreters and fusion algorithms.
-- [ ] **Marketplace**: Community-contributed extensions.
-- [ ] **Federation**: Cross-INDB instance queries.
-- [ ] **GraphQL Federation**: Distributed schema stitching.
-- [ ] **Event Sourcing**: CQRS pattern support.
+- [x] RAM keeps an id and its tokens, not the event body.
+- [x] The body is read from `cold.bin` on wake, or when the id is asked for by name.
+- [x] Scoring a seed uses the token trace, so noticing a sleeper does not load the life.
 
 ---
 
-## 📊 Progress Summary
+## 🟢 v0.11.0: Edges fade
+**Focus**: A weak link goes quiet. It is not cut.
+*Released: 2026-11-03*
 
-| Version | Status | Completion | Release Date |
-|---------|--------|------------|--------------|
-| v0.3.0 | ✅ Complete | 100% | Q1 2026 |
-| v0.4.0 | ✅ Complete | 100% | Q1 2026 |
-| v0.5.0 | ✅ Complete | 100% | Q1 2026 |
-| v0.6.0 | ✅ Complete | 100% | Q1 2026 |
-| v0.7.0 | ✅ Complete | 100% | Q1 2026 |
-| v0.8.0 | ✅ Complete | 100% | Q1 2026 |
-| v0.9.0 | ✅ Complete | 100% | Q1 2026 |
-| v1.0.0 | ✅ Complete | 100% | January 12, 2026 |
-| v2.0.0 | 🔵 Planned | 0% | Q3-Q4 2026 |
-| v3.0.0 | 🔵 Planned | 0% | 2027 |
+- [x] An edge that touches a sleeper below the archive line is marked stale and kept.
+- [x] A stale edge does not wake and does not answer Echo. Token overlap still can.
+- [x] A sleeper that still carries mass holds the edge past the seven-day clock.
 
 ---
 
-## 🎯 Current Focus (February-March 2026)
+## 🟢 v0.11.1: Inhale looks sideways (current)
+**Focus**: Fusion scores the neighbours, not the whole life.
+*Released: 2026-11-03*
 
-**Post-v1.0.0 Improvements**
+- [x] Heuristic fusion asks the token index. Events with no shared token are not scored.
+- [x] The embedding path still sees the whole hot tier.
+- [x] A fused body is replaced by id. The comparison no longer prints a debug line.
 
-**Recent Achievements (February 2026):**
-1. ✅ Raft cluster stabilization (99.8% success rate)
-2. ✅ Literary data ingestion (4,965 events)
-3. ✅ Echo algorithm tuning for semantic matching
-4. ✅ Prism/Instinct verification (100% success rate)
+---
 
-**Current Work:**
-1. 🔄 Performance optimization and monitoring
-2. 🔄 ML services documentation
-3. 🔄 Analytics module integration
-4. 🔄 Query optimization improvements
+## 🔵 Next
 
-**Next Milestone:** v2.0.0 Neural Layer (Q3-Q4 2026)
-- Vector embeddings
-- Semantic search
-- ML-based pattern recognition
+The next version is not numbered. 1.0.0 does not exist.
+
+---
+
+## 📊 Progress
+
+| Version | Status | Release |
+|---------|--------|---------|
+| v0.3.0 | ✅ Complete | Q1 2026 · cognitive core |
+| v0.4.0 | ✅ Complete | Q1 2026 · Raft |
+| v0.5.0 | ✅ Complete | Q1 2026 · audit and RBAC |
+| v0.6.0 | ✅ Complete | Q1 2026 · gRPC binary stream |
+| v0.7.0 | ✅ Complete | 2026-01-12 · origin layer |
+| v0.8.0 | ✅ Complete | 2026-09-22 · Psycho & Grain |
+| v0.9.0 | ✅ Complete | 2026-11-03 · Sleep & Wake |
+| v0.9.1 | ✅ Complete | 2026-11-03 · Direct recall |
+| v0.10.0 | ✅ Complete | 2026-11-03 · Cold stays cold |
+| v0.11.0 | ✅ Complete | 2026-11-03 · Edges fade |
+| v0.11.1 | ✅ **Current** | 2026-11-03 · Inhale looks sideways |
 

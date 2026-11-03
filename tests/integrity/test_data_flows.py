@@ -12,6 +12,9 @@ from typing import Dict, Any
 # Same default as the rest of the project: Dockerfile, fly.toml and the launcher use 8000.
 BASE_URL = os.environ.get("INDB_API_URL", "http://localhost:8000").rstrip("/")
 
+# Writes need a credential unless the target server runs with AUTH_MODE=OPEN.
+API_HEADERS = {"X-API-Key": os.environ["INDB_API_KEY"]} if os.environ.get("INDB_API_KEY") else {}
+
 from core.kernel import INDBKernel
 from core.event import Event
 from storage.binary import save_encrypted, load_decrypted
@@ -217,6 +220,7 @@ class TestProtocolFlow:
                     "raw_data_anchor": ["protocol:http", "test:flow"],
                     "location": "TestClient"
                 },
+                headers=API_HEADERS,
                 timeout=5.0
             )
             

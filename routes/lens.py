@@ -1,6 +1,8 @@
 """
 API endpoints for Contextual Lens queries
 """
+import logging
+
 from fastapi import APIRouter, Depends
 from typing import Dict, Any
 import uuid
@@ -8,15 +10,11 @@ import uuid
 from core.lens import ContextualLens, LensQueryEngine, LensMode
 from core.deps import IndbDep
 from core.kernel import AuthContext
-from auth.flexible_auth import require_auth
-
-async def get_auth(auth_info: dict = Depends(require_auth)) -> AuthContext:
-    return AuthContext(
-        user_id=auth_info.get("user_id", "api_user"),
-        auth_method=auth_info.get("method", "api_key")
-    )
+from auth.flexible_auth import require_identity as get_auth
 
 from core.routing import ContentNegotiationRoute
+
+logger = logging.getLogger("indb.lens")
 
 router = APIRouter(prefix="/api/v2/lens", tags=["lens"], route_class=ContentNegotiationRoute)
 
@@ -131,9 +129,7 @@ async def query_through_lens(
             "message": str(e)
         }
     except Exception as e:
-        print(f"Lens query error: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Lens query failed")
         return {
             "status": "error",
             "message": f"Internal error: {str(e)}"
@@ -199,7 +195,7 @@ async def shift_lens_spectrum(
         }
         
     except Exception as e:
-        print(f"Lens shift error: {e}")
+        logger.exception("Lens shift failed")
         return {
             "status": "error",
             "message": str(e)

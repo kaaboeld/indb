@@ -33,6 +33,9 @@ class AuthContext:
     auth_method: str = "mtls"  # mtls, webauthn, anonymous
     certificate_cn: Optional[str] = None
     session_token: Optional[str] = None
+    # Role carried by the credential. When absent, RBAC falls back to looking the
+    # user id up in its own table.
+    role: Optional[str] = None
 
 
 @dataclass
@@ -116,14 +119,9 @@ class INDBKernel:
     # --- Extended Accessors (for Echo/Prism) ---
 
     def get_event(self, event_id: str) -> Optional[Event]:
-        """
-        Retrieve a single event object by ID.  O(N) scan.
-        """
+        """Retrieve one event by id. Hot map first, then a sleeping copy."""
         self._check_initialized()
-        for event in self.db.iter_events():
-            if event.id == event_id:
-                return event
-        return None
+        return self.db.get_event_by_id(event_id)
 
     def get_all_events(self) -> List[Event]:
         """Retrieve all event objects (raw)."""
@@ -159,7 +157,7 @@ class INDBKernel:
         self._check_initialized()
         
         # RBAC Check
-        if not self.rbac.check_permission(auth.user_id, self.Permission.EVENT_READ):
+        if not self.rbac.check_permission(auth.user_id, self.Permission.EVENT_READ, getattr(auth, "role", None)):
              self.audit.log(auth.user_id, "interpret", "events", "DENIED", {"reason": "insufficient_permissions"})
              raise PermissionError("Access Denied: EVENT_READ permission required")
 
@@ -277,7 +275,7 @@ class INDBKernel:
         start_time = time.time()
         
         # RBAC Check
-        if not self.rbac.check_permission(auth.user_id, self.Permission.EVENT_READ):
+        if not self.rbac.check_permission(auth.user_id, self.Permission.EVENT_READ, getattr(auth, "role", None)):
              self.audit.log(auth.user_id, "query", "events", "DENIED", {"reason": "insufficient_permissions"})
              raise PermissionError("Access Denied: EVENT_READ permission required")
 
@@ -316,7 +314,7 @@ class INDBKernel:
         
         # RBAC Check (Only System Config or Admin can register sources?)
         # Let's say EVENT_WRITE is enough for now, or maybe SYSTEM_CONFIG
-        if not self.rbac.check_permission(auth.user_id, self.Permission.SYSTEM_CONFIG):
+        if not self.rbac.check_permission(auth.user_id, self.Permission.SYSTEM_CONFIG, getattr(auth, "role", None)):
              self.audit.log(auth.user_id, "register", "source", "DENIED", {"reason": "insufficient_permissions"})
              raise PermissionError("Access Denied: SYSTEM_CONFIG permission required")
 
@@ -340,7 +338,7 @@ class INDBKernel:
             self._check_initialized()
             
             # RBAC Check
-            if not self.rbac.check_permission(auth.user_id, self.Permission.EVENT_WRITE):
+            if not self.rbac.check_permission(auth.user_id, self.Permission.EVENT_WRITE, getattr(auth, "role", None)):
                  self.audit.log(auth.user_id, "ingest", "events", "DENIED", {"reason": "insufficient_permissions"})
                  raise PermissionError("Access Denied: EVENT_WRITE permission required")
 

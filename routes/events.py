@@ -3,12 +3,14 @@ Event Ingestion Routes (v2)
 
 Handles event creation, batch operations, and webhooks.
 """
+import logging
 import time
 import json
 import httpx
 from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, Request, HTTPException
 
+from auth.flexible_auth import require_identity
 from core.kernel import AuthContext
 from core.deps import IndbDep
 from core.rate_limit import limiter, RateLimits
@@ -22,12 +24,19 @@ from core.models import (
 
 from core.routing import ContentNegotiationRoute
 
+logger = logging.getLogger("indb.events")
+
 router = APIRouter(prefix="/api/v2", tags=["events"], route_class=ContentNegotiationRoute)
 
 
 @router.post("/events", response_model=StandardResponse[EventResponse])
 @limiter.limit(RateLimits.INGEST)
-async def create_event(request: Request, event: EventCreate, db: IndbDep):
+async def create_event(
+    request: Request,
+    event: EventCreate,
+    db: IndbDep,
+    auth: AuthContext = Depends(require_identity),
+):
     """Create a new event (v2)."""
     try:
         # ── Black Box Contract ─────────────────────────────────────────────────
@@ -58,8 +67,6 @@ async def create_event(request: Request, event: EventCreate, db: IndbDep):
         # ──────────────────────────────────────────────────────────────────────
 
         # Use Kernel Wrapper to trigger Webhooks
-        auth = AuthContext(user_id="api_writer", auth_method="api_key")
-
         event_data = {
             "raw_data_anchor": event.raw_data_anchor,
             "location": event.location,
@@ -104,7 +111,7 @@ async def create_event(request: Request, event: EventCreate, db: IndbDep):
     except Exception as e:
         if "RedirectToLeader" in str(e):
             leader_id = str(e).split(":")[1]
-            print(f"🔄 Proxying request to Leader: {leader_id}")
+            logger.info("Proxying request to leader %s", leader_id)
             
             try:
                 # Proxy to Leader directly via internal docker network
@@ -116,7 +123,7 @@ async def create_event(request: Request, event: EventCreate, db: IndbDep):
                     # Return the raw JSON response from the leader
                     return resp.json()
             except Exception as proxy_err:
-                print(f"Proxy Error: {proxy_err}")
+                logger.warning("Leader proxy failed: %s", proxy_err)
                 raise HTTPException(status_code=503, detail=f"Leader {leader_id} unavailable")
         
         # Re-raise other errors
@@ -124,7 +131,11 @@ async def create_event(request: Request, event: EventCreate, db: IndbDep):
 
 
 @router.post("/events/batch", response_model=StandardResponse[Dict[str, Any]])
-async def create_events_batch(batch: BatchEventCreate, db: IndbDep):
+async def create_events_batch(
+    batch: BatchEventCreate,
+    db: IndbDep,
+    auth: AuthContext = Depends(require_identity),
+):
     """
     Create multiple events in a single request (v2).
     
@@ -132,7 +143,12 @@ async def create_events_batch(batch: BatchEventCreate, db: IndbDep):
     If this node is a Raft follower, the entire batch is proxied to the leader.
     """
     start_time = time.time()
-    
+
+    # This path writes through db.db.ingest and so never reaches the kernel's own
+    # permission check — it has to make the call itself.
+    if not db.rbac.check_permission(auth.user_id, db.Permission.EVENT_WRITE, auth.role):
+        raise HTTPException(status_code=403, detail="EVENT_WRITE permission required")
+
     if not batch.events:
         raise HTTPException(status_code=400, detail="No events provided")
     
@@ -175,7 +191,7 @@ async def create_events_batch(batch: BatchEventCreate, db: IndbDep):
     
     # If follower redirect detected — proxy entire batch to leader
     if leader_id:
-        print(f"🔄 Proxying batch to Leader: {leader_id}")
+        logger.info("Proxying batch to leader %s", leader_id)
         try:
             async with httpx.AsyncClient(timeout=120.0) as proxy_client:
                 resp = await proxy_client.post(
@@ -184,7 +200,7 @@ async def create_events_batch(batch: BatchEventCreate, db: IndbDep):
                 )
                 return resp.json()
         except Exception as proxy_err:
-            print(f"Proxy Error: {proxy_err}")
+            logger.warning("Leader batch proxy failed: %s", proxy_err)
             raise HTTPException(status_code=503, detail=f"Leader {leader_id} unavailable: {proxy_err}")
     
     processing_time = time.time() - start_time
@@ -215,15 +231,31 @@ async def create_events_batch(batch: BatchEventCreate, db: IndbDep):
 
 # Webhook Management endpoints use WebhookRequest from core.models
 
+def _require_system_config(db, auth: AuthContext) -> None:
+    """A webhook forwards every future event to an arbitrary URL — admin territory."""
+    if not db.rbac.check_permission(auth.user_id, db.Permission.SYSTEM_CONFIG, auth.role):
+        raise HTTPException(status_code=403, detail="SYSTEM_CONFIG permission required")
+
+
 @router.post("/webhooks", response_model=StandardResponse[Dict[str, str]])
-async def register_webhook(webhook: WebhookRequest, db: IndbDep):
+async def register_webhook(
+    webhook: WebhookRequest,
+    db: IndbDep,
+    auth: AuthContext = Depends(require_identity),
+):
     """Register a new webhook URL."""
+    _require_system_config(db, auth)
     db.webhooks.register(webhook.url)
     return StandardResponse(data={"status": "registered", "url": webhook.url})
 
 
 @router.delete("/webhooks", response_model=StandardResponse[Dict[str, str]])
-async def unregister_webhook(webhook: WebhookRequest, db: IndbDep):
+async def unregister_webhook(
+    webhook: WebhookRequest,
+    db: IndbDep,
+    auth: AuthContext = Depends(require_identity),
+):
     """Unregister a webhook URL."""
+    _require_system_config(db, auth)
     db.webhooks.unregister(webhook.url)
     return StandardResponse(data={"status": "unregistered", "url": webhook.url})

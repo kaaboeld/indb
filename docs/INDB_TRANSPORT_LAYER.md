@@ -677,4 +677,4 @@ indb.bin (Single source of truth)
 ---
 
 *Documentation created: January 31, 2026*  
-*INDB version: v1.0.0*
+*INDB version: 0.11.1*

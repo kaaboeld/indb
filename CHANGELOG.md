@@ -1,193 +1,149 @@
-# INDB v1.0.0 Production Release
+# Changelog
 
-**Release Date:** January 12, 2026  
-**Status:** Production Ready
+Current release: **0.11.1**. Source of truth for the running version is `VERSION` in `core/constants.py`. Packed notes live in `releases/manifest.json`.
 
----
-
-## 🎉 Major Milestone: v1.0.0
-
-INDB has reached production readiness! This release marks the culmination of 7 major versions (v0.3 through v0.9) and represents a stable, secure, and performant autonomous database system.
+1.0.0 has not been cut. Work stays local until this tree is packed.
 
 ---
 
-## 🚀 What's New in v1.0.0
+## 0.11.1 — Inhale looks sideways
 
-### Core Improvements
-- **Async I/O Optimization**: Converted all blocking operations to async/await
-- **Memory-Mapped Storage**: Fast binary access for large datasets
-- **Object Pooling**: Reduced GC pressure with reusable Event objects
-- **LZ4 Compression**: Optional storage compression for space savings
+**Date:** 2026-11-03
 
-### Documentation
-- ✅ **Reality Guard Demo**: Interactive visualization of Inhale-Exhale-Axiom
-- ✅ **Comprehensive README**: Complete startup guide for all components
-- ✅ **MkDocs Documentation**: Full API reference and guides
-- ✅ **Type System Documentation**: Including binary type support
-
-### Testing & Quality
-- **Load Testing**: Verified 100k events/sec ingestion
-- **Security Audit**: Completed penetration testing
-- **Performance Profiling**: Optimized hot paths
-- **Integration Tests**: Full protocol coverage
-
-### Deployment
-- **Docker Compose**: Multi-node Raft cluster setup
-- **Kubernetes Helm**: Production-ready charts
-- **Monitoring**: Prometheus + Grafana dashboards
+A new event is scored against hot events that share a token. The rest of the life is not walked. Embeddings, when present, still see the whole hot tier. Fusion no longer prints a debug line on every comparison. Replacing a fused body uses the id map.
 
 ---
 
-## 📦 Previous Releases
+## 0.11.0 — Edges fade
 
-### v0.9.0: Performance & Caching (January 2026)
-- TTL Cache with LRU eviction
-- Bloom filters for duplicate detection
-- Weak references for memory efficiency
-- MessagePack binary protocol
+**Date:** 2026-11-03
 
-### v0.8.0: Autonomous Security (January 2026)
-- AES-256-GCM at-rest encryption
-- TLS/SSL transport encryption
-- Removed external database dependencies
-- Self-signed certificate generation
+A graph edge that touches a weak sleeper is marked stale and kept. It no longer wakes anyone and no longer answers Echo. A sleeper that still carries mass holds its edge past the seven-day clock. Token overlap can still wake what the edge has faded.
 
-### v0.7.0: The Origin Layer (January 2026)
-- Source entity system
-- Weighted consensus by reputation
-- Cryptographic event signing
-- Provenance tracking
+---
 
-### v0.6.0: Binary Stream (January 2026)
-- gRPC streaming support
-- Binary payload handling
-- Async/sync bridge
-- Modular architecture
+## 0.10.0 — Cold stays cold
 
-### v0.5.0: The Fortress (January 2026)
-- Immutable audit logs
-- RBAC authorization
-- Defense-in-depth security
+**Date:** 2026-11-03
 
-### v0.4.0: Distributed Autonomy (January 2026)
-- Raft consensus
-- Leader election
-- Log replication
-- WAL persistence
+A sleeper is the encrypted file, not a second copy of the life in RAM. The process keeps the id and the tokens, enough to notice a strong seed. The body is read from `cold.bin` when that seed wakes it, or when the id is asked for by name.
 
-### v0.3.0: The Cognitive Core (January 2026)
-- Event stream foundation
-- 35:1 fusion compression
+---
+
+## 0.9.1 — Direct recall
+
+**Date:** 2026-11-03
+
+Hot memory keeps an id map. `get_event`, `get_event_by_id`, and the Raft commit wait resolve one event without walking the stream. A sleeping event is still found by id in the cold tier.
+
+---
+
+## 0.9.0 — Sleep & Wake
+
+**Date:** 2026-11-03
+
+- A full hot tier exhales low-salience events into encrypted `cold.bin`. They are not deleted.
+- Signed events stay hot. The recent tail stays hot.
+- A seed whose token overlap or stored graph edge reaches the wake threshold pulls the sleeper back, re-indexes it, and reinforces `fusion_count`.
+- `/api/v2/health` reports `hot_events`, `cold_events`, and `wake_count` (wakes since process start).
+- Reference: [docs/MEMORY_LIFECYCLE.md](docs/MEMORY_LIFECYCLE.md)
+
+---
+
+## 0.8.0 — Psycho & Grain
+
+**Date:** 2026-09-22  
+**Image:** `indb:0.8.0`  
+**Git:** `e3e5882`
+
+### Psycho
+
+Pathfinding under weight ablation. Echo radiates; Psycho picks one route and prices what the observer's values did to it.
+
+```
+cost(a → b) = -log R(a, b) + barrier(b)
+```
+
+Minimising the sum of `-log R` maximises the product of resonances, so the cheapest path is the most plausible chain. `barrier` comes from the negative entries of the caller's `token_weights`.
+
+The search runs twice — valuation honoured, valuation removed — and both routes are priced on the same scale.
+
+- `GET /api/v2/psycho/profiles`
+- `POST /api/v2/psycho/path` with `from`, `to`, `profile`, `compare_to`, `token_weights`
+- Headline fields: `detour_cost`, `barrier_walked_into`, `identical_route`
+- Profiles include `psychopath` (affect flat, distress ignored) and `empath`; the baseline is `neutral`
+- Reference: [docs/PSYCHO.md](docs/PSYCHO.md)
+
+### Grain
+
+Identity verification in the kernel, from barcode-exact to a SynthID-style fingerprint.
+
+| Tier | Analog | Tolerance |
+|------|--------|-----------|
+| exact | EAN-13 / Ed25519 | ~0–5% |
+| redundant | QR-style N-of-M | ~30% |
+| resonant | Echo × source reputation | ~30–50% |
+| statistical | n-gram fingerprint | p-value |
+
+- `GET /api/v2/grain/tiers`
+- `POST /api/v2/grain/verify`
+- Reference: [docs/GRAIN.md](docs/GRAIN.md)
+
+### Auth
+
+- `AUTH_MODE`, RBAC roles, API keys
+- Anonymous writes are rejected
+
+### Product image
+
+`indb:0.8.0` ships the API, cognitive modules, WUI, and TUI. The landing site (`site/`) is a separate application.
+
+---
+
+## 0.7.0 — Origin layer
+
+**Date:** 2026-01-12  
+**Image:** `indb:0.7.0`
+
+- Source entity (`Sensor`, `AI`, `Human`, …) and a kernel source registry
+- Reputation-weighted fusion
+- Ed25519 event signing and provenance (`source_id`)
+- Prism perception paradox: `perception_gap`, `alternative_readings`, observer `token_weights`
+- Signed memory recovery by public `key_id`
+
+---
+
+## Earlier milestones
+
+These shipped before the packed catalog. They are in the 0.8.0 engine. They are not later version numbers.
+
+### 0.6.0 — Binary stream
+
+- gRPC `IngestStream`
+- `binary_payload` on events
+- JIT renderer decoupled from storage
+
+### 0.5.0 — Fortress
+
+- Audit log
+- RBAC
+- AES-256-GCM at rest, TLS in transit
+- No external database: `indb.bin` and msgpack
+
+### 0.4.0 — Raft
+
+- Leader election and log replication
+- Writes only on the leader
+
+### 0.3.0 — Cognitive core
+
+- Event stream
+- Fusion
 - JIT interpretation
-- Multi-protocol support
+- HTTP, WebSocket, UDP
 
 ---
 
-## 🔧 Breaking Changes
+## What was not a release
 
-### Storage Format
-- **Encryption**: Upgraded from Fernet to AES-256-GCM
-- **Migration Required**: Existing `indb.bin` files must be migrated
-- **Migration Tool**: `python3 scripts/migrate_encryption.py`
-
-### Dependencies
-- **Removed**: `pymongo` (BSON support)
-- **Added**: `lz4` (compression)
-- **Updated**: `cryptography` to latest version
-
-### API Changes
-- **Content-Type**: `application/bson` → `application/msgpack`
-- **Binary Endpoints**: New `/api/v2/events/binary` endpoint
-- **Cache Stats**: New `/api/v2/cache/stats` endpoint
-
----
-
-## 📊 Performance Metrics
-
-| Metric | v0.3.0 | v1.0.0 | Improvement |
-|--------|--------|--------|-------------|
-| Ingestion Latency | 0.8ms | 0.4ms | **50% faster** |
-| Query Latency | 5ms | 2ms | **60% faster** |
-| Throughput | 50k/sec | 100k/sec | **2x increase** |
-| Memory Usage | 150MB | 100MB | **33% reduction** |
-| Storage Size | 100MB | 60MB | **40% smaller** (with LZ4) |
-| Cache Hit Rate | N/A | 85% | **New feature** |
-
----
-
-## 🔒 Security Enhancements
-
-- ✅ **AES-256-GCM** encryption at rest
-- ✅ **TLS 1.3** for all transport
-- ✅ **PBKDF2** key derivation (100k iterations)
-- ✅ **Ed25519** signature verification
-- ✅ **RBAC** authorization
-- ✅ **Zero external dependencies** (no Redis, MongoDB, PostgreSQL)
-
----
-
-## 🛠️ Installation
-
-### Quick Start
-```bash
-# Clone and setup
-git clone <repo>
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Generate certificates
-python3 -m auth.certificates.generator
-
-# Start all services
-./start.sh
-```
-
-### Docker
-```bash
-docker-compose up -d
-```
-
-### Kubernetes
-```bash
-helm install indb ./helm/indb
-```
-
----
-
-## 📚 Documentation
-
-- **README**: [README.md](../README.md)
-- **API Docs**: http://localhost:8003/docs
-- **MkDocs**: http://localhost:8001
-- **Roadmap**: [ROADMAP.md](ROADMAP.md)
-- **Autonomy**: [AUTONOMY.md](AUTONOMY.md)
-- **Encryption**: [ENCRYPTION.md](ENCRYPTION.md)
-- **TLS Setup**: [TLS_SETUP.md](TLS_SETUP.md)
-
----
-
-## 🙏 Acknowledgments
-
-Thank you to everyone who contributed to making INDB production-ready!
-
----
-
-## 🔮 What's Next?
-
-### v2.0.0: The Neural Layer (Q3-Q4 2026)
-- Vector embeddings
-- Semantic search
-- ML-based pattern recognition
-- Predictive fusion
-
-### v3.0.0: The Marketplace (2027)
-- Plugin system
-- Community extensions
-- Federation
-- Event sourcing
-
----
-
-**INDB v1.0.0 - Production Ready. Autonomous. Secure. Fast.**
+An earlier draft of this file called the current release 1.0.0 and assigned AES, caching, and a 100k events/sec benchmark to that number. 1.0.0 was never cut. Cluster throughput measured for the 3-node Raft setup remains 19–28 events/sec. Optional `sentence-transformers` embeddings fall back to token overlap when the model is not installed.

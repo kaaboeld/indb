@@ -9,6 +9,9 @@ appears in output — so a stubbed or half-broken module fails instead of passin
 Usage:
     python3 scripts/verify_logic.py                      # against INDB_API_URL or prod
     INDB_API_URL=http://localhost:8000 python3 scripts/verify_logic.py
+
+Ingest needs a credential unless the target server runs with AUTH_MODE=OPEN, so set
+INDB_API_KEY to a key with the writer role.
 """
 
 import base64
@@ -22,6 +25,7 @@ import urllib.parse
 import urllib.request
 
 BASE = os.environ.get("INDB_API_URL", "https://api.indb.tech").rstrip("/")
+API_KEY = os.environ.get("INDB_API_KEY", "")
 V2 = f"{BASE}/api/v2"
 TIMEOUT = float(os.environ.get("INDB_HTTP_TIMEOUT", "45"))
 
@@ -47,9 +51,10 @@ def call(method, path, payload=None, params=None):
     if params:
         url = f"{url}?{urllib.parse.urlencode(params)}"
     data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        url, data=data, method=method, headers={"Content-Type": "application/json"}
-    )
+    headers = {"Content-Type": "application/json"}
+    if API_KEY:
+        headers["X-API-Key"] = API_KEY
+    req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT, context=SSL_CONTEXT) as resp:
             body = resp.read().decode()
@@ -293,6 +298,75 @@ def t_echo_resonance_bounds():
     return True, f"{len(ripples)} ripples, top {scores[0]:.2f}, sorted and bounded"
 
 
+def t_psycho_ablation_is_measured():
+    """
+    Psycho must not just return a route — it must price the ablated one on the
+    baseline's scale. A profile that quietly ignored the valuation, or a comparison
+    that compared two different scales, would pass a status check and fail here.
+    """
+    seed = corpus_seed()
+    if not seed:
+        return False, "corpus is empty, no anchors to route between"
+
+    status, body = call("GET", "/psycho/profiles")
+    profiles = unwrap(body)
+    if status != 200:
+        return False, f"profiles status={status} body={str(body)[:160]}"
+    ids = {p.get("id") for p in profiles.get("profiles", [])}
+    if not {"neutral", "psychopath"} <= ids:
+        return False, f"expected neutral and psychopath profiles, got {sorted(ids)}"
+
+    probe = next(p for p in profiles["profiles"] if p["id"] == "psychopath")
+    if probe["valuation_scale"] != 0.0 or probe["harmonics"]["emotion"] != 0.0:
+        return False, f"psychopath is not actually ablating: {probe}"
+
+    status, body = call("POST", "/psycho/path", {
+        "from": seed,
+        "to": corpus_query(),
+        "profile": "psychopath",
+        "compare_to": "neutral",
+        "token_weights": {"harm": -6.0},
+    })
+    if status != 200:
+        return False, f"path status={status} body={str(body)[:160]}"
+    data = unwrap(body)
+
+    ablation = data.get("ablation")
+    if not ablation:
+        return False, "a comparison was requested but none came back"
+    if ablation.get("baseline") != "neutral" or ablation.get("probe") != "psychopath":
+        return False, f"comparison ran the wrong profiles: {ablation.get('baseline')} vs {ablation.get('probe')}"
+    if not ablation.get("verdict"):
+        return False, "comparison carries no verdict"
+
+    result = data.get("result", {})
+    if not result.get("found"):
+        # An unreachable pair is a legitimate outcome, but it must say why.
+        if not result.get("reason"):
+            return False, "no route found and no reason given"
+        return True, f"no route between these anchors: {result['reason']}"
+
+    path = result.get("path", [])
+    ids_on_path = [h.get("event_id") for h in path]
+    if len(set(ids_on_path)) != len(ids_on_path):
+        return False, f"route revisits a node: {ids_on_path}"
+    if ids_on_path[0] != data["anchors"]["source"]["event_id"]:
+        return False, "route does not start at the source anchor"
+    if ids_on_path[-1] != data["anchors"]["target"]["event_id"]:
+        return False, "route does not end at the target anchor"
+    if result.get("total_cost") is None or result["total_cost"] < 0:
+        return False, f"cost is missing or negative: {result.get('total_cost')}"
+
+    if ablation.get("identical_route"):
+        return True, "route unchanged by ablation — the valuation was not steering here"
+    if ablation.get("probe_cost_on_baseline_scale") is None:
+        return False, "routes diverged but the ablated one was never re-priced on the baseline scale"
+    return True, (
+        f"{len(path)} nodes, detour_cost={ablation.get('detour_cost')}, "
+        f"barrier_walked_into={ablation.get('barrier_walked_into')}"
+    )
+
+
 def t_deduction():
     status, body = call("POST", "/deduction/deduce", {"query": "verify logic", "limit": 5})
     data = unwrap(body)
@@ -503,6 +577,7 @@ CHECKS = [
     ("Prism — gap, label, alternatives", t_prism_synthesize),
     ("Instinct — adrenaline axis moves confidence", t_prism_instinct_axis),
     ("Echo — resonance bounded and sorted", t_echo_resonance_bounds),
+    ("Psycho — ablation priced on a common scale", t_psycho_ablation_is_measured),
     ("Deduction — chains", t_deduction),
     ("Subwave — horizontal broadcast", t_subwave),
     ("Slice — anchors not mutated", t_slice_does_not_mutate),
