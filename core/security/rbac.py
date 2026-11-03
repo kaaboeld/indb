@@ -56,23 +56,42 @@ class AccessControl:
         
     def get_role(self, user_id: str) -> Optional[Role]:
         return self._user_roles.get(user_id)
-        
-    def check_permission(self, user_id: str, required_permission: Permission) -> bool:
-        """Check if user has specific permission."""
-        role = self.get_role(user_id)
-        if not role:
-            return False
-            
-        return required_permission in ROLE_PERMISSIONS.get(role, set())
 
-    def check_role(self, user_id: str, required_role: Role) -> bool:
+    def resolve_role(self, user_id: str, role: Optional[str] = None) -> Optional[Role]:
+        """
+        Role carried by the credential wins over the static table.
+
+        Identities now come from API keys and JWT claims, so they are not known
+        ahead of time and cannot be looked up in _user_roles.
+        """
+        if role:
+            try:
+                return Role(role.lower())
+            except ValueError:
+                return None
+        return self._user_roles.get(user_id)
+
+    def check_permission(
+        self,
+        user_id: str,
+        required_permission: Permission,
+        role: Optional[str] = None,
+    ) -> bool:
+        """Check if user has specific permission."""
+        resolved = self.resolve_role(user_id, role)
+        if not resolved:
+            return False
+
+        return required_permission in ROLE_PERMISSIONS.get(resolved, set())
+
+    def check_role(self, user_id: str, required_role: Role, role: Optional[str] = None) -> bool:
         """Check if user has specific role or higher (not actually hierarchical here, just exact match)."""
         # For simplicity, just exact match or admin override
-        role = self.get_role(user_id)
-        if not role:
+        resolved = self.resolve_role(user_id, role)
+        if not resolved:
             return False
-        
-        if role == Role.ADMIN:
+
+        if resolved == Role.ADMIN:
             return True
-            
-        return role == required_role
+
+        return resolved == required_role

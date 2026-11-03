@@ -10,7 +10,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 logger = logging.getLogger("indb.app")
 from fastapi.middleware.cors import CORSMiddleware
@@ -187,13 +187,30 @@ def create_app() -> FastAPI:
     # --------------------------------------------------------------------------
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+    # The kernel signals RBAC denials with PermissionError; without this they surface
+    # as 500s.
+    async def _permission_denied_handler(request, exc):
+        return JSONResponse(status_code=403, content={"detail": str(exc)})
+
+    app.add_exception_handler(PermissionError, _permission_denied_handler)
     
     # CORS
     if config.CORS_ENABLED:
+        cors_origins = config.cors_origins_list
+        allow_credentials = config.CORS_ALLOW_CREDENTIALS
+        # Starlette echoes the request Origin back when "*" is combined with credentials,
+        # which hands any site authenticated read access. Credentials lose.
+        if "*" in cors_origins and allow_credentials:
+            logger.warning(
+                "CORS: wildcard origin with credentials is unsafe — disabling "
+                "allow_credentials. Set CORS_ORIGINS to an explicit list instead."
+            )
+            allow_credentials = False
         app.add_middleware(
             CORSMiddleware,
-            allow_origins=config.cors_origins_list,
-            allow_credentials=config.CORS_ALLOW_CREDENTIALS,
+            allow_origins=cors_origins,
+            allow_credentials=allow_credentials,
             allow_methods=config.cors_methods_list,
             allow_headers=config.cors_headers_list,
         )
@@ -235,7 +252,7 @@ def create_app() -> FastAPI:
     # GraphQL
     graphql_app = GraphQLRouter(graphql_schema)
     app.include_router(graphql_app, prefix="/graphql")
-    from routes import events, query, websockets, health, system, analytics, echo, prism, instinct, deduction, what_if, slice, subwave, recovery, paradox, grain
+    from routes import events, query, websockets, health, system, analytics, echo, prism, instinct, deduction, what_if, slice, subwave, recovery, paradox, grain, psycho
 
     app.include_router(health.router)
     app.include_router(events.router)
@@ -253,6 +270,7 @@ def create_app() -> FastAPI:
     app.include_router(slice.router)
     app.include_router(subwave.router)
     app.include_router(grain.router)
+    app.include_router(psycho.router)
     app.include_router(lens_router)
     app.include_router(contact_router)
     

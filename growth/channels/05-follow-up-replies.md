@@ -38,7 +38,7 @@ Grain shipped as kernel module — unified identity verification was the missing
 
 ## «Performance / production ready?»
 
-v0.7.0, standalone on Fly (api.indb.tech). Raft cluster for multi-node. Metrics in docs. Happy to share stress test notes from README.
+0.10.0 (cold body stays on disk; 0.9.1 recall; 0.9.0 sleep and wake). Local tree, not yet the Fly image. Raft cluster for multi-node. Metrics in docs. Happy to share stress test notes from README.
 
 ---
 

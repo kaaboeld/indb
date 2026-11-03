@@ -1,4 +1,6 @@
-# Memory Lifecycle — Forgetting as Architecture (v0.8 direction)
+# Memory Lifecycle — Forgetting as Architecture
+
+Shipped in **0.9.0** (sleep and wake), **0.9.1** (recall by id), and **0.10.0** (the body stays on disk).
 
 > The concept is immortal; repositories are compilations.  
 > INDB is an **interpretational database** — it models **human memory**: anchors, forgetting, associative wake-up — not a tape archive.
@@ -7,12 +9,12 @@
 
 ## Polar circle of the project
 
-| Human memory | INDB today | v0.8 target |
-|--------------|------------|-------------|
-| Compress reality to anchors | `raw_data_anchor`, `blind_payload` (presence without content) | Same |
-| Forgetting is cleanup, not failure | TTL purge, entropy prune (low `fusion_count`) | **Sleep** default, erase optional |
-| Associative recall without life replay | Echo, index, graph, subwave (horizontal) | + **cold wake** |
-| Strong trigger restores old context | — | Seed above wake threshold pulls cold nodes |
+| Human memory | INDB |
+|--------------|------|
+| Compress reality to anchors | `raw_data_anchor`, `blind_payload` (presence without content) |
+| Forgetting is cleanup, not failure | Low salience sleeps to `cold.bin`. TTL is the erase |
+| Associative recall without life replay | Echo, index, graph, subwave — hot tier only |
+| Strong trigger restores old context | Token overlap or a stored edge at the wake threshold pulls the sleeper back |
 
 ---
 
@@ -23,7 +25,7 @@
 | | Sleep | Erase |
 |---|--------|--------|
 | RAM / hot index | Removed | Removed |
-| `indb.bin` (cold) | **Kept** | Deleted |
+| `cold.bin` | **Kept**, body not resident in RAM | Deleted |
 | Resonance graph edges | Faded / archived | Gone |
 | Can a wild seed wake it? | **Yes** | No |
 | Fits Axiom | Noise **fades**; signed presence may remain | Contradicts “you were here” for anchored facts |
@@ -79,7 +81,7 @@ This is the Rotterdam rain moment: one strong horizontal cue, no O(N) life scan.
 
 | Mechanism | Role |
 |-----------|------|
-| `MemoryManager.prune()` | Today: drops low-mass from RAM — v0.8: **cold tier** instead of discard |
+| `MemoryManager.prune()` | Exhales low-salience events into `cold.bin`. Signed events stay hot. |
 | `purge_expired()` | Hard TTL — true erase when contract says so |
 | `ResonanceGraph` stale window | Edge fade, align with salience |
 | `JITRenderer` temporal_opacity | Query-time freshness, not storage tier |
@@ -87,13 +89,13 @@ This is the Rotterdam rain moment: one strong horizontal cue, no O(N) life scan.
 
 ---
 
-## Implementation order (v0.8)
+## Implementation order
 
 1. ✅ `last_resonance_at` — `core/memory_touch.py` (Echo/Subwave; persist optional via `MEMORY_TOUCH_PERSIST_ON_RESONANCE`).
 2. ✅ `compute_salience()` in `core/memory_salience.py` (pure functions, constants only).
-3. Prune → cold list in `indb.bin` section or separate `cold.bin` (encrypted).
-4. Wake path in `horizontal_pool.collect_candidate_ids` (+ cold lookup by token).
-5. Metrics: `hot_count`, `cold_count`, `wake_count` on `/health` or stats.
+3. ✅ Prune sends low-salience events to encrypted `cold.bin` (`storage/cold_store.py`). Signed events stay hot. The recent tail stays hot.
+4. ✅ Wake path in `horizontal_pool.collect_candidate_ids`. A seed whose token overlap or stored edge reaches the wake threshold pulls the sleeper back into hot memory.
+5. ✅ `hot_events`, `cold_events`, `wake_count` on `/api/v2/health` and analytics database stats. `wake_count` is since process start.
 
 ---
 

@@ -1,0 +1,15 @@
+:8080 {
+  handle /indb-* {
+    root * /data
+    header Content-Disposition "attachment"
+    file_server
+  }
+  handle /run.sh {
+    root * /data
+    file_server
+  }
+  handle {
+    root * /srv
+    file_server
+  }
+}

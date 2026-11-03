@@ -145,6 +145,49 @@ Three modes controlled by adrenaline (0.0 - 1.0):
 
 ---
 
+### **Psycho** (Pathfinding Under Weight Ablation)
+**Measures what the observer's values were doing to a route.**
+
+Echo radiates in every direction. Psycho picks one and pays for it:
+
+```
+cost(a → b) = -log R(a, b) + barrier(b)
+```
+
+Minimising a sum of `-log R` maximises the product of resonances, so the cheapest
+path is the most plausible chain — not merely the one with fewest hops. `barrier`
+is what the observer pays to pass through a node, taken from the negative entries
+of their `token_weights`.
+
+The route alone is not the answer. Psycho runs the search twice — valuation
+honoured, valuation removed — and prices both on the same scale:
+
+```python
+POST /api/v2/psycho/path
+{
+  "from": "<event-id or free text>",
+  "to":   "<event-id or free text>",
+  "profile": "psychopath",      # Factor-1 analogue: affect flat, distress ignored
+  "compare_to": "neutral",      # the baseline
+  "token_weights": {"harm": -6.0}
+}
+
+→ detour_cost: 3.98            # what the shortcut costs once the valuation is priced back in
+  barrier_walked_into: 6.0     # barrier the shortcut enters that the baseline avoided
+  identical_route: false       # true would mean the weights were decoration
+```
+
+Zeroing every node's weight would be meaningless — every route would tie. Psycho
+ablates one *class* of weight (the emotional harmonic and the observer's valuation)
+and keeps the structural term, so a route still exists and is still ranked.
+
+**Use case:** Testing whether a weight in your ranking is load-bearing; tracing how
+a chain of events connects when a value judgement is taken out of the scoring.
+
+Full reference: [docs/PSYCHO.md](docs/PSYCHO.md)
+
+---
+
 ## 🏗️ Architecture
 
 ### **Distributed Consensus (Raft)**
@@ -248,11 +291,13 @@ After Fusion:
 | **Prism** | ✅ Production | Contextual synthesis | 100% success (50/50 parallel queries) |
 | **Echo** | ✅ Production | Resonance detection | <30ms latency |
 | **Instinct** | ✅ Production | Adrenaline reflexes | 100% success (50/50 parallel queries) |
+| **Psycho** | ✅ Production | Pathfinding under weight ablation | `POST /api/v2/psycho/path` |
+| **Grain** | ✅ Production | Identity across exact → statistical | `POST /api/v2/grain/verify` |
 | **Fusion Engine** | ✅ Production | Semantic deduplication | Real-time |
 | **Contextual Lens** | ✅ Production | Adaptive queries | <50ms |
 | **Event Ingestion** | ✅ Production | Multi-protocol intake | <1ms latency |
 | **Encryption** | ✅ Production | AES-256-GCM | At rest + in transit |
-| **Authentication** | ✅ Production | Ed25519 signatures | RBAC |
+| **Authentication** | ✅ Production | API keys, RBAC, Ed25519 | No anonymous writes |
 | **WebSocket** | ✅ Production | Real-time subscriptions | Live updates |
 | **GraphQL** | ✅ Production | Flexible queries | Schema introspection |
 | **MCP** | ✅ Production | Model Context Protocol | AI integration |
@@ -697,19 +742,8 @@ All events are cryptographically signed with Ed25519:
 - **ReDoc:** http://localhost:8000/redoc
 - **GraphQL Playground:** http://localhost:8000/graphql
 
-### **MkDocs Site**
-```bash
-# Start documentation server
-docker-compose up -d docs
-
-# View at http://localhost:8008
-```
-
-**OrbStack:** If `docs.backend.orb.local` returns the API instead of docs, use `http://localhost:8008` or add to `/etc/hosts`:
-```
-127.0.0.1 docs.backend.orb.local
-```
-Then open `http://docs.backend.orb.local:8008`.
+### **Docs**
+Documentation is not in the database image: https://docs.indb.tech
 
 ### **Core Concepts**
 - [Full Documentation (RU)](./INDB_FULL_DOCUMENTATION_RU.md)
@@ -748,61 +782,70 @@ python3 scripts/test_lens.py
 
 ## 🎯 Current Status
 
-**Version:** 0.7.0  
-**Status:** ✅ **Production-Ready**
+**Version:** 0.10.0 — Cold stays cold (2026-11-03)  
+**Status:** ✅ **Local tree**  
+**Image tag when packed:** `indb:0.10.0`
 
-### **Recent Achievements (Feb 2026)**
+### **0.10.0 — Cold stays cold**
 
-#### **Raft Consensus** ✅
-- Fixed all 5 critical bugs
-- **Stability improvement:** 4800%
-- Zero re-elections over 5+ minutes
-- Production-ready distributed consensus
+- A sleeper's body stays in encrypted `cold.bin`
+- RAM keeps the id and the tokens, enough to notice a strong seed
+- The body is read when that seed wakes it, or when the id is asked for by name
 
-#### **Prism Module** ✅
-- 100% success rate (50/50 parallel queries)
-- ~20ms average latency
-- Contextual synthesis working perfectly
+### **0.9.1 — Direct recall**
 
-#### **Echo Module** ✅
-- Harmonic resonance detection
-- Tuned for literary data
-- Location clustering functional
+- Hot memory keeps an id map
+- `get_event`, `get_event_by_id`, and the Raft commit wait use it
+- A sleeping event is still found by id in `cold.bin`
 
-#### **Instinct Module** ✅
-- 100% success rate (50/50 parallel queries)
-- Adrenaline scaling verified (0.0 → 1.0)
-- Reflex triggers operational
+### **0.9.0 — Sleep & Wake**
 
-#### **Infrastructure** ✅
-- 3-node Raft cluster stable
-- HAProxy load balancing
-- Docker deployment streamlined
-- TUI for cluster management
+- Low-salience events exhale into encrypted `cold.bin`
+- Signed events and the recent tail stay hot
+- A strong seed wakes a sleeper and re-indexes it
+- `/api/v2/health` reports `hot_events`, `cold_events`, `wake_count`
+- Reference: [docs/MEMORY_LIFECYCLE.md](docs/MEMORY_LIFECYCLE.md)
+
+### **0.8.0 — Psycho & Grain**
+
+#### **Psycho** ✅
+- Path cost is `-log R(a, b) + barrier(b)`: the cheapest route is the most plausible chain
+- Runs the search twice — valuation honoured, valuation removed — and prices both on the same scale
+- `detour_cost`, `barrier_walked_into`, `identical_route` say whether a weight was load-bearing
+- Profiles include `psychopath` (affect flat) and `empath`; baseline is `neutral`
+- `GET /api/v2/psycho/profiles` · `POST /api/v2/psycho/path`
+- Reference: [docs/PSYCHO.md](docs/PSYCHO.md)
+
+#### **Grain** ✅
+- One identity check across four noise tiers: exact → redundant → resonant → statistical
+- Barcode (Ed25519) through SynthID-style n-gram fingerprint, in the kernel
+- `GET /api/v2/grain/tiers` · `POST /api/v2/grain/verify`
+- Reference: [docs/GRAIN.md](docs/GRAIN.md)
+
+#### **Auth** ✅
+- `AUTH_MODE`, RBAC roles, API keys
+- Anonymous writes are rejected
+
+#### **Product image** ✅
+- The image ships API, cognitive modules, WUI, and TUI
+- The landing site (`site/`) is a separate app
+
+### **Already in the engine**
+
+Prism, Echo, Instinct, Fusion, Lens, Paradox, signed memory, Raft, AES-256-GCM at rest, and the WUI/TUI consoles. 1.0.0 has not been cut.
 
 ---
 
 ## 🗺️ Roadmap
 
-### **Q1 2026** (February-March)
-- ✅ Raft stability fixes
-- ✅ Prism/Echo/Instinct modules
-- ✅ Production deployment
-- 🔄 Performance optimization
-- 🔄 Monitoring dashboard
-- 🔄 ML services integration
+Current cut is **0.10.0**. 1.0.0 is not cut. Local only.
 
-### **Q2 2026**
-- Advanced fusion patterns
-- ML-based pattern detection
-- Multi-region replication
-- Real-time analytics
-
-### **Q3 2026**
-- Blockchain integration (optional)
-- Advanced encryption modes
-- Federated learning
-- Edge deployment
+| Version | What landed |
+|---------|-------------|
+| 0.10.0 | Cold body stays on disk |
+| 0.9.1 | Direct recall by id |
+| 0.9.0 | Sleep & Wake |
+| 0.8.0 | Psycho, Grain, authenticated writes, product image |
 
 ---
 
@@ -838,7 +881,7 @@ Proprietary - All Rights Reserved
 **INDB is:**
 - ✅ A distributed epistemological engine
 - ✅ Production-ready (verified under load)
-- ✅ Semantically intelligent (Prism/Echo/Instinct)
+- ✅ Semantically intelligent (Prism/Echo/Instinct/Psycho/Grain)
 - ✅ Fault-tolerant (Raft consensus)
 - ✅ Secure (encryption + signatures)
 - ✅ Fast (<1ms ingestion, <30ms queries)
