@@ -2,7 +2,7 @@
 
 ## Test Suite Overview
 
-INDB v1.0.0 includes comprehensive testing to ensure system integrity, data consistency, and protocol functionality.
+INDB 0.11.1 includes comprehensive testing to ensure system integrity, data consistency, and protocol functionality.
 
 ## Test Categories
 

@@ -14,9 +14,24 @@ venv/
 # Master encryption key — production uses Fly secrets (INDB_MASTER_KEY_B64).
 indb.key
 **/indb.key
+# TLS material is generated locally by auth/certificates/manager.py and terminated
+# by Fly in production — never commit a keypair.
+*.pem
+**/certs/
+auth/certificates/*.crt
+auth/certificates/*.key
 data-node-*/
 audit.bin
 indb.bin
+cold.bin
+# Materialized graphs, rebuilt from indb.bin on demand
+causal_edges.bin
+resonance_edges.bin
+paradox.bin
 site/
 .vscode/
 .idea/
+# Personal session notes — not for the repo
+REPORT_*.md
+# Portable image bundles (docker save) — rebuilt by scripts/image.py
+dist/

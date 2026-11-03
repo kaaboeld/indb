@@ -1,5 +1,5 @@
 site_name: INDB
-site_description: Implicit Neural Database — Signed Memory
+site_description: Interpretational Database — Signed Cognitive Memory
 site_author: INDB
 dev_addr: '127.0.0.1:8001'
 
@@ -43,6 +43,9 @@ nav:
     - Typing System: TYPING.md
     - Paradox Patterns: PARADOX.md
     - Grain (Identity Tolerance): GRAIN.md
+    - Psycho (Weight Ablation): PSYCHO.md
+    - Packer (releases): PACK.md
+    - Docker image: DOCKER.md
     - Signed Memory Recovery: SIGNED_MEMORY_RECOVERY.md
     - Cognitive Firewall: COGNITIVE_FIREWALL.md
   - Reference:

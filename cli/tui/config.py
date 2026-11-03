@@ -10,7 +10,11 @@ from urllib.parse import urlparse
 
 import httpx
 
-DEFAULT_VERSION = "0.7.0"
+try:
+    from core.constants import VERSION as DEFAULT_VERSION
+except ImportError:
+    DEFAULT_VERSION = "0.11.1"
+
 PRODUCTION_API_URL = "https://api.indb.tech"
 
 # Load .env from project root when available.

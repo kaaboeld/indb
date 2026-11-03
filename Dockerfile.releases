@@ -1,0 +1,4 @@
+FROM caddy:2-alpine
+COPY releases/www/Caddyfile /etc/caddy/Caddyfile
+COPY releases/www/index.html /srv/index.html
+EXPOSE 8080

@@ -1,7 +1,7 @@
-# INDB Authentication & Security (v1.0.0)
+# INDB Authentication & Security (v0.11.1)
 
 !!! warning "Status: Roadmap"
-    The WebAuthn and ZKP features described below are **Design Specifications** for upcoming phases. Current (v2.1) implemented authentication is **Bearer Token (JWT)**, **mTLS**, and **Signature Verification**.
+    The WebAuthn and ZKP sections below are design specifications. What ships is `AUTH_MODE`, RBAC roles, and API keys — anonymous writes are rejected — plus Bearer JWT, mTLS, and Ed25519 signatures.
 
 
 ## Problem: Password-Based Auth is Broken

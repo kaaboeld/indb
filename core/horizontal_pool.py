@@ -47,6 +47,17 @@ def collect_candidate_ids(
         candidate_ids |= index_ids
         modes.append("index")
 
+    wake = getattr(db, "wake_candidates", None)
+    if wake is not None:
+        try:
+            woken = wake(seed)
+        except Exception as e:
+            logger.debug("Cold wake skipped: %s", e)
+            woken = []
+        if woken:
+            candidate_ids |= set(woken)
+            modes.append("wake")
+
     try:
         from core.semantic_neighbors import expand_pool_from_memory, semantic_candidate_ids
 

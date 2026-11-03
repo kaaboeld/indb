@@ -294,7 +294,7 @@ Scripts receive `INDB_API_URL` from the TUI config. Only one script runs at a ti
 | `INDB_API_URL` | `https://api.indb.tech` | API base URL |
 | `INDB_CLUSTER_NODES` | — | Comma-separated URLs for Cluster tab |
 | `INDB_IN_DOCKER` | `false` | Hides local control buttons |
-| `INDB_VERSION` | `0.7.0` | Shown in header |
+| `INDB_VERSION` | `0.11.1` | Shown in header |
 
 ---
 

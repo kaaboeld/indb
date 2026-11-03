@@ -1,5 +1,5 @@
 # INDB Core Roadmap 2026
-**Core implementation concepts for 2026**
+**Design notes. The shipped release in this tree is 0.11.1. Nothing below is a version number.**
 
 ---
 
@@ -8,11 +8,9 @@
 INDB Kernel must evolve, integrating the leading concepts of 2026:
 
 ```
-Classic Core (v1.0)
+Classic Core (0.11.1, current)
     ↓
-Cognitive Core (v2.0)
-    ↓
-Quantum Core (v3.0)
+directions below — not cut
 ```
 
 ---
@@ -637,7 +635,7 @@ decrypted_results = homomorphic.decrypt(similar_cases)
 
 ## Conclusion
 
-INDB v2.0 should include:
+Directions after 0.11.1, not a cut version:
 
 ✅ **Semantic layer** (embeddings)  
 ✅ **Temporal reasoning**  
@@ -651,5 +649,4 @@ INDB v2.0 should include:
 
 ---
 
-*Roadmap created: January 31, 2026*  
-*Target version: INDB v2.0 (Q3-Q4 2026)*
+*Notes written: January 31, 2026. Shipped release in this tree: 0.11.1 (2026-11-03).*

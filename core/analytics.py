@@ -205,6 +205,9 @@ class INDBAnalytics:
                 "average_hours": sum(ages) / len(ages) if ages else 0,
             },
             "cache_size": self.db.cache.size() if hasattr(self.db, "cache") else 0,
+            "hot_events": len(events),
+            "cold_events": self.db.cold.count if getattr(self.db, "cold", None) is not None else 0,
+            "wake_count": self.db.cold.wake_count if getattr(self.db, "cold", None) is not None else 0,
         }
 
     def get_fusion_stats(self) -> Dict[str, Any]:

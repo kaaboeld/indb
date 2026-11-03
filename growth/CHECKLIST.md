@@ -6,6 +6,9 @@
 
 - [ ] https://indb.tech/ — 200, секции Hero → Contact
 - [ ] https://indb.tech/#grain — секция Grain на месте
+- [ ] https://indb.tech/#psycho — секция Psycho на месте
+- [ ] https://docs.indb.tech/PSYCHO/ — страница модуля
+- [ ] `GET /api/v2/psycho/profiles` — JSON с 3 профилями
 - [ ] https://api.indb.tech/health — 200
 - [ ] https://api.indb.tech/docs — Swagger открывается
 - [ ] https://docs.indb.tech/ — MkDocs актуален

@@ -39,7 +39,7 @@ Make a GET request to http://localhost:8888/health and tell me what the server r
 
 **Expected:**
 ```json
-{"status": "healthy", "version": "0.7.0", ...}
+{"status": "ok", "version": "0.11.1"}
 ```
 
 Hermes reads the response and explains it. Confirms: agent sees the network, INDB is alive.

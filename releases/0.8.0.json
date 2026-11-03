@@ -1,0 +1,14 @@
+{
+  "version": "0.8.0",
+  "title": "Psycho & Grain",
+  "date": "2026-09-22",
+  "git": "e3e5882",
+  "image": "indb:0.8.0",
+  "notes": [
+    "Psycho: Factor-1 weight ablation on the resonance graph",
+    "Grain: barcode-to-SynthID identity verification in the kernel",
+    "Auth: AUTH_MODE, RBAC roles, API keys — no anonymous writes",
+    "Product image: API, modules, WUI, TUI — landing is a separate app"
+  ],
+  "packed_at": "2026-09-22T05:38:45Z"
+}

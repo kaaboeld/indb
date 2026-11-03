@@ -38,7 +38,7 @@ Grain shipped as kernel module — unified identity verification was the missing
 
 ## «Performance / production ready?»
 
-v0.7.0, standalone on Fly (api.indb.tech). Raft cluster for multi-node. Metrics in docs. Happy to share stress test notes from README.
+0.11.1 (fusion scores shared tokens; 0.11.0 edges fade). Local tree, not yet the Fly image. Raft cluster for multi-node. Metrics in docs. Happy to share stress test notes from README.
 
 ---
 

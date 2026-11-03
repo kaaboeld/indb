@@ -74,6 +74,14 @@ class ResonanceIndex:
             self.index(event)
         logger.debug("ResonanceIndex rebuilt (%d events)", len(self._event_tokens))
 
+    def token_ids(self, seed: Event) -> Set[str]:
+        """Events that share a token with the seed. Location is not enough."""
+        out: Set[str] = set()
+        for key in _token_keys(seed.raw_data_anchor):
+            out |= self._by_token.get(key, set())
+        out.discard(seed.id)
+        return out
+
     def candidate_ids(self, seed: Event, cap: int = RESONANCE_INDEX_MAX_CANDIDATES) -> Set[str]:
         """
         Horizontal slice: union of events sharing tokens or location with seed.

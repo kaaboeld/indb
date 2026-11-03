@@ -1,0 +1,13 @@
+{
+  "version": "0.11.0",
+  "title": "Edges fade",
+  "date": "2026-11-03",
+  "git": "",
+  "image": "indb:0.11.0",
+  "notes": [
+    "An edge that touches a weak sleeper is marked stale and kept",
+    "That edge does not wake and does not answer Echo. Token overlap still can",
+    "A sleeper that still carries mass holds the edge past the seven-day clock"
+  ],
+  "packed_at": "2026-11-03T21:30:00Z"
+}

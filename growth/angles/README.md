@@ -10,5 +10,6 @@ One angle per campaign beat. Don't mix all five in one post.
 | **Blind / Black Box** | [blind-black-box.md](./blind-black-box.md) | privacy, healthcare |
 | **Reality Guard** | [reality-guard.md](./reality-guard.md) | ops, misinformation, IoT |
 | **Agent Idle Audit** | [agent-idle-audit.md](./agent-idle-audit.md) | agent/MCP, DEV.to part 2, anti-RAG positioning |
+| **Psycho — Weight Ablation** | [psycho.md](./psycho.md) | HN Phase 3, HABR, DEV.to part 3 |
 
 Mix angle + channel template from [../channels/](../channels/).

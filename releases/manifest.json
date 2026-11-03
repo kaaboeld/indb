@@ -1,0 +1,99 @@
+{
+  "current": "0.11.1",
+  "published": "0.8.0",
+  "releases": [
+    {
+      "version": "0.11.1",
+      "title": "Inhale looks sideways",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.11.1",
+      "notes": [
+        "Heuristic fusion scores hot events that share a token",
+        "The embedding path still sees the whole hot tier",
+        "A fused body is replaced by id"
+      ],
+      "packed_at": "2026-11-03T21:40:00Z"
+    },
+    {
+      "version": "0.11.0",
+      "title": "Edges fade",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.11.0",
+      "notes": [
+        "An edge that touches a weak sleeper is marked stale and kept",
+        "That edge does not wake and does not answer Echo. Token overlap still can",
+        "A sleeper that still carries mass holds the edge past the seven-day clock"
+      ],
+      "packed_at": "2026-11-03T21:30:00Z"
+    },
+    {
+      "version": "0.10.0",
+      "title": "Cold stays cold",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.10.0",
+      "notes": [
+        "A sleeper's body stays in encrypted cold.bin",
+        "RAM keeps the id and the tokens needed to notice a strong seed",
+        "The body is read on wake, or when the id is asked for by name"
+      ],
+      "packed_at": "2026-11-03T20:52:00Z"
+    },
+    {
+      "version": "0.9.1",
+      "title": "Direct recall",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.9.1",
+      "notes": [
+        "Hot memory resolves an event by id without walking the stream",
+        "get_event, get_event_by_id, and the Raft commit wait use that map",
+        "A sleeping event is still returned by id from the cold tier"
+      ],
+      "packed_at": "2026-11-03T20:48:00Z"
+    },
+    {
+      "version": "0.9.0",
+      "title": "Sleep & Wake",
+      "date": "2026-11-03",
+      "git": "",
+      "image": "indb:0.9.0",
+      "notes": [
+        "Low-salience events exhale into encrypted cold.bin instead of being deleted",
+        "Signed events and the recent tail stay hot",
+        "A strong seed wakes a sleeper back into the resonance index",
+        "Health reports hot_events, cold_events, and wake_count"
+      ],
+      "packed_at": "2026-11-03T20:48:00Z"
+    },
+    {
+      "version": "0.8.0",
+      "title": "Psycho & Grain",
+      "date": "2026-09-22",
+      "git": "e3e5882",
+      "image": "indb:0.8.0",
+      "download": "https://indb.tech/releases/indb-0.8.0.tar.gz",
+      "notes": [
+        "Psycho: Factor-1 weight ablation on the resonance graph",
+        "Grain: barcode-to-SynthID identity verification in the kernel",
+        "Auth: AUTH_MODE, RBAC roles, API keys — no anonymous writes",
+        "Product image: API, modules, WUI, TUI — landing is a separate app"
+      ],
+      "packed_at": "2026-09-22T05:38:45Z"
+    },
+    {
+      "version": "0.7.0",
+      "title": "Origin layer",
+      "date": "2026-01-12",
+      "git": "",
+      "image": "indb:0.7.0",
+      "notes": [
+        "Source entity system and reputation-weighted consensus",
+        "Ed25519 event signing and provenance",
+        "Kernel source registry for Sensor, AI, and Human origins"
+      ]
+    }
+  ]
+}

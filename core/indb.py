@@ -10,11 +10,13 @@ from core.resonance_index import ResonanceIndex
 from core.resonance_graph import ResonanceGraph
 from core.causal_index import CausalIndex
 from storage.binary import load_decrypted, save_encrypted
+from storage.cold_store import ColdStore
 from core.constants import (
     FUSION_DEFAULT_THRESHOLD,
     FUSION_MAX_FUSION_COUNT,
     FUSION_AUTOTUNE_INTERVAL_SEC,
     INTERPRET_MOOD_DEFAULT,
+    VERSION,
 )
 
 logger = logging.getLogger("indb.core")
@@ -37,7 +39,14 @@ class INDB:
         self.resonance_index = ResonanceIndex()
         self.resonance_graph = ResonanceGraph.load()
         self.causal_index = CausalIndex.load()
-        self.memory = MemoryManager(on_compaction=self._sync_resonance_index)
+        self.cold = ColdStore()
+        self.cold.load()
+        self.resonance_graph.bind_salience(self.cold.salience_map)
+        self._sleep_needs_hot_persist = False
+        self.memory = MemoryManager(
+            on_compaction=self._sync_resonance_index,
+            on_sleep=self._sleep_events,
+        )
         if len(self.memory) > 0:
             self.causal_index.rebuild(self.memory)
             self.causal_index.persist_if_dirty()
@@ -51,7 +60,16 @@ class INDB:
             else:
                 self.memory.add(item)
                 self.resonance_index.index(item)
-        logger.info("Memory initialised: %d events", len(self.memory))
+        hot_ids = {event.id for event in self.memory}
+        if self.cold.drop_present(hot_ids):
+            self.cold.persist()
+        if self._sleep_needs_hot_persist:
+            self._persist()
+        logger.info(
+            "Memory initialised: %d hot, %d cold",
+            len(self.memory),
+            self.cold.count,
+        )
 
         self.lock = threading.Lock()
         self.raft = raft_node
@@ -116,7 +134,8 @@ class INDB:
         self._last_tune_time = 0.0
 
         logger.info(
-            "INDB v0.3.0 ready — events=%d  encrypted=yes  cache=active",
+            "INDB v%s ready — events=%d  encrypted=yes  cache=active",
+            VERSION,
             len(self.memory),
         )
 
@@ -248,19 +267,29 @@ class INDB:
         invalidate_query_cache()
 
     def update_event(self, updated_event):
-        """Update existing event (used for fusion)"""
-        for i, event in enumerate(self.memory):
-            if event.id == updated_event.id:
-                self.memory[i] = updated_event
-                self.resonance_index.index(updated_event)
-                self._persist()
-                return updated_event
-
-        # Event not found, append as new
-        self.memory.add(updated_event)
+        """Update existing event (used for fusion)."""
+        if not self.memory.replace(updated_event):
+            self.memory.add(updated_event)
         self.resonance_index.index(updated_event)
         self._persist()
         return updated_event
+
+    def _fusion_candidates(self, event: Event) -> List[Event]:
+        """
+        Events worth scoring for a merge.
+
+        The heuristic cannot reach the fusion line without a shared token:
+        location and time together weigh 0.40, and the threshold never tunes
+        below 0.60. Embeddings can, so that path still sees the whole hot tier.
+        """
+        if getattr(self.fusion_engine, "embeddings", None):
+            return list(self.memory)
+        found: List[Event] = []
+        for event_id in self.resonance_index.token_ids(event):
+            existing = self.memory.get(event_id)
+            if existing is not None:
+                found.append(existing)
+        return found
 
     MAX_REGISTRY_SIZE = 1000
 
@@ -290,12 +319,18 @@ class INDB:
         """Get source by ID."""
         return self.source_registry.get(source_id)
 
+    def _sleep_events(self, events: List[Event]) -> None:
+        """Exhale landed. Keep the events on cold disk before hot memory forgets them."""
+        self.cold.add(events)
+        self._sleep_needs_hot_persist = True
+
     def _sync_resonance_index(self) -> None:
         """Rebuild horizontal structures after memory compaction (prune / TTL)."""
         self.resonance_index.rebuild(self.memory)
         self.causal_index.rebuild(self.memory)
-        valid = {e.id for e in self.memory}
+        valid = {e.id for e in self.memory} | self.cold.ids()
         self.resonance_graph.prune_missing(valid)
+        self.resonance_graph.fade(self.cold.salience_map())
         self.causal_index.prune_missing(valid)
         self.resonance_graph.persist_if_dirty()
         self.causal_index.persist_if_dirty()
@@ -318,6 +353,7 @@ class INDB:
                 try:
                     metrics = self.analytics.get_system_health()
                     new_th = self.fusion_engine.tune_threshold(metrics)
+                    logger.debug("Fusion threshold tuned to %.3f", new_th)
                     self._last_tune_time = now
                 except Exception as e:
                     logger.warning(
@@ -326,11 +362,10 @@ class INDB:
 
         # Try fusion if engine is available
         if self.fusion_engine and self.fusion_engine.config["enabled"]:
-            events_snapshot = list(self.memory)
             try:
                 similar = self.fusion_engine.find_similar_events(
                     event,
-                    events_snapshot,
+                    self._fusion_candidates(event),
                     self.fusion_engine.config["threshold"],
                     1
                 )
@@ -459,7 +494,7 @@ class INDB:
                     waited = 0.0
 
                     while waited < max_wait:
-                        if any(e.id == event.id for e in self.memory):
+                        if self.memory.get(event.id) is not None:
                             logger.debug("Event %s committed and applied by Raft", event.id[:8])
                             return event
                         await asyncio.sleep(wait_interval)
@@ -615,10 +650,68 @@ class INDB:
 
     def get_event_by_id(self, event_id: str) -> Optional[Event]:
         with self.lock:
-            for event in self.memory:
-                if event.id == event_id:
-                    return event
-        return None
+            found = self.memory.get(event_id)
+            if found is not None:
+                return found
+            return self.cold.get(event_id)
+
+    def wake_candidates(self, seed: Event) -> List[str]:
+        """
+        Pull sleeping events back when this seed resonates hard enough.
+
+        Token overlap and a live graph edge both count. A faded edge does not
+        wake anyone; the tokens of a strong seed still can. A weak neighbour
+        stays asleep.
+        """
+        from core.constants import MEMORY_WAKE_ECHO_THRESHOLD, MEMORY_WAKE_MAX_PER_QUERY
+        from core.memory_salience import should_wake, token_overlap
+
+        scored: Dict[str, float] = {}
+        for event_id in self.cold.overlapping_ids(seed):
+            keys = self.cold.trace_tokens(event_id)
+            if not keys:
+                continue
+            scored[event_id] = max(
+                scored.get(event_id, 0.0),
+                token_overlap(seed.raw_data_anchor, keys),
+            )
+
+        for row in self.resonance_graph.get_edges(seed.id):
+            event_id = row.get("target_id")
+            if not event_id or not self.cold.contains(event_id):
+                continue
+            scored[event_id] = max(scored.get(event_id, 0.0), float(row.get("score") or 0.0))
+
+        woken: List[str] = []
+        for event_id, score in sorted(scored.items(), key=lambda item: item[1], reverse=True):
+            if len(woken) >= MEMORY_WAKE_MAX_PER_QUERY:
+                break
+            if score < MEMORY_WAKE_ECHO_THRESHOLD or not should_wake(echo_score=score):
+                continue
+            if self._wake(event_id):
+                woken.append(event_id)
+        return woken
+
+    def _wake(self, event_id: str) -> bool:
+        """Move one sleeping event back into hot memory and re-index it."""
+        from core.memory_touch import touch_resonance
+
+        with self.lock:
+            event = self.cold.take(event_id)
+            if event is None:
+                return False
+            touch_resonance(event)
+            event.fusion_count = int(getattr(event, "fusion_count", 0) or 0) + 1
+            meta = event.temporal_metadata if event.temporal_metadata is not None else {}
+            meta["woken_at"] = time.time()
+            event.temporal_metadata = meta
+            self.memory.add(event)
+            self.resonance_index.index(event)
+            self.cold.wake_count += 1
+            self.cold.persist()
+            self._persist()
+            logger.info("Woke event %s (cold=%d)", event.id[:8], self.cold.count)
+            return True
 
     def restore_signed_events(
         self,
