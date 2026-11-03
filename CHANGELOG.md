@@ -1,8 +1,24 @@
 # Changelog
 
-Current release: **0.10.0**. Source of truth for the running version is `VERSION` in `core/constants.py`. Packed notes live in `releases/manifest.json`.
+Current release: **0.11.1**. Source of truth for the running version is `VERSION` in `core/constants.py`. Packed notes live in `releases/manifest.json`.
 
 1.0.0 has not been cut. Work stays local until this tree is packed.
+
+---
+
+## 0.11.1 — Inhale looks sideways
+
+**Date:** 2026-11-03
+
+A new event is scored against hot events that share a token. The rest of the life is not walked. Embeddings, when present, still see the whole hot tier. Fusion no longer prints a debug line on every comparison. Replacing a fused body uses the id map.
+
+---
+
+## 0.11.0 — Edges fade
+
+**Date:** 2026-11-03
+
+A graph edge that touches a weak sleeper is marked stale and kept. It no longer wakes anyone and no longer answers Echo. A sleeper that still carries mass holds its edge past the seven-day clock. Token overlap can still wake what the edge has faded.
 
 ---
 

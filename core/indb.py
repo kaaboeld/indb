@@ -16,6 +16,7 @@ from core.constants import (
     FUSION_MAX_FUSION_COUNT,
     FUSION_AUTOTUNE_INTERVAL_SEC,
     INTERPRET_MOOD_DEFAULT,
+    VERSION,
 )
 
 logger = logging.getLogger("indb.core")
@@ -40,6 +41,7 @@ class INDB:
         self.causal_index = CausalIndex.load()
         self.cold = ColdStore()
         self.cold.load()
+        self.resonance_graph.bind_salience(self.cold.salience_map)
         self._sleep_needs_hot_persist = False
         self.memory = MemoryManager(
             on_compaction=self._sync_resonance_index,
@@ -132,7 +134,8 @@ class INDB:
         self._last_tune_time = 0.0
 
         logger.info(
-            "INDB v0.3.0 ready — events=%d  encrypted=yes  cache=active",
+            "INDB v%s ready — events=%d  encrypted=yes  cache=active",
+            VERSION,
             len(self.memory),
         )
 
@@ -264,19 +267,29 @@ class INDB:
         invalidate_query_cache()
 
     def update_event(self, updated_event):
-        """Update existing event (used for fusion)"""
-        for i, event in enumerate(self.memory):
-            if event.id == updated_event.id:
-                self.memory[i] = updated_event
-                self.resonance_index.index(updated_event)
-                self._persist()
-                return updated_event
-
-        # Event not found, append as new
-        self.memory.add(updated_event)
+        """Update existing event (used for fusion)."""
+        if not self.memory.replace(updated_event):
+            self.memory.add(updated_event)
         self.resonance_index.index(updated_event)
         self._persist()
         return updated_event
+
+    def _fusion_candidates(self, event: Event) -> List[Event]:
+        """
+        Events worth scoring for a merge.
+
+        The heuristic cannot reach the fusion line without a shared token:
+        location and time together weigh 0.40, and the threshold never tunes
+        below 0.60. Embeddings can, so that path still sees the whole hot tier.
+        """
+        if getattr(self.fusion_engine, "embeddings", None):
+            return list(self.memory)
+        found: List[Event] = []
+        for event_id in self.resonance_index.token_ids(event):
+            existing = self.memory.get(event_id)
+            if existing is not None:
+                found.append(existing)
+        return found
 
     MAX_REGISTRY_SIZE = 1000
 
@@ -317,6 +330,7 @@ class INDB:
         self.causal_index.rebuild(self.memory)
         valid = {e.id for e in self.memory} | self.cold.ids()
         self.resonance_graph.prune_missing(valid)
+        self.resonance_graph.fade(self.cold.salience_map())
         self.causal_index.prune_missing(valid)
         self.resonance_graph.persist_if_dirty()
         self.causal_index.persist_if_dirty()
@@ -339,6 +353,7 @@ class INDB:
                 try:
                     metrics = self.analytics.get_system_health()
                     new_th = self.fusion_engine.tune_threshold(metrics)
+                    logger.debug("Fusion threshold tuned to %.3f", new_th)
                     self._last_tune_time = now
                 except Exception as e:
                     logger.warning(
@@ -347,11 +362,10 @@ class INDB:
 
         # Try fusion if engine is available
         if self.fusion_engine and self.fusion_engine.config["enabled"]:
-            events_snapshot = list(self.memory)
             try:
                 similar = self.fusion_engine.find_similar_events(
                     event,
-                    events_snapshot,
+                    self._fusion_candidates(event),
                     self.fusion_engine.config["threshold"],
                     1
                 )
@@ -645,7 +659,8 @@ class INDB:
         """
         Pull sleeping events back when this seed resonates hard enough.
 
-        Token overlap and a stored graph edge both count. A weak neighbour
+        Token overlap and a live graph edge both count. A faded edge does not
+        wake anyone; the tokens of a strong seed still can. A weak neighbour
         stays asleep.
         """
         from core.constants import MEMORY_WAKE_ECHO_THRESHOLD, MEMORY_WAKE_MAX_PER_QUERY

@@ -9,7 +9,7 @@ All hardcoded values should be defined here for easy maintenance.
 # Application Version
 # ==============================================================================
 
-VERSION = "0.10.0"
+VERSION = "0.11.1"
 """INDB application version. Used in health, OpenAPI, and responses."""
 
 INDB_PRODUCT_NAME = "Interpretational Database"
@@ -432,6 +432,8 @@ CAUSAL_INDEX_MAX_LINKS_PER_EVENT = 20
 # Memory lifecycle (salience / hot-cold / wake) — see docs/MEMORY_LIFECYCLE.md
 MEMORY_RECENCY_TAU_SEC = 86_400.0
 MEMORY_HOT_SALIENCE_THRESHOLD = 0.15
+MEMORY_COLD_ARCHIVE_THRESHOLD = 0.05
+"""A sleeper below this salience fades the graph edges that touch it. The edge stays."""
 MEMORY_WAKE_ECHO_THRESHOLD = 0.85
 MEMORY_WAKE_LOCK_THRESHOLD = 0.75
 MEMORY_WAKE_MAX_PER_QUERY = 8

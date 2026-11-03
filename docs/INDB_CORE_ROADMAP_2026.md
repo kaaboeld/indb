@@ -1,5 +1,5 @@
 # INDB Core Roadmap 2026
-**Design notes. The shipped release in this tree is 0.10.0. Nothing below is a version number.**
+**Design notes. The shipped release in this tree is 0.11.1. Nothing below is a version number.**
 
 ---
 
@@ -8,7 +8,7 @@
 INDB Kernel must evolve, integrating the leading concepts of 2026:
 
 ```
-Classic Core (0.10.0, current)
+Classic Core (0.11.1, current)
     ↓
 directions below — not cut
 ```
@@ -635,7 +635,7 @@ decrypted_results = homomorphic.decrypt(similar_cases)
 
 ## Conclusion
 
-Directions after 0.10.0, not a cut version:
+Directions after 0.11.1, not a cut version:
 
 ✅ **Semantic layer** (embeddings)  
 ✅ **Temporal reasoning**  
@@ -649,4 +649,4 @@ Directions after 0.10.0, not a cut version:
 
 ---
 
-*Notes written: January 31, 2026. Shipped release in this tree: 0.10.0 (2026-11-03).*
+*Notes written: January 31, 2026. Shipped release in this tree: 0.11.1 (2026-11-03).*

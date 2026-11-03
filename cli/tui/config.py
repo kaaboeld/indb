@@ -13,7 +13,7 @@ import httpx
 try:
     from core.constants import VERSION as DEFAULT_VERSION
 except ImportError:
-    DEFAULT_VERSION = "0.10.0"
+    DEFAULT_VERSION = "0.11.1"
 
 PRODUCTION_API_URL = "https://api.indb.tech"
 

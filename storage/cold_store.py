@@ -13,6 +13,7 @@ from collections import defaultdict
 from typing import Dict, Iterable, List, Optional, Set
 
 from core.event import Event
+from core.memory_salience import compute_salience
 from core.resonance_index import _token_keys
 from storage.binary import load_decrypted, save_encrypted
 from storage.format import COLD_FILE
@@ -20,9 +21,19 @@ from storage.format import COLD_FILE
 logger = logging.getLogger("indb.cold")
 
 
+class _TraceMass:
+    """Fusion and last touch, enough to score a sleeper without its body."""
+
+    def __init__(self, fusion_count: int, last_touch: float) -> None:
+        self.fusion_count = fusion_count
+        self.timestamp = last_touch
+        self.temporal_metadata = {"last_touch": last_touch}
+
+
 class ColdStore:
     def __init__(self) -> None:
         self._traces: Dict[str, Set[str]] = {}
+        self._mass: Dict[str, tuple] = {}
         self._by_token: Dict[str, Set[str]] = defaultdict(set)
         self.wake_count = 0
 
@@ -39,6 +50,13 @@ class ColdStore:
     def trace_tokens(self, event_id: str) -> Optional[Set[str]]:
         """Tokens kept awake so a seed can be scored without loading the body."""
         return self._traces.get(event_id)
+
+    def salience_map(self) -> Dict[str, float]:
+        """Current salience of each sleeper. Bodies stay on disk."""
+        return {
+            event_id: compute_salience(_TraceMass(fusion, last_touch))
+            for event_id, (fusion, last_touch) in self._mass.items()
+        }
 
     def get(self, event_id: str) -> Optional[Event]:
         if event_id not in self._traces:
@@ -116,10 +134,20 @@ class ColdStore:
         self._forget_trace(event.id)
         keys = _token_keys(event.raw_data_anchor)
         self._traces[event.id] = keys
+        meta = getattr(event, "temporal_metadata", None) or {}
+        last_touch = float(
+            meta.get("last_resonance_at")
+            or meta.get("last_touch")
+            or getattr(event, "timestamp", 0)
+            or 0
+        )
+        fusion = max(0, int(getattr(event, "fusion_count", 0) or 0))
+        self._mass[event.id] = (fusion, last_touch)
         for key in keys:
             self._by_token[key].add(event.id)
 
     def _forget_trace(self, event_id: str) -> None:
+        self._mass.pop(event_id, None)
         keys = self._traces.pop(event_id, None)
         if not keys:
             return

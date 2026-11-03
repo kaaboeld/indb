@@ -3,6 +3,7 @@ Event Ingestion Routes (v2)
 
 Handles event creation, batch operations, and webhooks.
 """
+import logging
 import time
 import json
 import httpx
@@ -22,6 +23,8 @@ from core.models import (
 )
 
 from core.routing import ContentNegotiationRoute
+
+logger = logging.getLogger("indb.events")
 
 router = APIRouter(prefix="/api/v2", tags=["events"], route_class=ContentNegotiationRoute)
 
@@ -108,7 +111,7 @@ async def create_event(
     except Exception as e:
         if "RedirectToLeader" in str(e):
             leader_id = str(e).split(":")[1]
-            print(f"🔄 Proxying request to Leader: {leader_id}")
+            logger.info("Proxying request to leader %s", leader_id)
             
             try:
                 # Proxy to Leader directly via internal docker network
@@ -120,7 +123,7 @@ async def create_event(
                     # Return the raw JSON response from the leader
                     return resp.json()
             except Exception as proxy_err:
-                print(f"Proxy Error: {proxy_err}")
+                logger.warning("Leader proxy failed: %s", proxy_err)
                 raise HTTPException(status_code=503, detail=f"Leader {leader_id} unavailable")
         
         # Re-raise other errors
@@ -188,7 +191,7 @@ async def create_events_batch(
     
     # If follower redirect detected — proxy entire batch to leader
     if leader_id:
-        print(f"🔄 Proxying batch to Leader: {leader_id}")
+        logger.info("Proxying batch to leader %s", leader_id)
         try:
             async with httpx.AsyncClient(timeout=120.0) as proxy_client:
                 resp = await proxy_client.post(
@@ -197,7 +200,7 @@ async def create_events_batch(
                 )
                 return resp.json()
         except Exception as proxy_err:
-            print(f"Proxy Error: {proxy_err}")
+            logger.warning("Leader batch proxy failed: %s", proxy_err)
             raise HTTPException(status_code=503, detail=f"Leader {leader_id} unavailable: {proxy_err}")
     
     processing_time = time.time() - start_time

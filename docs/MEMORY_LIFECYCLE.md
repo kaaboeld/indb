@@ -1,6 +1,6 @@
 # Memory Lifecycle — Forgetting as Architecture
 
-Shipped in **0.9.0** (sleep and wake), **0.9.1** (recall by id), and **0.10.0** (the body stays on disk).
+Shipped in **0.9.0** (sleep and wake), **0.9.1** (recall by id), **0.10.0** (the body stays on disk), and **0.11.0** (a weak edge fades and stays). The tree is **0.11.1**. That cut narrows fusion. It does not change sleep, wake, or edge fade.
 
 > The concept is immortal; repositories are compilations.  
 > INDB is an **interpretational database** — it models **human memory**: anchors, forgetting, associative wake-up — not a tape archive.
@@ -83,7 +83,7 @@ This is the Rotterdam rain moment: one strong horizontal cue, no O(N) life scan.
 |-----------|------|
 | `MemoryManager.prune()` | Exhales low-salience events into `cold.bin`. Signed events stay hot. |
 | `purge_expired()` | Hard TTL — true erase when contract says so |
-| `ResonanceGraph` stale window | Edge fade, align with salience |
+| `ResonanceGraph.fade()` | A weak sleeper marks the edge stale. The edge stays. Mass holds it past the clock. |
 | `JITRenderer` temporal_opacity | Query-time freshness, not storage tier |
 | Fusion `mass` | Core of salience numerator |
 
@@ -96,6 +96,7 @@ This is the Rotterdam rain moment: one strong horizontal cue, no O(N) life scan.
 3. ✅ Prune sends low-salience events to encrypted `cold.bin` (`storage/cold_store.py`). Signed events stay hot. The recent tail stays hot.
 4. ✅ Wake path in `horizontal_pool.collect_candidate_ids`. A seed whose token overlap or stored edge reaches the wake threshold pulls the sleeper back into hot memory.
 5. ✅ `hot_events`, `cold_events`, `wake_count` on `/api/v2/health` and analytics database stats. `wake_count` is since process start.
+6. ✅ `MEMORY_COLD_ARCHIVE_THRESHOLD`. Edges that touch a sleeper below it are marked stale, not deleted. A heavier sleeper holds the edge past `RESONANCE_GRAPH_STALE_SEC`.
 
 ---
 

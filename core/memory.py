@@ -43,6 +43,7 @@ class MemoryManager:
         # A deque might be faster for appends but slower for slice scans.
         self.stream: List[Event] = []
         self._by_id: Dict[str, Event] = {}
+        self._pos: Dict[str, int] = {}
         self.pruning_threshold = pruning_threshold
         self.is_pruning = False
         self._on_compaction = on_compaction
@@ -60,6 +61,7 @@ class MemoryManager:
 
     def add(self, event: Event):
         """Add an event to memory. Triggers pruning if needed."""
+        self._pos[event.id] = len(self.stream)
         self.stream.append(event)
         self._by_id[event.id] = event
 
@@ -71,7 +73,20 @@ class MemoryManager:
         return self._by_id.get(event_id)
 
     def _reindex(self) -> None:
-        self._by_id = {event.id: event for event in self.stream}
+        self._by_id = {}
+        self._pos = {}
+        for index, event in enumerate(self.stream):
+            self._by_id[event.id] = event
+            self._pos[event.id] = index
+
+    def replace(self, event: Event) -> bool:
+        """Put a new body at an existing id. The stream is not walked."""
+        index = self._pos.get(event.id)
+        if index is None:
+            return False
+        self.stream[index] = event
+        self._by_id[event.id] = event
+        return True
 
     def get_all(self) -> List[Event]:
         """Return reference to stream."""
@@ -159,8 +174,10 @@ class MemoryManager:
     def __setitem__(self, index, value):
         previous = self.stream[index]
         self._by_id.pop(previous.id, None)
+        self._pos.pop(previous.id, None)
         self.stream[index] = value
         self._by_id[value.id] = value
+        self._pos[value.id] = index
 
     def purge_expired(self, now: float) -> int:
         """

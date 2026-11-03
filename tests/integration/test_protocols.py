@@ -1,5 +1,5 @@
 """
-Integration Tests for INDB 0.10.0
+Integration Tests for INDB 0.11.1
 End-to-end protocol testing.
 """
 

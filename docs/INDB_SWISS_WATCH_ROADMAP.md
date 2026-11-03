@@ -1,6 +1,6 @@
 # Swiss Watch — design sketch
 
-The shipped product is **0.10.0**. This file is a design sketch. Version labels inside it (`v1.0`, `v2.0`) are not releases.
+The shipped product is **0.11.1**. This file is a design sketch. Version labels inside it (`v1.0`, `v2.0`) are not releases.
 
 **Precision Engineering for Cognitive Systems**
 
@@ -942,10 +942,10 @@ class SwissHomomorphicEngine:
 
 ## Conclusion
 
-This sketch is not a release. The product in this tree is 0.10.0.
+This sketch is not a release. The product in this tree is 0.11.1.
 
 ```
-0.10.0 (this tree)
+0.11.1 (this tree)
     ↓
 this sketch (not cut)
 ```
@@ -962,7 +962,7 @@ Like a Swiss watch, every component works in perfect harmony:
 
 ---
 
-*Design sketch. Shipped product in this tree: 0.10.0 (2026-11-03).*  
+*Design sketch. Shipped product in this tree: 0.11.1 (2026-11-03).*  
 *Sketch written: January 31, 2026.*  
 
 🇨🇭 **Made with Swiss precision**

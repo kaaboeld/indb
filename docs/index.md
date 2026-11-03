@@ -5,10 +5,11 @@
 
 **INDB** = **I**nterpretational **D**ata**b**ase. See [INTERPRETATIONAL_DATABASE.md](./INTERPRETATIONAL_DATABASE.md).
 
-**Version:** 0.10.0 — Cold stays cold  
+**Version:** 0.11.1 — Inhale looks sideways  
 **Status:** ✅ Local tree  
 **Released:** November 3, 2026  
-**Previous:** 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain
+**Previous:** 0.11.0 Edges fade · 0.10.0 Cold stays cold · 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain  
+**Packed file:** 0.8.0 (`indb:0.8.0`). Later cuts are in this tree and are not that file.
 
 ---
 
@@ -199,7 +200,7 @@ Headline fields: `detour_cost`, `barrier_walked_into`, `identical_route`.
 
 Full reference: [PSYCHO.md](./PSYCHO.md)
 
-**Status:** ✅ Production (0.8.0)
+**Status:** ✅ Shipped in 0.8.0. Present in 0.11.1.
 
 ---
 
@@ -476,9 +477,19 @@ pytest --cov=core --cov-report=html
 
 ---
 
-## 🏆 Current release — 0.10.0 Cold stays cold (November 3, 2026)
+## 🏆 Current release — 0.11.1 Inhale looks sideways (November 3, 2026)
 
-### **Cold stays cold** ✅
+### **Inhale looks sideways** ✅
+- Heuristic fusion scores hot events that share a token
+- The embedding path still sees the whole hot tier
+- A fused body is replaced by id
+
+### **0.11.0 Edges fade** ✅
+- A weak sleeper marks the edge stale. The edge stays
+- Echo and wake skip that edge. A strong token overlap still wakes
+- Mass holds an edge past the seven-day clock
+
+### **0.10.0 Cold stays cold** ✅
 - The sleeper's body stays in `cold.bin`
 - RAM keeps the id and the tokens
 - Wake, or a lookup by id, reads that one body
@@ -561,10 +572,12 @@ Russian summary report:
 
 ## 🗺️ Roadmap
 
-**Current:** 0.10.0. 1.0.0 is not cut. Local only.
+**Current:** 0.11.1. 1.0.0 is not cut. Local only.
 
 | Version | Cut |
 |---------|-----|
+| 0.11.1 | Fusion scores shared tokens |
+| 0.11.0 | Weak edges fade and stay |
 | 0.10.0 | Cold body stays on disk |
 | 0.9.1 | Direct recall by id |
 | 0.9.0 | Sleep & Wake — [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md) |

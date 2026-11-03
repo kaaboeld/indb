@@ -1,7 +1,7 @@
 # INDB Strategic Roadmap
 
 > **Vision**: Autonomous, High-Performance Interpretative Database.
-> **Current release**: **0.10.0 — Cold stays cold** (2026-11-03). Previous cuts in this tree: **0.9.1 — Direct recall**, **0.9.0 — Sleep & Wake**.
+> **Current release**: **0.11.1 — Inhale looks sideways** (2026-11-03). Previous cuts in this tree: **0.11.0 — Edges fade**, **0.10.0 — Cold stays cold**, **0.9.1 — Direct recall**, **0.9.0 — Sleep & Wake**.
 
 ---
 
@@ -106,13 +106,33 @@ These are part of the engine. An earlier draft filed them under a 1.0.0 that was
 
 ---
 
-## 🟢 v0.10.0: Cold stays cold (current)
+## 🟢 v0.10.0: Cold stays cold
 **Focus**: The sleeper is the file.
 *Released: 2026-11-03*
 
 - [x] RAM keeps an id and its tokens, not the event body.
 - [x] The body is read from `cold.bin` on wake, or when the id is asked for by name.
 - [x] Scoring a seed uses the token trace, so noticing a sleeper does not load the life.
+
+---
+
+## 🟢 v0.11.0: Edges fade
+**Focus**: A weak link goes quiet. It is not cut.
+*Released: 2026-11-03*
+
+- [x] An edge that touches a sleeper below the archive line is marked stale and kept.
+- [x] A stale edge does not wake and does not answer Echo. Token overlap still can.
+- [x] A sleeper that still carries mass holds the edge past the seven-day clock.
+
+---
+
+## 🟢 v0.11.1: Inhale looks sideways (current)
+**Focus**: Fusion scores the neighbours, not the whole life.
+*Released: 2026-11-03*
+
+- [x] Heuristic fusion asks the token index. Events with no shared token are not scored.
+- [x] The embedding path still sees the whole hot tier.
+- [x] A fused body is replaced by id. The comparison no longer prints a debug line.
 
 ---
 
@@ -134,5 +154,7 @@ The next version is not numbered. 1.0.0 does not exist.
 | v0.8.0 | ✅ Complete | 2026-09-22 · Psycho & Grain |
 | v0.9.0 | ✅ Complete | 2026-11-03 · Sleep & Wake |
 | v0.9.1 | ✅ Complete | 2026-11-03 · Direct recall |
-| v0.10.0 | ✅ **Current** | 2026-11-03 · Cold stays cold |
+| v0.10.0 | ✅ Complete | 2026-11-03 · Cold stays cold |
+| v0.11.0 | ✅ Complete | 2026-11-03 · Edges fade |
+| v0.11.1 | ✅ **Current** | 2026-11-03 · Inhale looks sideways |
 

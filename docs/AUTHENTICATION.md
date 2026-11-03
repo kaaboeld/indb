@@ -1,4 +1,4 @@
-# INDB Authentication & Security (v0.10.0)
+# INDB Authentication & Security (v0.11.1)
 
 !!! warning "Status: Roadmap"
     The WebAuthn and ZKP sections below are design specifications. What ships is `AUTH_MODE`, RBAC roles, and API keys — anonymous writes are rejected — plus Bearer JWT, mTLS, and Ed25519 signatures.
