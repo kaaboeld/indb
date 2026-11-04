@@ -1,0 +1,16 @@
+# These are supported funding model platforms
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+
+github: kaaboeld
+patreon: # single Patreon username
+open_collective: # single Open Collective username
+ko_fi: # single Ko-fi username
+tidelift: # single Tidelift platform-name/package-name, e.g. npm/babel
+community_bridge: # single Community Bridge project-name
+liberapay: # single Liberapay username
+issuehunt: # single IssueHunt username
+lfx_crowdfunding: # single LFX Crowdfunding project-name
+polar: # single Polar username
+buy_me_a_coffee: kaaboeld
+thanks_dev: # single thanks.dev username
+custom: # up to 4 URLs, e.g. ['https://example.com/sponsor']
