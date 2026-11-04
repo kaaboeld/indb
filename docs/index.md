@@ -8,7 +8,7 @@
 **Version:** 0.11.1 — Inhale looks sideways  
 **Changelog:** [changelog.md](./changelog.md)  
 **Self-host:** [SELFHOST.md](./SELFHOST.md) — the file named latest  
-**Status:** ✅ Local tree  
+**Status:** Public source at https://github.com/kaaboeld/indb  
 **Released:** November 3, 2026  
 **Previous:** 0.11.0 Edges fade · 0.10.0 Cold stays cold · 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain  
 **Packed file:** [latest](https://indb.tech/releases/indb-latest.tar.gz) is 0.11.1 until the next pack. The pinned file for this cut is [indb-0.11.1.tar.gz](https://indb.tech/releases/indb-0.11.1.tar.gz).
@@ -36,19 +36,18 @@ Accept reality as it is: raw, chaotic, unfiltered.
 
 - Multi-protocol intake (UDP, gRPC, HTTP, WebSocket)
 - No judgment, only observation
-- **Performance:** <1ms latency, 1000+ events/sec
+- **Measured 3-node Raft run:** 19–28 events/sec sustained, 50–250ms per request
 
 #### **2. EXHALE** (Fusion & Decay)
 Compress truth. Purge noise. Reputation is gravity.
 
+What the engine computes is salience:
+
 ```
-Mass = Count × Reputation²
+salience = log(1 + fusion_count) × source_weight × recency
 ```
 
-- 1000 lies from bots (rep 0.01) → Mass = 0.1
-- 1 truth from sensor (rep 0.99) → Mass = 0.98
-
-**The system "exhales" the lies as waste heat.**
+A fusion count of 0 is salience 0. That event sleeps unless it is signed or still in the recent tail. See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md).
 
 #### **3. AXIOM** (Irrefutable Core)
 What remains is cryptographically signed, immutable truth.
@@ -87,7 +86,7 @@ Response includes the **Perception Paradox**:
 
 *What you see may not be what it is.*
 
-**Status:** ✅ Production (100% success, ~20ms latency)
+**Status:** In the engine. No separate published latency.
 
 ---
 
@@ -99,24 +98,18 @@ Finds similar events through harmonic analysis.
 - Emotion similarity: 30%
 - Meta (location): 50%
 
-**Status:** ✅ Production (<30ms latency)
+**Status:** In the engine. No separate published latency.
 
 ---
 
 ### **Instinct** — Adrenaline Reflexes
 Adaptive response based on urgency.
 
-**Three Modes:**
-- **Analytical (0.0):** Deep analysis, ~10% confidence
-- **Alert (0.5):** Balanced, ~46% confidence
-- **Instinctive (1.0):** Meta-only, ~82% confidence
+**Modes:** Analytical below 0.3, Alert below 0.7, Instinctive from 0.7.
 
-**Reflex Triggers:**
-- Location Match: +0.7
-- Owner Signature: +0.5
-- Critical Tokens: +0.3
+Bonuses are multiplied by adrenaline: owner `0.8`, location `0.7`, shared critical token `0.5`. Confidence is `reflex_bonus × 0.6 + adrenaline × 0.3`, plus `0.1` on a location match.
 
-**Status:** ✅ Production (100% success, ~25ms latency)
+**Status:** In the engine. No separate published latency.
 
 ---
 
@@ -231,7 +224,7 @@ graph TD
 - ✅ Data replication across all nodes
 - ✅ Synchronous commits
 - ✅ Fault tolerance (survives single node failures)
-- ✅ **Stable:** 4800% improvement (zero re-elections over 5+ minutes)
+- ✅ **Stable on that run:** zero re-elections over 5+ minutes
 
 ---
 
@@ -246,21 +239,7 @@ graph TD
 | **Data Persistence** | 100% (survives restarts) |
 | **Stability** | Zero re-elections (5+ min) |
 
-### Module Performance
-| Module | Success Rate | Latency | Status |
-|--------|-------------|---------|--------|
-| **Prism** | 100% (50/50) | ~20ms | ✅ Production |
-| **Echo** | 100% | <30ms | ✅ Production |
-| **Instinct** | 100% (50/50) | ~25ms | ✅ Production |
-| **Deduction** | 100% | <50ms | ✅ Production |
-| **Grain** | 4 tiers | kernel-native | ✅ Production |
-| **Psycho** | ablation vs baseline | path on the resonance graph | ✅ Production |
-| **Fusion** | Real-time | N/A | ✅ Production |
-
-### Standalone Performance
-- **Ingestion:** <1ms per event
-- **Query:** <10ms for 1000 events
-- **Fusion:** Real-time semantic deduplication
+Module timings that used to sit here (<1ms ingest, <10ms for 1000 events, 50/50 at ~20ms) are not a published measurement. The figure this page stands behind is the cluster table above.
 
 ---
 
@@ -319,7 +298,7 @@ docker-compose -f docker-compose.standalone.yml up -d
 - Data replication across all nodes
 - Synchronous commits
 - Fault tolerance
-- **Recent Fix:** 4800% stability improvement
+- The measured 3-node run had zero re-elections over 5+ minutes
 
 ### 🔍 Contextual Lens
 - Adjustable spectrum ratios (10/90, 30/70, 50/50, 70/30, 90/10)
@@ -334,7 +313,7 @@ docker-compose -f docker-compose.standalone.yml up -d
 - Temporal awareness
 
 ### 🔐 Security
-- **Encryption:** AES-256-GCM (at rest), TLS/SSL (in transit)
+- **Encryption:** AES-256-GCM at rest. TLS when `INDB_USE_SSL` is on
 - **Signatures:** Ed25519
 - **Auth:** API keys + RBAC
 
@@ -444,7 +423,7 @@ Monitor system for anomalies.
 | Interface | URL / command | Docs |
 |-----------|---------------|------|
 | **WUI** (Web Console) | [api.indb.tech/wui/](https://api.indb.tech/wui/) | [wui.md](wui.md) |
-| **TUI** (Terminal) | `cd db && ./start_tui.sh` | [cli.md](cli.md) |
+| **TUI** (Terminal) | `./start_tui.sh` from the clone | [cli.md](cli.md) |
 | **Overview** | — | [CONSOLE.md](CONSOLE.md) |
 
 ### API Documentation
@@ -611,19 +590,13 @@ Proprietary - All Rights Reserved
 ## 🏆 Summary
 
 **INDB is:**
-- ✅ A distributed epistemological engine
-- ✅ Production-ready (verified under load)
-- ✅ Semantically intelligent (Prism/Echo/Instinct/Psycho/Grain)
-- ✅ Fault-tolerant (Raft consensus)
-- ✅ Secure (encryption + signatures)
-- ✅ Fast (<1ms ingestion, <30ms queries)
+- An interpretational database. Meaning is read at query time
+- Public source, packed image 0.11.1
+- Prism, Echo, Instinct, Psycho, Grain, Fusion, Lens
+- Optional Raft. The public API is one node
+- AES-256-GCM at rest, optional TLS, optional Ed25519
 
-**INDB solves:**
-- Information overload (Fusion)
-- Collective gaslighting (Axioms)
-- Context loss (Prism)
-- Pattern blindness (Echo)
-- Slow response (Instinct)
+**The measured cluster** (3-node Raft) holds 19–28 events/sec and 50–250ms per request. That is the number. 1.0.0 is not cut.
 
 ---
 

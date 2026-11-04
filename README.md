@@ -121,27 +121,15 @@ Echo finds:
 
 Three modes controlled by adrenaline (0.0 - 1.0):
 
-**Analytical (0.0):**
-- Deep token analysis
-- Slow, thorough
-- Confidence: ~10%
+**Analytical** below 0.3, **Alert** below 0.7, **Instinctive** from 0.7.
 
-**Alert (0.5):**
-- Balanced approach
-- Moderate speed
-- Confidence: ~46%
+The bonus is multiplied by adrenaline, not a fixed add:
 
-**Instinctive (1.0):**
-- Meta-only (location, owner)
-- Instant reflexes
-- Confidence: ~82%
+- Owner match: `0.8 × adrenaline` (only above 0.3)
+- Location match: `0.7 × adrenaline`
+- Shared critical token: `0.5 × adrenaline`
 
-**Reflex Triggers:**
-- Location Match: +0.7 confidence
-- Owner Signature: +0.5 confidence
-- Critical Tokens: +0.3 confidence
-
-**Use case:** Emergency response, threat detection, pattern matching under time pressure
+Confidence is `reflex_bonus × 0.6 + adrenaline × 0.3`, plus `0.1` when the location matches, capped at 1. It is not a fixed 10% / 46% / 82% per mode.
 
 ---
 
@@ -401,17 +389,21 @@ Module-level timings that used to sit here (<1ms ingest, <10ms for 1000 events, 
 3. **Instinct** (adrenaline=1.0) triggers on anomalies
 4. **Prism** analyzes significance
 
-**Result:** Instant threat detection with context.
+**Result:** The repeated line fuses. The odd one stays.
 
 ---
 
 ## 🚀 Quick Start
 
-### **Docker Deployment (Recommended)**
+The packed image is the release. Load and run it from [docs/SELFHOST.md](docs/SELFHOST.md). A write needs `X-API-Key`. Reads stay open.
+
+### **Docker Compose in this tree**
+
+The compose file in the clone is the 3-node Raft cluster, not the public node.
 
 ```bash
-# Clone repository
-cd /path/to/indb-web/backend
+git clone https://github.com/kaaboeld/indb.git
+cd indb
 
 # Start 3-node cluster
 docker-compose up -d
@@ -422,9 +414,10 @@ sleep 20
 # Verify cluster
 curl http://localhost:8080/raft/status
 
-# Ingest event
+# Ingest event. Anonymous writes are rejected.
 curl -X POST http://localhost:8080/api/v2/events \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-key>" \
   -d '{
     "raw_data_anchor": ["test", "event"],
     "location": "test/demo",
@@ -456,17 +449,16 @@ docker-compose -f docker-compose.standalone.yml up -d
 | Interface | Command / URL |
 |-----------|---------------|
 | **WUI** (browser) | [https://api.indb.tech/wui/](https://api.indb.tech/wui/) |
-| **TUI** (terminal) | `cd db && ./start_tui.sh` |
+| **TUI** (terminal) | `./start_tui.sh` from the clone |
 
 Docs: [docs/CONSOLE.md](docs/CONSOLE.md) · [docs/wui.md](docs/wui.md) · [docs/cli.md](docs/cli.md)
 
 #### TUI — Terminal Dashboard
 
 ```bash
-cd db
 ./start_tui.sh
 
-# Production (default)
+# Public API
 INDB_API_URL=https://api.indb.tech ./start_tui.sh
 
 # Local cluster
@@ -480,8 +472,8 @@ INDB_API_URL=http://localhost:8888 ./start_tui.sh
 #### WUI — Web Console
 
 ```bash
-cd db/wui && npm install && npm run dev    # dev: localhost:5174/wui/
-cd db/wui && npm run build                 # prod: served at /wui/
+cd wui && npm install && npm run dev    # dev: localhost:5174/wui/
+cd wui && npm run build                   # the image serves the built console at /wui/
 ```
 
 **Tabs:** Control · Events · Modules · Cluster · Query · Analytics (no Scripts — use TUI)
@@ -600,18 +592,19 @@ curl -X POST http://localhost:8000/api/v2/prism/instinct \
   }'
 ```
 
-**Response:**
+**Shape of the reply.** The numbers below are the formula for a location match at adrenaline 0.7: bonus `0.7 × 0.7 = 0.49`, confidence `0.49 × 0.6 + 0.7 × 0.3 + 0.1 = 0.604`. Mode at 0.7 is Instinctive.
+
 ```json
 {
   "instinct": {
-    "mode": "Alert",
-    "instinct_confidence": 0.46,
+    "mode": "Instinctive",
+    "instinct_confidence": 0.604,
     "adrenaline_level": 0.7,
     "reflex_arc": ["Location Match: books/Dostoevsky/The Idiot"],
     "triggers": [
       {
         "type": "location",
-        "bonus": 0.7,
+        "bonus": 0.49,
         "reason": "Location Match"
       }
     ]
