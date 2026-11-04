@@ -7,6 +7,9 @@
 
 See [docs/INTERPRETATIONAL_DATABASE.md](docs/INTERPRETATIONAL_DATABASE.md).
 
+**Source:** https://github.com/kaaboeld/indb  
+**Packed file:** [latest](https://indb.tech/releases/indb-latest.tar.gz) is 0.11.1. The numbered archive stays at [indb-0.11.1.tar.gz](https://indb.tech/releases/indb-0.11.1.tar.gz).
+
 ---
 
 ## 🎯 Vision
@@ -28,7 +31,7 @@ INDB is not a classical database and not an archive. It is an **Interpretational
 - Accept everything: truth, noise, lies, sensor data
 - No judgment, only observation
 - **Latency:** <1ms per event
-- **Throughput:** 1000+ events/sec
+- **Throughput:** 19–28 events/sec sustained on the measured 3-node Raft cluster
 
 **Visual:** A cloud of chaotic data points swarming the system.
 
@@ -783,9 +786,8 @@ python3 scripts/test_lens.py
 ## 🎯 Current Status
 
 **Version:** 0.11.1 — Inhale looks sideways (2026-11-03)  
-**Status:** ✅ **Local tree**  
-**This tree, when packed:** `indb:0.11.1`  
-**File on indb.tech today:** `indb:0.8.0`
+**Status:** Public source at https://github.com/kaaboeld/indb  
+**Packed file:** `indb:0.11.1`, also published as [latest](https://indb.tech/releases/indb-latest.tar.gz)
 
 ### **0.11.1 — Inhale looks sideways**
 
@@ -851,7 +853,7 @@ Prism, Echo, Instinct, Fusion, Lens, Paradox, signed memory, Raft, AES-256-GCM a
 
 ## 🗺️ Roadmap
 
-Current cut is **0.11.1**. 1.0.0 is not cut. Local only.
+Current cut is **0.11.1**. 1.0.0 is not cut.
 
 | Version | What landed |
 |---------|-------------|
