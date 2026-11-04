@@ -30,8 +30,7 @@ INDB is not a classical database and not an archive. It is an **Interpretational
 - Open all protocols (UDP, gRPC, HTTP, WebSocket)
 - Accept everything: truth, noise, lies, sensor data
 - No judgment, only observation
-- **Latency:** <1ms per event
-- **Throughput:** 19–28 events/sec sustained on the measured 3-node Raft cluster
+- **Measured 3-node Raft run:** 19–28 events/sec sustained, 50–250ms per request
 
 **Visual:** A cloud of chaotic data points swarming the system.
 
@@ -42,15 +41,13 @@ INDB is not a classical database and not an archive. It is an **Interpretational
 
 The **Fusion Engine** compresses repetitive signals. The **Entropy Manager** lets weak data fade.
 
-**The Key Insight:**
+**What the engine computes** is salience, not a squared reputation:
+
 ```
-Mass = Count × Reputation²
+salience = log(1 + fusion_count) × source_weight × recency
 ```
 
-- 1000 lies from bots (rep 0.01) → Mass = 0.1
-- 1 truth from trusted sensor (rep 0.99) → Mass = 0.98
-
-**The system "exhales" the lies as waste heat.**
+A fusion count of 0 is salience 0. That event sleeps unless it is signed or still in the recent tail. Reference: [docs/MEMORY_LIFECYCLE.md](docs/MEMORY_LIFECYCLE.md).
 
 **Visual:** The swarm collapses. Blue noise evaporates. Green core remains.
 
@@ -219,13 +216,12 @@ Full reference: [docs/PSYCHO.md](docs/PSYCHO.md)
 - ✅ Data replication across all nodes
 - ✅ Synchronous commits (data queryable immediately)
 - ✅ Fault tolerance (survives single node failures)
-- ✅ **Stable:** Zero re-elections over 5+ minutes (after fixes)
+- ✅ **Stable on that run:** zero re-elections over 5+ minutes
 
-**Performance:**
+**Timing used in that setup:**
 - Heartbeat: 100ms
 - Election timeout: 5-10s
 - RPC timeout: 500ms
-- **Stability improvement:** 4800% (vs previous implementation)
 
 ---
 
@@ -288,25 +284,25 @@ After Fusion:
 
 ## 🚀 Complete Feature Matrix
 
-| Module | Status | Purpose | Performance |
-|--------|--------|---------|-------------|
-| **Raft Consensus** | ✅ Stable | Distributed coordination | 4800% stability improvement |
-| **Prism** | ✅ Production | Contextual synthesis | 100% success (50/50 parallel queries) |
-| **Echo** | ✅ Production | Resonance detection | <30ms latency |
-| **Instinct** | ✅ Production | Adrenaline reflexes | 100% success (50/50 parallel queries) |
-| **Psycho** | ✅ Production | Pathfinding under weight ablation | `POST /api/v2/psycho/path` |
-| **Grain** | ✅ Production | Identity across exact → statistical | `POST /api/v2/grain/verify` |
-| **Fusion Engine** | ✅ Production | Semantic deduplication | Real-time |
-| **Contextual Lens** | ✅ Production | Adaptive queries | <50ms |
-| **Event Ingestion** | ✅ Production | Multi-protocol intake | <1ms latency |
-| **Encryption** | ✅ Production | AES-256-GCM | At rest + in transit |
-| **Authentication** | ✅ Production | API keys, RBAC, Ed25519 | No anonymous writes |
-| **WebSocket** | ✅ Production | Real-time subscriptions | Live updates |
-| **GraphQL** | ✅ Production | Flexible queries | Schema introspection |
-| **MCP** | ✅ Production | Model Context Protocol | AI integration |
-| **TUI** | ✅ Production | Terminal dashboard | Scripts + Query Lab |
-| **WUI** | ✅ Production | Web dashboard at `/wui/` | Query Lab + analytics |
-| **Source Connectors** | ✅ Production | Modular ingestion adapters | Plug-and-play, auto-discovered |
+| Module | Status | Purpose | Note |
+|--------|--------|---------|------|
+| **Raft Consensus** | In the engine | Distributed coordination | Optional. Measured run is below. The public API is one node |
+| **Prism** | In the engine | Contextual synthesis | |
+| **Echo** | In the engine | Resonance detection | |
+| **Instinct** | In the engine | Adrenaline reflexes | |
+| **Psycho** | In the engine | Pathfinding under weight ablation | `POST /api/v2/psycho/path` |
+| **Grain** | In the engine | Identity across exact → statistical | `POST /api/v2/grain/verify` |
+| **Fusion Engine** | In the engine | Semantic deduplication | Scores hot events that share a token |
+| **Contextual Lens** | In the engine | Adaptive queries | |
+| **Event Ingestion** | In the engine | Multi-protocol intake | Cluster rate is the measured figure below |
+| **Encryption** | In the engine | AES-256-GCM at rest | TLS when `INDB_USE_SSL` is on |
+| **Authentication** | In the engine | API keys, RBAC | Anonymous writes are rejected. An Ed25519 signature is optional |
+| **WebSocket** | In the engine | Subscriptions | |
+| **GraphQL** | In the engine | Queries | `/graphql` |
+| **MCP** | In the engine | Model Context Protocol | Endpoint is in the tree. No separate benchmark |
+| **TUI** | In the image | Terminal dashboard | |
+| **WUI** | In the image | Web dashboard at `/wui/` | Public on the demo node |
+| **Source Connectors** | In the engine | Ingestion adapters | |
 
 ---
 
@@ -319,29 +315,7 @@ After Fusion:
 - **Data Persistence:** 100% (survives node restarts)
 - **Stability:** Zero re-elections over 5+ minutes
 
-### **Prism Module**
-- **Parallel Queries:** 50/50 success (100%)
-- **Latency:** ~20ms average
-- **Accuracy:** Correct significance scoring
-- **Scalability:** Linear with event count
-
-### **Instinct Module**
-- **Parallel Queries:** 50/50 success (100%)
-- **Latency:** ~25ms average
-- **Adrenaline Scaling:** Verified (0.0 → 0.5 → 1.0)
-- **Reflex Triggers:** Working (location, owner, tokens)
-
-### **Echo Module**
-- **Resonance Calculation:** <30ms
-- **Harmonic Weights:** Tuned for literary data
-- **Clustering:** Location-aware
-- **Accuracy:** High semantic similarity detection
-
-### **Standalone Performance**
-- **Ingestion:** <1ms per event
-- **Query:** <10ms for 1000 events
-- **Fusion:** Real-time semantic deduplication
-- **Memory:** Efficient (O(n) with compression)
+Module-level timings that used to sit here (<1ms ingest, <10ms for 1000 events, 50/50 at ~20ms) are not a published measurement. The figure this file stands behind is the cluster block above.
 
 ---
 
@@ -367,7 +341,7 @@ After Fusion:
 - **MCP:** Model Context Protocol (Hermes: same Inhale/Exhale flow via ingest_event, query_events)
 
 ### **Security**
-- **Encryption:** AES-256-GCM (at rest), TLS/SSL (in transit)
+- **Encryption:** AES-256-GCM at rest. TLS when `INDB_USE_SSL` is on
 - **Signatures:** Ed25519
 - **Auth:** API keys + RBAC
 
@@ -724,7 +698,7 @@ INDB_KEY_PATH=./certs/server.key
 ```
 
 ### **Signatures**
-All events are cryptographically signed with Ed25519:
+An event may carry an Ed25519 signature. A signed event does not sleep:
 ```json
 {
   "signature": {
@@ -896,26 +870,13 @@ Proprietary - All Rights Reserved
 ## 🏆 Summary
 
 **INDB is:**
-- ✅ A distributed epistemological engine
-- ✅ Production-ready (verified under load)
-- ✅ Semantically intelligent (Prism/Echo/Instinct/Psycho/Grain)
-- ✅ Fault-tolerant (Raft consensus)
-- ✅ Secure (encryption + signatures)
-- ✅ Fast (<1ms ingestion, <30ms queries)
+- An interpretational database. Meaning is read at query time
+- Public source, packed image 0.11.1
+- Prism, Echo, Instinct, Psycho, Grain, Fusion, Lens
+- Optional Raft. The public API is one node
+- AES-256-GCM at rest, optional TLS, optional Ed25519
 
-**INDB solves:**
-- Information overload (Fusion)
-- Collective gaslighting (Axioms)
-- Context loss (Prism)
-- Pattern blindness (Echo)
-- Slow response (Instinct)
-
-**INDB enables:**
-- Truth preservation in hostile environments
-- Semantic search across massive datasets
-- Real-time threat detection
-- Compressed, meaningful memory
-- Adaptive intelligence
+**The measured cluster** (3-node Raft) holds 19–28 events/sec and 50–250ms per request. That is the number. 1.0.0 is not cut.
 
 ---
 
