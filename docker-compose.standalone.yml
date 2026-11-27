@@ -19,6 +19,8 @@ services:
       RAFT_ENABLED: "false"
       # From .env (gitignored). Form: secret:role:user_id
       API_KEYS: ${API_KEYS:-}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      OLLAMA_URL: http://host.docker.internal:11434
     volumes:
       - indb-data:/data
     healthcheck:
