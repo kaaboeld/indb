@@ -124,7 +124,14 @@ def _calculate_relevance(event, query_tokens: set, query_lower: str, fuzzy: bool
     score = 0.0
     matches = []
     event_tokens = [t.lower() for t in event.raw_data_anchor]
-    
+
+    # The event's own id is the seed of a read. A query that names it must find it,
+    # even when the id is not one of the stored tokens.
+    event_id = str(getattr(event, "id", "") or "").lower()
+    if event_id and (event_id == query_lower or event_id in query_tokens):
+        score += 2.0
+        matches.append(event_id)
+
     # 1. Base Token Matching
     for token in event_tokens:
         # Handle key:value tokens
@@ -522,24 +529,36 @@ def _find_similar_by_tokens(source_event, all_events, exclude_id, threshold, lim
     similar = []
 
     for e in all_events:
-        if e.id != exclude_id:
-            event_tokens = set(e.raw_data_anchor)
-            overlap = len(source_tokens & event_tokens)
-            total = len(source_tokens | event_tokens)
-            similarity = overlap / total if total > 0 else 0.0
+        event_tokens = set(e.raw_data_anchor)
+        if e.id == exclude_id:
+            similar.append(
+                {
+                    "id": e.id,
+                    "location": e.location,
+                    "tokens": e.raw_data_anchor[:5],
+                    "timestamp": e.timestamp,
+                    "similarity": 1.0,
+                    "shared_tokens": list(source_tokens)[:5],
+                    "is_fused": hasattr(e, "fusion_count"),
+                }
+            )
+            continue
+        overlap = len(source_tokens & event_tokens)
+        total = len(source_tokens | event_tokens)
+        similarity = overlap / total if total > 0 else 0.0
 
-            if similarity >= threshold:
-                similar.append(
-                    {
-                        "id": e.id,
-                        "location": e.location,
-                        "tokens": e.raw_data_anchor[:5],
-                        "timestamp": e.timestamp,
-                        "similarity": round(similarity, 3),
-                        "shared_tokens": list(source_tokens & event_tokens)[:5],
-                        "is_fused": hasattr(e, "fusion_count"),
-                    }
-                )
+        if similarity >= threshold:
+            similar.append(
+                {
+                    "id": e.id,
+                    "location": e.location,
+                    "tokens": e.raw_data_anchor[:5],
+                    "timestamp": e.timestamp,
+                    "similarity": round(similarity, 3),
+                    "shared_tokens": list(source_tokens & event_tokens)[:5],
+                    "is_fused": hasattr(e, "fusion_count"),
+                }
+            )
 
     similar.sort(key=lambda x: x["similarity"], reverse=True)
     return similar[:limit]
@@ -579,14 +598,25 @@ async def get_event_associations(
             similar_events = []
 
             for e in db.iter_events():
-                if e.id != event_id:
-                    similarity = embeddings.calculate_similarity(source_tokens, e.raw_data_anchor)
-                    if similarity >= threshold:
-                        similar_events.append(
-                            {
-                                "id": e.id,
-                                "location": e.location,
-                                "tokens": e.raw_data_anchor[:5],
+                if e.id == event_id:
+                    similar_events.append(
+                        {
+                            "id": e.id,
+                            "location": e.location,
+                            "tokens": e.raw_data_anchor[:5],
+                            "timestamp": e.timestamp,
+                            "similarity": 1.0,
+                            "is_fused": hasattr(e, "fusion_count"),
+                        }
+                    )
+                    continue
+                similarity = embeddings.calculate_similarity(source_tokens, e.raw_data_anchor)
+                if similarity >= threshold:
+                    similar_events.append(
+                        {
+                            "id": e.id,
+                            "location": e.location,
+                            "tokens": e.raw_data_anchor[:5],
                                 "timestamp": e.timestamp,
                                 "similarity": round(similarity, 3),
                                 "is_fused": hasattr(e, "fusion_count"),

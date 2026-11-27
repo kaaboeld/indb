@@ -104,10 +104,15 @@ async def synthesize_meaning(payload: SynthesizeRequest, request: Request):
     )
 
     if not cloud:
-        raise HTTPException(
-            status_code=404,
-            detail="No resonance found. The memory is silent."
-        )
+        # A just-written anchor has no neighbours yet. Echo skips the seed, so the
+        # cloud is empty and the read would say not-found. The seed is the memory.
+        from core.echo import ResonanceResult
+        cloud = [ResonanceResult(
+            event_id=seed_id,
+            score=1.0,
+            harmonic_type="direct",
+            reason="the seed is the memory just written",
+        )]
 
     # Step 3: Prism synthesis — relational meaning, paradox-aware
     result = prism_engine.synthesize(
