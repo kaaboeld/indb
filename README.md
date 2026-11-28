@@ -25,7 +25,7 @@ INDB is not a classical database and not an archive. It is an **Interpretational
 ## 🫁 The Core Metaphor: Inhale → Exhale → Axiom
 
 ### 1. **INHALE** (Ingestion)
-**Accept reality as it is: raw, chaotic, unfiltered.**
+**Accept the observation as it is: raw, chaotic, unfiltered.**
 
 - Open all protocols (UDP, gRPC, HTTP, WebSocket)
 - Accept everything: observations, noise, lies, sensor data
@@ -47,7 +47,7 @@ The **Fusion Engine** compresses repetitive signals. The **Entropy Manager** let
 salience = log(1 + fusion_count) × source_weight × recency
 ```
 
-A fusion count of 0 is salience 0. That event sleeps unless it is signed or still in the recent tail. Reference: [docs/MEMORY_LIFECYCLE.md](docs/MEMORY_LIFECYCLE.md).
+A fusion count of 0 is salience 0. `source_weight` 0 is valid: that source is excluded from Fusion and salience is 0. The event sleeps unless it is signed or still in the recent tail. Reference: [docs/MEMORY_LIFECYCLE.md](docs/MEMORY_LIFECYCLE.md).
 
 **Visual:** The swarm collapses. Blue noise evaporates. Green core remains.
 
@@ -344,7 +344,7 @@ Module-level timings that used to sit here (<1ms ingest, <10ms for 1000 events, 
 - **REST:** Standard API
 - **WebSocket:** Real-time subscriptions
 - **GraphQL:** Flexible queries
-- **MCP:** Model Context Protocol (Hermes: same Inhale/Exhale flow via ingest_event, query_events)
+- **MCP:** Model Context Protocol (Hermes: `ingest_event` is Inhale, `query_events` is Interpret)
 
 ### **Security**
 - **Encryption:** AES-256-GCM at rest. TLS when `INDB_USE_SSL` is on

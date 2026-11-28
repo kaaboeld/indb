@@ -14,7 +14,7 @@ from cli.tui.widgets import OptionPicker, OutputLog
 
 
 QUERY_MODES = [
-    ("Interpret (Exhale)", "interpret"),
+    ("Interpret", "interpret"),
     ("Prism Synthesize", "prism"),
     ("Prism Instinct", "instinct"),
     ("Lens Query", "lens"),

@@ -75,9 +75,9 @@ Use the **Query** tab in WUI or TUI. Fields use `|` as separator inside **Primar
 
 Set API base first (WUI header or `INDB_API_URL` for TUI).
 
-### Interpret (Exhale) — contextual recall
+### Interpret — contextual recall
 
-**What it does:** Returns events matching mood + location (+ optional goal). This is the core “exhale” — meaning at query time.
+**What it does:** Returns events matching mood + location (+ optional goal). Recall at query time. Exhale is Fusion + sleep, not this endpoint.
 
 | Field | Example |
 |-------|---------|

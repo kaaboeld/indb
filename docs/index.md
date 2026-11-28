@@ -32,7 +32,7 @@ Under that sits an **Epistemological Engine**: signed memory, fusion, and parado
 ### Inhale → Exhale → Axiom
 
 #### **1. INHALE** (Ingestion)
-Accept reality as it is: raw, chaotic, unfiltered.
+Accept the observation as it is: raw, chaotic, unfiltered.
 
 - Multi-protocol intake (UDP, gRPC, HTTP, WebSocket)
 - No judgment, only observation
@@ -47,7 +47,7 @@ What the engine computes is salience:
 salience = log(1 + fusion_count) × source_weight × recency
 ```
 
-A fusion count of 0 is salience 0. That event sleeps unless it is signed or still in the recent tail. See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md).
+A fusion count of 0 is salience 0. `source_weight` 0 is valid: that source is excluded from Fusion and salience is 0. That event sleeps unless it is signed or still in the recent tail. See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md).
 
 #### **3. AXIOM** (Signed presence)
 What remains is what you saw, signed. The observation cannot be rewritten. That is presence, not a verdict.

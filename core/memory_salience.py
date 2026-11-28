@@ -20,15 +20,18 @@ from core.constants import (
 def compute_salience(
     event: Any,
     now: Optional[float] = None,
-    source_weight: float = 1.0,
+    source_weight: Optional[float] = None,
 ) -> float:
     """
     Salience ∈ (0, ~∞); higher = stays hot longer.
-    Uses fusion_count and last resonance touch from temporal_metadata.
+    Uses fusion_count, source_weight (0 is a valid exclude), and last resonance touch.
     """
+    from core.event import source_weight_of
+
     now = now if now is not None else time.time()
     fusion = max(0, int(getattr(event, "fusion_count", 0) or 0))
     mass = math.log1p(fusion)
+    weight = source_weight_of(event) if source_weight is None else max(0.0, float(source_weight))
 
     meta = getattr(event, "temporal_metadata", None) or {}
     last_touch = float(
@@ -39,7 +42,7 @@ def compute_salience(
     age = max(0.0, now - last_touch)
     recency = 1.0 / (1.0 + age / MEMORY_RECENCY_TAU_SEC)
 
-    return mass * source_weight * recency
+    return mass * weight * recency
 
 
 def is_hot(salience: float) -> bool:

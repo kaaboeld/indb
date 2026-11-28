@@ -12,11 +12,12 @@
 | Phase | Meaning | Endpoint / Protocol | Pre-Hermes | With Hermes |
 |-------|---------|---------------------|------------|-------------|
 | **Inhale** | Accept raw reality | `POST /events`, UDP, gRPC, WebSocket | ✅ | ✅ + MCP `ingest_event` |
-| **Exhale** | Compress noise, exhale meaning | Fusion + `POST /interpret` | ✅ | ✅ (same backend) |
+| **Exhale** | Compress repeats, fade the unreinforced | Fusion + sleep (`cold.bin`) | ✅ | ✅ |
+| **Interpret** | Recall at read time | `POST /interpret`, Prism, Deduction | ✅ | ✅ + MCP `query_events` |
 | **Axiom** | Signed presence; the observation cannot be rewritten | All responses Ed25519 | ✅ | ✅ |
-| **Resonate** | Semantic search | `GET /search`, Echo, Prism | ✅ | ✅ + MCP `query_events` |
+| **Resonate** | Semantic search | `GET /search`, Echo | ✅ | ✅ |
 
-**Conclusion:** Hermes is another Inhale source (MCP) and Exhale consumer (query). Same INDB, same flow. Conceptually nothing changes.
+**Conclusion:** Hermes is another Inhale source (MCP) and Interpret consumer (`query_events`). Same INDB, same flow. Conceptually nothing changes.
 
 ---
 
@@ -24,7 +25,7 @@
 
 Hermes is a **module** like any other (moltbook, etc.). It is **pluggable** — the system must work when Hermes is connected or disconnected.
 
-- **Hermes enabled:** MCP ingest/query, HermesConnector polls sessions. Extra Inhale/Exhale paths.
+- **Hermes enabled:** MCP ingest (Inhale) / query (Interpret), HermesConnector polls sessions.
 - **Hermes disabled:** `HERMES_ENABLED=false` — connector does not start. REST, UDP, gRPC, other modules unchanged.
 - **No Hermes at all:** INDB core (ingest, fusion, interpret, search, echo, prism) works via REST. No dependency on Hermes.
 
@@ -54,7 +55,7 @@ All modules follow this principle: **enable/disable without breaking core.**
 | `README.md` | Inhale-Exhale-Axiom, salience, sleep/wake, Prism `query` | ✅ 0.11.1 |
 | `MEMORY_LIFECYCLE.md` | Sleep, wake, cold.bin, edge fade | ✅ 0.9–0.11 |
 | `USE_CASES.md` | Legal, Healthcare, Finance, Journalism, IoT | ✅ |
-| `API.md` | POST /interpret = Exhale, not Lens. Prism takes `query` | ✅ |
+| `API.md` | POST /interpret = recall, not Exhale. Prism takes `query` | ✅ |
 | `TECHNICAL_REFERENCE.md` | scan(), JITRenderer, filter_key, id map, cold.bin | ✅ 0.11.1 |
 | `CONTEXTUAL_LENS.md` | Triple-Half, POST /lens/query | ✅ |
 | `HERMES_INDB_WORKFLOW.md` | MCP ingest/query, HermesConnector | ✅ |
@@ -69,11 +70,11 @@ All modules follow this principle: **enable/disable without breaking core.**
 
 | Endpoint | Purpose | Concept |
 |----------|---------|---------|
-| `POST /interpret` | Scan memory with mood/goal, JIT rendering | **Exhale** — exhale meaning |
+| `POST /interpret` | Scan memory with mood/goal, JIT rendering | **Interpret** — recall, not Exhale |
 | `POST /lens/query` | Triple-Half (context_a + context_b, ratio) | **Contextual Lens** — blend perspectives |
 | `POST /prism/synthesize` | Perception paradox, alternative_readings | **Prism** — competing readings |
 
-Previously API.md 1.4 had "Contextual Scan (Lens)" for `/interpret` — fixed to "Exhale — Contextual Interpretation".
+Exhale is Fusion + sleep. `POST /interpret` is recall.
 
 ---
 
@@ -83,7 +84,7 @@ Previously API.md 1.4 had "Contextual Scan (Lens)" for `/interpret` — fixed to
 ```
 Client → POST /events (ingest)
 Client → GET /events (list)
-Client → POST /interpret (exhale)
+Client → POST /interpret (recall)
 Client → GET /search (resonate)
 ```
 
@@ -118,7 +119,7 @@ Hermes → MCP get_stats     → stats
 - [x] Hermes — in HERMES_*.md (as pluggable module)
 - [x] No hardcoding — in constants.py
 - [x] Interpret ≠ Lens — in API.md
-- [x] Inhale/Exhale/Resonate — in API.md, index.md
+- [x] Exhale = Fusion + sleep; Interpret = `POST /interpret` — in API.md, PHILOSOPHY.md
 - [x] Psycho and Grain — in PSYCHO.md, GRAIN.md, API.md, release 0.8.0
 - [x] Sleep / wake / cold / fade — in MEMORY_LIFECYCLE.md, README, index.md, release 0.9–0.11
 - [x] Prism / Echo / Instinct contracts — `query` / `seed_id`, not `seed_event_id` + `cloud_size`

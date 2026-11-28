@@ -1,15 +1,16 @@
 # INDB API Reference (v0.11.1)
 
 **Base URL** (Docker compose): `http://localhost:8000/api/v2`  
-**Note:** INDB is an **interpretational database** (memory, not archive). Engine: Inhale → Exhale → Axiom. Events are anchors; meaning comes from interpret, prism, echo, subwave.
+**Note:** INDB is an **interpretational database** (memory, not archive). Engine: Inhale → Exhale (Fusion + sleep) → Axiom. Events are anchors; meaning at read time comes from interpret, prism, echo, subwave.
 
 Writes need `X-API-Key`. Reads stay open. See [AUTHENTICATION.md](./AUTHENTICATION.md).
 
 **Breathing metaphor:**
-- **Inhale:** `POST /events` — accept raw reality
-- **Exhale:** `POST /interpret` — context-aware scan, JIT rendering
+- **Inhale:** `POST /events` — accept raw observation
+- **Exhale:** Fusion + sleep — compress repeats, fade the unreinforced. Not an HTTP verb
+- **Interpret:** `POST /interpret` — recall through mood/goal (JIT). Read-time, not Exhale
 - **Resonate:** `GET /search` — semantic lookup
-- **Axiom:** signed, immutable memory
+- **Axiom:** signed presence; the observation cannot be rewritten
 
 All defaults and thresholds live in `core/constants.py` — no hardcoded values. Hermes MCP uses the same backend; REST and MCP share the same flow.
 
@@ -140,10 +141,10 @@ Response includes the **Perception Paradox**:
 
 When `is_paradoxical=True`: *what you see may not be what it is.*
 
-### 1.4 Exhale — Contextual Interpretation
+### 1.4 Interpret — Contextual recall
 `POST /interpret`
 
-**Concept:** The engine *exhales* — scans memory through a given context (mood, goal). JIT Renderer derives meaning from events at runtime. No hardcoded values; defaults from `core/constants.py`.
+**Concept:** Recall, not Exhale. Scans memory through a given context (mood, goal). JIT Renderer derives meaning at read time. No hardcoded values; defaults from `core/constants.py`. Exhale is Fusion + sleep at ingest/prune.
 
 ```json
 {

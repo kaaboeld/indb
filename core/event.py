@@ -33,6 +33,7 @@ class Event:
         blind_payload: Optional[str] = None,
         binary_payload: Optional[bytes] = None,
         source_id: Optional[str] = None,
+        source_weight: float = 1.0,
         fusion_count: int = 0,
         is_fused: bool = False,
         signature: Optional[Dict[str, Any]] = None,
@@ -46,6 +47,7 @@ class Event:
         self.blind_payload = blind_payload
         self.binary_payload = binary_payload
         self.source_id = source_id
+        self.source_weight = max(0.0, float(source_weight))
         self.fusion_count = fusion_count
         self.is_fused = is_fused
         self.signature = signature
@@ -66,6 +68,7 @@ class Event:
             "blind_payload": self.blind_payload,
             # "binary_payload": self.binary_payload, # Excluded for JSON safety
             "source_id": self.source_id,
+            "source_weight": self.source_weight,
             "fusion_count": self.fusion_count,
             "is_fused": self.is_fused,
         }
@@ -93,6 +96,7 @@ class Event:
             # binary_payload is typically not in the dict unless manually injected
             binary_payload=d.get("binary_payload"),
             source_id=d.get("source_id"),
+            source_weight=d.get("source_weight", 1.0),
             fusion_count=d.get("fusion_count", 0),
             is_fused=d.get("is_fused", False),
             signature=d.get("signature"),
@@ -102,3 +106,15 @@ class Event:
         return (
             f"Event(id={self.id[:8]}, tokens={len(self.raw_data_anchor)}, location={self.location})"
         )
+
+
+def source_weight_of(event: Any) -> float:
+    """Reputation gravity for fusion and salience. Unset is 1.0. 0 is a valid exclude."""
+    if not hasattr(event, "source_weight") or event.source_weight is None:
+        return 1.0
+    return max(0.0, float(event.source_weight))
+
+
+def is_zero_weight(event: Any) -> bool:
+    """source_weight 0 does not enter fusion and has salience 0."""
+    return source_weight_of(event) == 0.0

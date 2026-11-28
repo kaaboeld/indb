@@ -464,9 +464,13 @@ routes/events.py → kernel.db.ingest(raw_data_anchor, location, ...)
 
 ---
 
-## 3. Fusion Engine
+## 3. Fusion Engine (Exhale)
 
-Fusion is **semantic deduplication**. When a new event is "similar enough" to an existing one, they are merged into a single `FusedEvent` instead of stored separately.
+Fusion is Exhale: **semantic deduplication**, then sleep for what stays weak. When a new event is "similar enough" to an existing one, they are merged into a single `FusedEvent` instead of stored separately.
+
+`POST /interpret` is recall, not Exhale.
+
+**`source_weight` 0 is valid.** That source does not enter Fusion (no merge, no `fusion_count`) and salience is 0. Unset weight is 1.0. Signed events also take no part in Fusion.
 
 ### 3.1 Similarity Calculation
 
@@ -699,7 +703,7 @@ MemoryManager:
     get(event_id)         # Hot id, then cold.bin
 ```
 
-Hot lookup is an id map (0.9.1). A sleeper's body stays in `cold.bin` (0.10.0). Echo still walks the hot tier; fusion in 0.11.1 scores hot events that share a token.
+Hot lookup is an id map (0.9.1). A sleeper's body stays in `cold.bin` (0.10.0). Prune to cold is Exhale. Echo still walks the hot tier; fusion in 0.11.1 scores hot events that share a token. `source_weight` 0 is excluded from Fusion and has salience 0.
 
 ---
 
