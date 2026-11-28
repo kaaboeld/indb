@@ -1,0 +1,11 @@
+{
+  "version": "0.11.2",
+  "title": "INDB patch",
+  "date": "2026-11-28",
+  "git": "84628df",
+  "image": "indb:0.11.2",
+  "notes": [
+    "INDB patch"
+  ],
+  "packed_at": "2026-11-28T02:50:12Z"
+}

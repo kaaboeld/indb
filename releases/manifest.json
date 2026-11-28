@@ -1,8 +1,32 @@
 {
-  "current": "0.11.1",
-  "published": "0.11.1",
+  "current": "0.11.3",
+  "published": "0.11.3",
   "latest": "https://indb.tech/releases/indb-latest.tar.gz",
   "releases": [
+    {
+      "version": "0.11.3",
+      "title": "INDB patch",
+      "date": "2026-11-28",
+      "git": "84628df",
+      "image": "indb:0.11.3",
+      "notes": [
+        "INDB patch"
+      ],
+      "packed_at": "2026-11-28T02:53:37Z",
+      "download": "https://indb.tech/releases/indb-0.11.3.tar.gz",
+      "latest": "https://indb.tech/releases/indb-latest.tar.gz"
+    },
+    {
+      "version": "0.11.2",
+      "title": "INDB patch",
+      "date": "2026-11-28",
+      "git": "84628df",
+      "image": "indb:0.11.2",
+      "notes": [
+        "INDB patch"
+      ],
+      "packed_at": "2026-11-28T02:50:12Z"
+    },
     {
       "version": "0.11.1",
       "title": "Inhale looks sideways",

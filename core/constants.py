@@ -9,7 +9,7 @@ All hardcoded values should be defined here for easy maintenance.
 # Application Version
 # ==============================================================================
 
-VERSION = "0.11.1"
+VERSION = "0.11.3"
 """INDB application version. Used in health, OpenAPI, and responses."""
 
 INDB_PRODUCT_NAME = "Interpretational Database"
