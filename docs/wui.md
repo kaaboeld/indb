@@ -184,7 +184,7 @@ Same as TUI — see [Console Guide — Query Lab](./CONSOLE.md#query-lab--all-mo
 
 | Mode | Primary example |
 |------|-----------------|
-| Interpret (Exhale) | `Neutral \| books/Orwell/1984` |
+| Interpret | `Neutral \| books/Orwell/1984` |
 | Prism Synthesize | `would have died` |
 | Prism Instinct | `query \| 0.8` |
 | Lens Query | `recent \| historical` |

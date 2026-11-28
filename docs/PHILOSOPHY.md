@@ -114,7 +114,7 @@ The architect's role is not to *manage* this world — but to give it **room to 
 - Prism returns competing readings, not a single truth
 - Contradiction is a signal, not an error
 - No hardcoded values — meaning is observer-dependent, context-dependent, never fixed
-- The engine breathes: inhale (POST /events), exhale (POST /interpret), resonate (GET /search)
+- The engine breathes: inhale (`POST /events`), exhale (Fusion + sleep), interpret (`POST /interpret`), resonate (`GET /search`)
 - Signed memory: every fact, every response, every moment
 
 ---

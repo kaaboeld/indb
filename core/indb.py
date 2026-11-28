@@ -478,6 +478,10 @@ class INDB:
             source_id=source_id,
             signature=signature,
         )
+        if source_id:
+            src = self.get_source(source_id)
+            if src is not None:
+                event.source_weight = float(src.reputation)
         if temporal_metadata:
             event.temporal_metadata = temporal_metadata
 

@@ -43,6 +43,9 @@ salience = log(1 + fusion_count) * source_weight * recency_boost(last_touch)
 
 recency_boost(Δt) = 1 / (1 + Δt / τ)     # τ = MEMORY_RECENCY_TAU_SEC
 
+`source_weight` comes from the source registry (`reputation`). Unset is 1.0.
+**0 is valid:** that source does not enter Fusion (no merge, no fusion_count) and salience is 0.
+
 last_touch = max(timestamp, last_echo_at, last_subwave_at)
 ```
 

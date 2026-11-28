@@ -9,7 +9,7 @@ import time
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple, Union
 from datetime import datetime
-from core.event import Event
+from core.event import Event, is_zero_weight, source_weight_of
 from core.constants import (
     FUSION_MAX_FUSION_COUNT,
     FUSION_DEFAULT_THRESHOLD,
@@ -69,6 +69,7 @@ class FusedEvent:
     # sources has no single one, and modules that fire owner reflexes must see None
     # rather than an arbitrary winner.
     source_id: Optional[str] = None
+    source_weight: float = 1.0
     
     # Fusion-specific fields
     fusion_count: int = 1
@@ -105,6 +106,7 @@ class FusedEvent:
             "temporal_metadata": self.temporal_metadata,
             "blind_payload": self.blind_payload,
             "source_id": self.source_id,
+            "source_weight": self.source_weight,
             "fusion_count": self.fusion_count,
             "fusion_type": self.fusion_type,
             "source_events": self.source_events,
@@ -129,6 +131,7 @@ class FusedEvent:
             temporal_metadata=d.get("temporal_metadata", {}),
             blind_payload=d.get("blind_payload"),
             source_id=d.get("source_id"),
+            source_weight=d.get("source_weight", 1.0),
             fusion_count=d.get("fusion_count", 1),
             fusion_type=d.get("fusion_type", "original"),
             source_events=d.get("source_events", []),
@@ -310,6 +313,7 @@ class EventFusion:
             temporal_metadata=base.temporal_metadata,
             blind_payload=getattr(base, "blind_payload", None) or getattr(new, "blind_payload", None),
             source_id=self._merged_source_id(base, new),
+            source_weight=max(source_weight_of(base), source_weight_of(new)),
             
             fusion_count=base_count + 1,
             fusion_type="full_merge",
@@ -377,6 +381,7 @@ class EventFusion:
             temporal_metadata=base.temporal_metadata,
             blind_payload=getattr(base, "blind_payload", None) or getattr(new, "blind_payload", None),
             source_id=self._merged_source_id(base, new),
+            source_weight=max(source_weight_of(base), source_weight_of(new)),
             
             fusion_count=base_count + 1,
             fusion_type="weighted_merge",
@@ -473,19 +478,21 @@ class EventFusion:
         Returns:
             List of similar events with metadata
 
-        Signed events take no part in fusion, on either side. A signature attests to one
+        Signed events and source_weight 0 take no part in fusion, on either side.
+        Weight 0 is a valid exclude: that source does not add mass.
+        A signature attests to one
         observation; a merge produces a record that no key ever signed, so verification
         fails and recovery by key_id no longer finds it. Grain's redundant tier promises
         that N of M signed events survive damage, which only holds while each stays a
         record of its own.
         """
-        if is_signed(target):
+        if is_signed(target) or is_zero_weight(target):
             return []
 
         similarities = []
         
         for event in event_pool:
-            if is_signed(event):
+            if is_signed(event) or is_zero_weight(event):
                 continue
 
             # Skip if target is already part of this fusion
@@ -591,6 +598,9 @@ class EventFusion:
         Returns:
             Fused event or tuple of linked events
         """
+        if is_zero_weight(base) or is_zero_weight(new):
+            return new
+
         similarity = self.calculate_similarity(base, new)
         
         if strategy is None:

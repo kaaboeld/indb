@@ -35,6 +35,26 @@ def test_shared_token_is_scored_and_disjoint_noise_is_not():
     assert similar[0]["id"] == partner.id
 
 
+def test_zero_source_weight_is_excluded_from_fusion():
+    host = _Host()
+    partner = host.keep(Event(["bicycle", "speed"], "Amsterdam", source_weight=1.0))
+    dead = host.keep(Event(["bicycle", "speed"], "Amsterdam", source_weight=0.0))
+    incoming = Event(["bicycle", "speed"], "Amsterdam")
+
+    similar = host.fusion_engine.find_similar_events(
+        incoming, [partner, dead], threshold=0.5
+    )
+    assert [row["id"] for row in similar] == [partner.id]
+
+    similar_from_zero = host.fusion_engine.find_similar_events(
+        dead, [partner], threshold=0.5
+    )
+    assert similar_from_zero == []
+
+    fused = host.fusion_engine.fuse_events(partner, dead, "full_merge")
+    assert fused is dead
+
+
 def test_embeddings_still_see_the_whole_hot_tier():
     host = _Host()
     host.fusion_engine.embeddings = object()
