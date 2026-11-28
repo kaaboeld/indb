@@ -1,5 +1,7 @@
 # INDB Console Guide
 
+**Version:** 0.11.5
+
 INDB ships two operational dashboards that mirror each other:
 
 | Interface | Best for | URL / command |

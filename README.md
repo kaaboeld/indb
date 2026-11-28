@@ -8,7 +8,7 @@
 See [docs/INTERPRETATIONAL_DATABASE.md](docs/INTERPRETATIONAL_DATABASE.md).
 
 **Source:** https://github.com/kaaboeld/indb  
-**Packed file:** [latest](https://indb.tech/releases/indb-latest.tar.gz) is 0.11.1. The numbered archive stays at [indb-0.11.1.tar.gz](https://indb.tech/releases/indb-0.11.1.tar.gz).
+**Packed file:** [latest](https://github.com/kaaboeld/indb/releases/latest) is **0.11.5**. The GitHub Release is [INDB 0.11.5](https://github.com/kaaboeld/indb/releases/tag/v0.11.5).
 
 ---
 
@@ -290,7 +290,7 @@ After Fusion:
 | Module | Status | Purpose | Note |
 |--------|--------|---------|------|
 | **Raft Consensus** | In the engine | Distributed coordination | Optional. Measured run is below. The public API is one node |
-| **Sleep & Wake** | In the engine | Hot / cold memory | 0.9.0–0.11.1. Signed and recent stay hot |
+| **Sleep & Wake** | In the engine | Hot / cold memory | 0.9.0–0.11.5. Signed and recent stay hot |
 | **Prism** | In the engine | Paradox-aware synthesis | `query` + `observer_context` |
 | **Echo** | In the engine | Resonance detection | `seed_id`, `radius`, `limit` |
 | **Instinct** | In the engine | Adrenaline reflexes | `query`, `adrenaline` |
@@ -789,9 +789,14 @@ python3 scripts/test_lens.py
 
 ## 🎯 Current Status
 
-**Version:** 0.11.1 — Inhale looks sideways (2026-11-03)  
+**Version:** 0.11.5 — INDB 0.11.5 (2026-11-28)  
 **Status:** Public source at https://github.com/kaaboeld/indb  
-**Packed file:** `indb:0.11.1`, also published as [latest](https://indb.tech/releases/indb-latest.tar.gz)
+**Packed file:** GitHub Release [v0.11.5](https://github.com/kaaboeld/indb/releases/tag/v0.11.5) (`indb-latest.zip`)
+
+### **0.11.5 — INDB 0.11.5**
+
+- Current cut. Same kernel contracts as 0.11.1
+- Source zip on the GitHub Release; no auto-bump on pack
 
 ### **0.11.1 — Inhale looks sideways**
 
@@ -857,10 +862,11 @@ Prism, Echo, Instinct, Deduction, Fusion, Lens, Subwave, Paradox, signed memory,
 
 ## 🗺️ Roadmap
 
-Current cut is **0.11.1**. 1.0.0 is not cut.
+Current cut is **0.11.5**. 1.0.0 is not cut.
 
 | Version | What landed |
 |---------|-------------|
+| 0.11.5 | INDB 0.11.5 — current GitHub Release |
 | 0.11.1 | Fusion scores shared tokens |
 | 0.11.0 | Weak edges fade and stay |
 | 0.10.0 | Cold body stays on disk |
@@ -901,7 +907,7 @@ Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses
 
 **INDB is:**
 - An interpretational database. Meaning is read at query time
-- Public source, packed image 0.11.1
+- Public source, current release 0.11.5
 - Prism, Echo, Instinct, Deduction, Psycho, Grain, Fusion, Lens, Subwave
 - Sleep, wake, cold body on disk, faded edges, fusion on shared tokens
 - Optional Raft. The public API is one node

@@ -11,7 +11,7 @@ docker run -d --name indb \
 
 ```bash
 curl http://127.0.0.1:8000/health
-# {"status":"ok","version":"0.11.1"}
+# {"status":"ok","version":"0.11.5"}
 
 docker run --rm -it --network container:indb indb:latest tui
 ```
@@ -37,6 +37,6 @@ curl -fsSL -o indb-latest.tar.gz https://indb.tech/releases/indb-latest.tar.gz
 docker load -i indb-latest.tar.gz
 ```
 
-That name is 0.11.1 until the next pack. The pinned file stays https://indb.tech/releases/indb-0.11.1.tar.gz. The previous packed file remains https://indb.tech/releases/indb-0.8.0.tar.gz. `python3 scripts/image.py` writes `dist/indb-<version>/` and the same bytes as `dist/indb-latest.tar.gz`.
+That name is 0.11.5 until the next pack. The GitHub Release is https://github.com/kaaboeld/indb/releases/tag/v0.11.5. The previous packed file remains https://indb.tech/releases/indb-0.8.0.tar.gz. `python3 scripts/image.py` writes `dist/indb-<version>/` and the same bytes as `dist/indb-latest.tar.gz`.
 
 Not in the image: landing, MkDocs, growth, books, SDKs, packer.

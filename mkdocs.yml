@@ -22,6 +22,7 @@ theme:
     - content.code.copy
 
 extra:
+  version: "0.11.5"
   analytics:
     provider: google
     property: G-VM2EFYWCD6

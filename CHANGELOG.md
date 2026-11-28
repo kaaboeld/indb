@@ -1,8 +1,25 @@
 # Changelog
 
-Current release: **0.11.1**. Source of truth for the running version is `VERSION` in `core/constants.py`. Packed notes live in `releases/manifest.json`.
+Current release: **0.11.5**. Source of truth for the running version is `VERSION` in `core/constants.py`. Packed notes live in `releases/manifest.json`.
 
-The file the docs and the site offer is https://indb.tech/releases/indb-latest.tar.gz. That name is this cut until the next pack. 1.0.0 has not been cut.
+GitHub Release: https://github.com/kaaboeld/indb/releases/tag/v0.11.5 (`indb-latest.zip`). 1.0.0 has not been cut.
+
+---
+
+## 0.11.5 — INDB 0.11.5
+
+**Date:** 2026-11-28
+
+First GitHub application release of this tree. Kernel contracts are those of 0.11.1 (fusion scores hot events that share a token). This cut is packaging, packer, and docs.
+
+- `VERSION` in `core/constants.py` is `0.11.5`
+- `scripts/pack.py` no longer has `--bump`; export keeps the current VERSION
+- `scripts/image.py --export-only` does not require `--publish-site` when the sibling site catalog is stale or absent
+- GitHub Release asset is source zip `indb-latest.zip` (~910 KiB), not a `docker save`
+- README and docs current-cut pointers say 0.11.5
+
+Latest: https://github.com/kaaboeld/indb/releases/tag/v0.11.5  
+Self-host: https://docs.indb.tech/SELFHOST/
 
 ---
 

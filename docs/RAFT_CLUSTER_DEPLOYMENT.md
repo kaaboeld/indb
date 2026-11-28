@@ -310,5 +310,5 @@ To add more nodes:
 ---
 
 **Status**: In the engine. Optional. The public API is one node. 1.0.0 is not cut.  
-**Version**: 0.11.1  
+**Version**: 0.11.5  
 **Last Updated**: 2026-11-28

@@ -1,4 +1,4 @@
-# INDB API Reference (v0.11.1)
+# INDB API Reference (v0.11.5)
 
 **Base URL** (Docker compose): `http://localhost:8000/api/v2`  
 **Note:** INDB is an **interpretational database** (memory, not archive). Engine: Inhale → Exhale (Fusion + sleep) → Axiom. Events are anchors; meaning at read time comes from interpret, prism, echo, subwave.
@@ -347,7 +347,7 @@ Implementation examples for each pattern: [SIGNED_MEMORY_RECOVERY.md](./SIGNED_M
 
 ### 2.6 Paradox (type) — contract
 
-> **Status:** API contract, live in 0.11.1. Prism read-time paradox (`is_paradoxical`) is live — see §1.3.
+> **Status:** API contract, live in 0.11.5. Prism read-time paradox (`is_paradoxical`) is live — see §1.3.
 
 Paradox is **not** an Event flag. Separate store, empty anchor until observation.
 

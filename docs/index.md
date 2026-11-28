@@ -5,13 +5,13 @@
 
 **INDB** = **I**nterpretational **D**ata**b**ase. See [INTERPRETATIONAL_DATABASE.md](./INTERPRETATIONAL_DATABASE.md).
 
-**Version:** 0.11.1 — Inhale looks sideways  
+**Version:** 0.11.5 — INDB 0.11.5  
 **Changelog:** [changelog.md](./changelog.md)  
 **Self-host:** [SELFHOST.md](./SELFHOST.md) — the file named latest  
 **Status:** Public source at https://github.com/kaaboeld/indb  
-**Released:** November 3, 2026  
-**Previous:** 0.11.0 Edges fade · 0.10.0 Cold stays cold · 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain  
-**Packed file:** [latest](https://indb.tech/releases/indb-latest.tar.gz) is 0.11.1 until the next pack. The pinned file for this cut is [indb-0.11.1.tar.gz](https://indb.tech/releases/indb-0.11.1.tar.gz).
+**Released:** November 28, 2026  
+**Previous:** 0.11.1 Inhale looks sideways · 0.11.0 Edges fade · 0.10.0 Cold stays cold · 0.9.1 Direct recall · 0.9.0 Sleep & Wake · 0.8.0 Psycho & Grain  
+**Packed file:** GitHub Release [v0.11.5](https://github.com/kaaboeld/indb/releases/tag/v0.11.5) (`indb-latest.zip`).
 
 ---
 
@@ -206,7 +206,7 @@ Headline fields: `detour_cost`, `barrier_walked_into`, `identical_route`.
 
 Full reference: [PSYCHO.md](./PSYCHO.md)
 
-**Status:** ✅ Shipped in 0.8.0. Present in 0.11.1.
+**Status:** ✅ Shipped in 0.8.0. Present in 0.11.5.
 
 ---
 
@@ -479,7 +479,11 @@ pytest --cov=core --cov-report=html
 
 ---
 
-## 🏆 Current release — 0.11.1 Inhale looks sideways (November 3, 2026)
+## 🏆 Current release — 0.11.5 INDB 0.11.5 (November 28, 2026)
+
+### **INDB 0.11.5** ✅
+- Current cut. Same kernel contracts as 0.11.1
+- Source zip on the GitHub Release
 
 ### **Inhale looks sideways** ✅
 - Heuristic fusion scores hot events that share a token
@@ -574,10 +578,11 @@ Russian summary report:
 
 ## 🗺️ Roadmap
 
-**Current:** 0.11.1. 1.0.0 is not cut. Local only.
+**Current:** 0.11.5. 1.0.0 is not cut. Local only.
 
 | Version | Cut |
 |---------|-----|
+| 0.11.5 | INDB 0.11.5 — current GitHub Release |
 | 0.11.1 | Fusion scores shared tokens |
 | 0.11.0 | Weak edges fade and stay |
 | 0.10.0 | Cold body stays on disk |
@@ -612,7 +617,7 @@ Proprietary - All Rights Reserved
 
 **INDB is:**
 - An interpretational database. Meaning is read at query time
-- Public source, packed image 0.11.1
+- Public source, current release 0.11.5
 - Prism, Echo, Instinct, Deduction, Psycho, Grain, Fusion, Lens, Subwave
 - Sleep, wake, cold body on disk, faded edges, fusion on shared tokens
 - Optional Raft. The public API is one node

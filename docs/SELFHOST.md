@@ -2,16 +2,16 @@
 
 This page is the packed release named **latest**. It is not a build from this git tree, and it is not the Fly app.
 
-`latest` is whatever cut was packed last. Right now that cut is **0.11.1**. The next pack replaces this name and leaves the numbered file where it is.
+`latest` is whatever cut was packed last. Right now that cut is **0.11.5**. The next pack replaces this name and leaves the numbered file where it is.
 
-The file is a `docker save` of `indb:0.11.1` and `indb:latest`. Load it, then run it the way you would run Postgres: one container, one volume, your disk.
+The GitHub Release for this cut is source zip `indb-latest.zip` (INDB 0.11.5). A `docker save` of `indb:0.11.5` is a separate, much larger artifact.
 
 | | |
 |---|---|
 | Latest | https://indb.tech/releases/indb-latest.tar.gz |
 | Checksum | https://indb.tech/releases/indb-latest.sha256 |
-| This cut, pinned | https://indb.tech/releases/indb-0.11.1.tar.gz |
-| Image inside | `indb:latest` (`indb:0.11.1`) |
+| This cut, pinned | https://github.com/kaaboeld/indb/releases/tag/v0.11.5 |
+| Image inside | `indb:latest` (`indb:0.11.5`) |
 | Same cut, public | https://api.indb.tech/health |
 
 The previous packed file, 0.8.0, stays at its own URL. Do not mix the two volumes.
@@ -34,7 +34,7 @@ docker run -d --name indb \
 
 ```bash
 curl http://127.0.0.1:8000/health
-# {"status":"ok","version":"0.11.1"}
+# {"status":"ok","version":"0.11.5"}
 ```
 
 A write sends the same secret in `X-API-Key`. Without that header a write is rejected. Reads stay open. `API_KEYS` is `secret:role:name`. The role is `writer` or `admin`.

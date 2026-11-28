@@ -3,7 +3,7 @@
 > Alignment of code, documentation, and philosophy. Inhale — Exhale — Axiom.
 
 **Date:** 2026-11-28  
-**Version:** 0.11.1
+**Version:** 0.11.5
 
 ---
 
@@ -52,11 +52,11 @@ All modules follow this principle: **enable/disable without breaking core.**
 | Document | Key Points | Status |
 |----------|------------|--------|
 | `PHILOSOPHY.md` | Inhale/Exhale, no hardcode, observer context | ✅ |
-| `README.md` | Inhale-Exhale-Axiom, salience, sleep/wake, Prism `query` | ✅ 0.11.1 |
+| `README.md` | Inhale-Exhale-Axiom, salience, sleep/wake, Prism `query` | ✅ 0.11.5 |
 | `MEMORY_LIFECYCLE.md` | Sleep, wake, cold.bin, edge fade | ✅ 0.9–0.11 |
 | `USE_CASES.md` | Legal, Healthcare, Finance, Journalism, IoT | ✅ |
 | `API.md` | POST /interpret = recall, not Exhale. Prism takes `query` | ✅ |
-| `TECHNICAL_REFERENCE.md` | scan(), JITRenderer, filter_key, id map, cold.bin | ✅ 0.11.1 |
+| `TECHNICAL_REFERENCE.md` | scan(), JITRenderer, filter_key, id map, cold.bin | ✅ 0.11.5 |
 | `CONTEXTUAL_LENS.md` | Triple-Half, POST /lens/query | ✅ |
 | `HERMES_INDB_WORKFLOW.md` | MCP ingest/query, HermesConnector | ✅ |
 | `HERMES_INTEGRATION_SCENARIOS.md` | Scenarios 1–5 | ✅ |

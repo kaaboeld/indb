@@ -1,6 +1,6 @@
 # Memory Lifecycle — Forgetting as Architecture
 
-Shipped in **0.9.0** (sleep and wake), **0.9.1** (recall by id), **0.10.0** (the body stays on disk), and **0.11.0** (a weak edge fades and stays). The tree is **0.11.1**. That cut narrows fusion. It does not change sleep, wake, or edge fade.
+Shipped in **0.9.0** (sleep and wake), **0.9.1** (recall by id), **0.10.0** (the body stays on disk), and **0.11.0** (a weak edge fades and stays). The tree is **0.11.5**. 0.11.1 narrowed fusion. It does not change sleep, wake, or edge fade.
 
 > The concept is immortal; repositories are compilations.  
 > INDB is an **interpretational database** — it models **human memory**: anchors, forgetting, associative wake-up — not a tape archive.

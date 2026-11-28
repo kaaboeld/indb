@@ -1,7 +1,7 @@
 # INDB Strategic Roadmap
 
 > **Vision**: Autonomous, High-Performance Interpretative Database.
-> **Current release**: **0.11.1 — Inhale looks sideways** (2026-11-03). Previous cuts in this tree: **0.11.0 — Edges fade**, **0.10.0 — Cold stays cold**, **0.9.1 — Direct recall**, **0.9.0 — Sleep & Wake**.
+> **Current release**: **0.11.5 — INDB 0.11.5** (2026-11-28). Previous cuts in this tree: **0.11.1 — Inhale looks sideways**, **0.11.0 — Edges fade**, **0.10.0 — Cold stays cold**, **0.9.1 — Direct recall**, **0.9.0 — Sleep & Wake**.
 
 ---
 
@@ -126,13 +126,22 @@ These are part of the engine. An earlier draft filed them under a 1.0.0 that was
 
 ---
 
-## 🟢 v0.11.1: Inhale looks sideways (current)
+## 🟢 v0.11.1: Inhale looks sideways
 **Focus**: Fusion scores the neighbours, not the whole life.
 *Released: 2026-11-03*
 
 - [x] Heuristic fusion asks the token index. Events with no shared token are not scored.
 - [x] The embedding path still sees the whole hot tier.
 - [x] A fused body is replaced by id. The comparison no longer prints a debug line.
+
+---
+
+## 🟢 v0.11.5: INDB 0.11.5 (current)
+**Focus**: Current GitHub Release.
+*Released: 2026-11-28*
+
+- [x] `VERSION` 0.11.5. Source zip on the GitHub Release.
+- [x] Pack no longer auto-bumps on export.
 
 ---
 
@@ -156,5 +165,6 @@ The next version is not numbered. 1.0.0 does not exist.
 | v0.9.1 | ✅ Complete | 2026-11-03 · Direct recall |
 | v0.10.0 | ✅ Complete | 2026-11-03 · Cold stays cold |
 | v0.11.0 | ✅ Complete | 2026-11-03 · Edges fade |
-| v0.11.1 | ✅ **Current** | 2026-11-03 · Inhale looks sideways |
+| v0.11.1 | ✅ Complete | 2026-11-03 · Inhale looks sideways |
+| v0.11.5 | ✅ **Current** | 2026-11-28 · INDB 0.11.5 |
 
