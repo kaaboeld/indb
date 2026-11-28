@@ -10,6 +10,8 @@ Books:
 
 Usage:
   INDB_URL=https://api.indb.tech python3 scripts/load_fly_curated_books.py
+
+Texts are not in the INDB repo. Optional cache: clone kaaboeld/indb-demo as data/demo.
 """
 
 from __future__ import annotations
@@ -43,7 +45,7 @@ BOOKS = [
         "author": "Various / KJV",
         "theme": "sacred,theology,prophecy,covenant",
         "location": "books/Bible/KJV",
-        "local_file": ROOT / "data/books_10k/bible-kjv.txt",
+        "local_file": ROOT / "data/demo/books_10k/bible-kjv.txt",
         "url": "https://www.gutenberg.org/cache/epub/10/pg10.txt",
     },
     {
@@ -52,7 +54,7 @@ BOOKS = [
         "author": "George Orwell",
         "theme": "surveillance,doublethink,totalitarianism,truth",
         "location": "books/Orwell/1984",
-        "local_file": ROOT / "data/books/1984-orwell.txt",
+        "local_file": ROOT / "data/demo/books/1984-orwell.txt",
         "url": "https://gutenberg.net.au/ebooks01/0100021.txt",
     },
 ]
@@ -92,7 +94,7 @@ FIFTY_SHADES_THEMES = [
 
 
 def download_1984_if_needed(book: dict) -> Path | None:
-    path = ROOT / "data/books/1984-orwell.txt"
+    path = ROOT / "data/demo/books/1984-orwell.txt"
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and path.stat().st_size > 50_000:
         return path

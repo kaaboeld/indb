@@ -36,6 +36,7 @@ auth/certificates/*.key
 *.log
 data-node-*/
 logs-node-*/
+# Runtime volume and optional demo books (data/demo) — never the core image
 data/
 logs/
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-Download and load real books from Project Gutenberg as INDB events
+Download and load real books from Project Gutenberg as INDB events.
+
+Texts are not in the INDB repo. Optional cache: clone kaaboeld/indb-demo as data/demo.
 """
 import httpx
 import re
@@ -42,7 +44,7 @@ BOOKS = [
 ]
 
 INDB_URL = "http://localhost:8000" # Use Node 1 (Bootstrap)
-BOOKS_DIR = Path("data/books")
+BOOKS_DIR = Path("data/demo/books")
 
 def download_book(book_info):
     """Download book from Project Gutenberg"""

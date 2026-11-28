@@ -36,3 +36,7 @@ site/
 REPORT_*.md
 # Portable image bundles (docker save) — rebuilt by scripts/image.py
 dist/
+# Demo literary corpora live in a separate repo (kaaboeld/indb-demo), never here
+data/demo/
+data/books/
+data/books_10k/

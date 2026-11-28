@@ -13,7 +13,9 @@ Books:
      (* Perfume/Süskind 1985 is still under copyright; Dorian Gray covers
         similar themes: obsession, beauty, decay, moral corruption)
 
-Target: 2000 events per book == 10,000 total
+Target: 2000 events per book == 10,000 total.
+
+Texts are not in the INDB repo. Optional cache: clone kaaboeld/indb-demo as data/demo.
 """
 
 import httpx
@@ -34,7 +36,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # Config
 # ---------------------------------------------------------------------------
 INDB_URL = os.getenv("INDB_URL", "https://loadbalancer.backend.orb.local")
-BOOKS_DIR = Path("data/books_10k")
+BOOKS_DIR = Path("data/demo/books_10k")
 TARGET_PER_BOOK = 2000  # 5 books × 2000 = 10,000
 
 # Local pg*.txt files are expected one directory above scripts/ (i.e. in backend/)

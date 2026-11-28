@@ -496,6 +496,10 @@ cd wui && npm run build                   # the image serves the built console a
 
 **Tabs:** Control · Events · Modules · Cluster · Query · Analytics (no Scripts — use TUI)
 
+### Optional demo books
+
+Demo literary corpora are **not** in this repository. They live in a separate repo: [kaaboeld/indb-demo](https://github.com/kaaboeld/indb-demo). Clone it as `data/demo`, or let `scripts/load_books.py` / `scripts/load_10k_books.py` download from Project Gutenberg.
+
 ---
 
 ## 🔌 Source Connectors
