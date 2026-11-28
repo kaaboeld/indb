@@ -13,7 +13,7 @@
 |-------|---------|---------------------|------------|-------------|
 | **Inhale** | Accept raw reality | `POST /events`, UDP, gRPC, WebSocket | ✅ | ✅ + MCP `ingest_event` |
 | **Exhale** | Compress noise, exhale meaning | Fusion + `POST /interpret` | ✅ | ✅ (same backend) |
-| **Axiom** | Signed, immutable memory | All responses Ed25519 | ✅ | ✅ |
+| **Axiom** | Signed presence; the observation cannot be rewritten | All responses Ed25519 | ✅ | ✅ |
 | **Resonate** | Semantic search | `GET /search`, Echo, Prism | ✅ | ✅ + MCP `query_events` |
 
 **Conclusion:** Hermes is another Inhale source (MCP) and Exhale consumer (query). Same INDB, same flow. Conceptually nothing changes.

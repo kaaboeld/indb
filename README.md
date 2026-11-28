@@ -14,11 +14,11 @@ See [docs/INTERPRETATIONAL_DATABASE.md](docs/INTERPRETATIONAL_DATABASE.md).
 
 ## 🎯 Vision
 
-INDB is not a classical database and not an archive. It is an **Interpretational Database** — and an **Epistemological Engine** under the hood: truth as process (inhale → exhale → axiom), not as a static table.
+INDB is not a classical database and not an archive. It is an **Interpretational Database** — and an **Epistemological Engine** under the hood: memory as process (inhale → exhale → axiom), not as a static table.
 
-**The Paradox of 1984:** How do you preserve objective reality when collective gaslighting can rewrite history?
+**The Paradox of 1984:** When the story is rewritten, how do you still remember what you saw?
 
-**INDB's Answer:** Treat data as **memory** — metabolism, resonance, forgetting, wake — not storage.
+**INDB's Answer:** Treat data as **memory** — metabolism, resonance, forgetting, wake — not storage. The reply is how we remember now, not a frozen archive of how it was.
 
 ---
 
@@ -28,7 +28,7 @@ INDB is not a classical database and not an archive. It is an **Interpretational
 **Accept reality as it is: raw, chaotic, unfiltered.**
 
 - Open all protocols (UDP, gRPC, HTTP, WebSocket)
-- Accept everything: truth, noise, lies, sensor data
+- Accept everything: observations, noise, lies, sensor data
 - No judgment, only observation
 - **Measured 3-node Raft run:** 19–28 events/sec sustained, 50–250ms per request
 
@@ -37,7 +37,7 @@ INDB is not a classical database and not an archive. It is an **Interpretational
 ---
 
 ### 2. **EXHALE** (Fusion & Decay)
-**Compress truth. Purge noise. Reputation is gravity.**
+**Compress the swarm. Fade the unreinforced. Reputation is gravity.**
 
 The **Fusion Engine** compresses repetitive signals. The **Entropy Manager** lets weak data fade.
 
@@ -53,12 +53,11 @@ A fusion count of 0 is salience 0. That event sleeps unless it is signed or stil
 
 ---
 
-### 3. **AXIOM** (Irrefutable Core)
-**What remains after the Exhale is the Axiom.**
+### 3. **AXIOM** (Signed presence)
+**What remains after the Exhale is the Axiom — what you saw, signed.**
 
 - Cryptographically signed
-- Immutable
-- Resistant to gaslighting
+- The observation cannot be rewritten
 - The "Black Box" of your reality
 
 **Visual:** A glowing, solid monolith in the center of the void.
@@ -871,14 +870,14 @@ Current cut is **0.11.1**. 1.0.0 is not cut.
 
 INDB is built on three core principles:
 
-### **1. Truth Through Metabolism**
+### **1. Memory Through Metabolism**
 Data is not static. It lives, breathes, fuses, and decays.
 
 ### **2. Reputation as Gravity**
-Not all data is equal. Trust shapes reality.
+Not all traces weigh the same. Trust shapes what stays hot.
 
-### **3. Axioms Resist Gaslighting**
-What is signed and witnessed cannot be rewritten.
+### **3. Axiom Is What You Saw**
+What is signed and witnessed cannot be rewritten. That is presence, not a verdict.
 
 ---
 
@@ -908,6 +907,6 @@ Proprietary - All Rights Reserved
 
 ---
 
-**Built with ❤️ for Truth in the Age of Manipulation**
+**Built with ❤️ for how we remember now**
 
 **"Inhale the chaos. Exhale the noise. Remember the Axiom."**
