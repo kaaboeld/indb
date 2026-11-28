@@ -2,7 +2,7 @@
 
 > Alignment of code, documentation, and philosophy. Inhale — Exhale — Axiom.
 
-**Date:** 2026-09-22  
+**Date:** 2026-11-28  
 **Version:** 0.11.1
 
 ---
@@ -51,10 +51,11 @@ All modules follow this principle: **enable/disable without breaking core.**
 | Document | Key Points | Status |
 |----------|------------|--------|
 | `PHILOSOPHY.md` | Inhale/Exhale, no hardcode, observer context | ✅ |
-| `README.md` | Inhale-Exhale-Axiom, Mass = Count × Rep² | ✅ |
+| `README.md` | Inhale-Exhale-Axiom, salience, sleep/wake, Prism `query` | ✅ 0.11.1 |
+| `MEMORY_LIFECYCLE.md` | Sleep, wake, cold.bin, edge fade | ✅ 0.9–0.11 |
 | `USE_CASES.md` | Legal, Healthcare, Finance, Journalism, IoT | ✅ |
-| `API.md` | POST /interpret = Exhale, not Lens | ✅ fixed |
-| `TECHNICAL_REFERENCE.md` | scan(), JITRenderer, filter_key | ✅ |
+| `API.md` | POST /interpret = Exhale, not Lens. Prism takes `query` | ✅ |
+| `TECHNICAL_REFERENCE.md` | scan(), JITRenderer, filter_key, id map, cold.bin | ✅ 0.11.1 |
 | `CONTEXTUAL_LENS.md` | Triple-Half, POST /lens/query | ✅ |
 | `HERMES_INDB_WORKFLOW.md` | MCP ingest/query, HermesConnector | ✅ |
 | `HERMES_INTEGRATION_SCENARIOS.md` | Scenarios 1–5 | ✅ |
@@ -119,6 +120,8 @@ Hermes → MCP get_stats     → stats
 - [x] Interpret ≠ Lens — in API.md
 - [x] Inhale/Exhale/Resonate — in API.md, index.md
 - [x] Psycho and Grain — in PSYCHO.md, GRAIN.md, API.md, release 0.8.0
+- [x] Sleep / wake / cold / fade — in MEMORY_LIFECYCLE.md, README, index.md, release 0.9–0.11
+- [x] Prism / Echo / Instinct contracts — `query` / `seed_id`, not `seed_event_id` + `cloud_size`
 
 ---
 

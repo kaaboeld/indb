@@ -3,6 +3,8 @@
 **Base URL** (Docker compose): `http://localhost:8000/api/v2`  
 **Note:** INDB is an **interpretational database** (memory, not archive). Engine: Inhale → Exhale → Axiom. Events are anchors; meaning comes from interpret, prism, echo, subwave.
 
+Writes need `X-API-Key`. Reads stay open. See [AUTHENTICATION.md](./AUTHENTICATION.md).
+
 **Breathing metaphor:**
 - **Inhale:** `POST /events` — accept raw reality
 - **Exhale:** `POST /interpret` — context-aware scan, JIT rendering
@@ -37,6 +39,8 @@ Most integrations only need these **4 endpoints**.
 
 ### 1.1 Create Event
 `POST /events`
+
+Anonymous writes are rejected. Send `X-API-Key`.
 
 Single event:
 ```json

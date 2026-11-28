@@ -140,4 +140,4 @@ docker-compose up -d --scale indb-api=3
 
 ---
 
-**Status**: Production-ready Backend Infrastructure
+**Status**: In the engine. Packed image 0.11.1. 1.0.0 is not cut.

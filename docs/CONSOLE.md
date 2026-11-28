@@ -5,7 +5,7 @@ INDB ships two operational dashboards that mirror each other:
 | Interface | Best for | URL / command |
 |-----------|----------|---------------|
 | **WUI** (Web Console) | Daily ops, demos, sharing links, Query Lab | `https://api.indb.tech/wui/` or `http://localhost:8000/wui/` |
-| **TUI** (Terminal UI) | SSH sessions, low bandwidth, script runner | `cd db && ./start_tui.sh` |
+| **TUI** (Terminal UI) | SSH sessions, low bandwidth, script runner | `./start_tui.sh` from the clone |
 
 Both talk to the **same live API**. Neither stores data locally — they poll and query the configured endpoint.
 
