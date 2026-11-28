@@ -889,7 +889,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
 
 ## 📝 License
 
-Proprietary - All Rights Reserved
+Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0). See [LICENSE](./LICENSE).
 
 ---
 
