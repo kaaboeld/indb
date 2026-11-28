@@ -12,7 +12,7 @@
 | Method | When to use | How |
 |--------|---------------|-----|
 | **WUI Query tab** | Browser, demos, JSON output | [https://api.indb.tech/wui/](https://api.indb.tech/wui/) → Query → pick mode → Run |
-| **TUI Query tab** | Terminal / SSH | `cd db && ./start_tui.sh` → Query (`p`) |
+| **TUI Query tab** | Terminal / SSH | `./start_tui.sh` from the clone → Query (`p`) |
 | **curl** | Scripts, CI, automation | Examples below — replace base URL |
 | **Script** | Batch demo | `INDB_API_URL=https://api.indb.tech python3 scripts/query_examples.py` |
 

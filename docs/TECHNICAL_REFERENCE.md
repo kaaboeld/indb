@@ -143,10 +143,10 @@ curl "http://localhost:8000/api/v2/events?temporal_query=last+1+hour"
 EVENT_ID=$(curl -s "http://localhost:8000/api/v2/events?q=murder" | python3 -c \
   "import sys,json; print(json.load(sys.stdin)['events'][0]['id'])")
 
-# Ask Prism what this event means in context
+# Ask Prism what this event means in context. `query` is an event id or text.
 curl -X POST http://localhost:8000/api/v2/prism/synthesize \
   -H "Content-Type: application/json" \
-  -d "{\"seed_event_id\": \"$EVENT_ID\", \"cloud_size\": 10}"
+  -d "{\"query\": \"$EVENT_ID\"}"
 ```
 
 ```json
@@ -160,7 +160,11 @@ curl -X POST http://localhost:8000/api/v2/prism/synthesize \
     "significance_score": 0.81,
     "context_label": "Anomaly",
     "insight": "Direct Hit — rare token cluster in location books/Dostoevsky"
-  }
+  },
+  "alternative_readings": [],
+  "perception_gap": 0.0,
+  "is_paradoxical": false,
+  "has_unread_essence": false
 }
 ```
 
@@ -169,15 +173,16 @@ curl -X POST http://localhost:8000/api/v2/prism/synthesize \
 ```bash
 curl -X POST http://localhost:8000/api/v2/echo/resonate \
   -H "Content-Type: application/json" \
-  -d "{\"seed_event_id\": \"$EVENT_ID\", \"cloud_size\": 10}"
+  -d "{\"seed_id\": \"$EVENT_ID\", \"radius\": 0.3, \"limit\": 20}"
 ```
 
 ```json
 {
-  "resonances": [
-    {"event_id": "c4d9...", "resonance_score": 0.81, "tokens": ["love", "beyond", "death"]},
-    {"event_id": "e7f2...", "resonance_score": 0.74, "tokens": ["sacrifice", "himself"]},
-    {"event_id": "f1a3...", "resonance_score": 0.67, "tokens": ["guilt", "suffering", "soul"]}
+  "center": "a3f12e91-...",
+  "ripples": [
+    {"event_id": "c4d9...", "score": 0.81, "harmonic_type": "mixed", "reason": "Shared tokens: [love, death]"},
+    {"event_id": "e7f2...", "score": 0.74, "harmonic_type": "emotional", "reason": "Shared tokens: [sacrifice]"},
+    {"event_id": "f1a3...", "score": 0.67, "harmonic_type": "direct", "reason": "Shared tokens: [guilt]"}
   ]
 }
 ```
@@ -212,7 +217,7 @@ curl "http://localhost:8000/api/v2/events?location=moltbook"
 **TUI** (terminal, includes Scripts):
 
 ```bash
-cd db && ./start_tui.sh
+./start_tui.sh
 # s → Scripts · e → Events · p → Query · a → Analytics
 ```
 
@@ -395,11 +400,11 @@ GET /api/v2/events?q=impossible
 
 # Use Prism to find thematically significant passages
 POST /api/v2/prism/synthesize
-  {"seed_event_id": "a3f12e91-...", "cloud_size": 10}
+  {"query": "a3f12e91-..."}
 
 # Use Echo to find emotionally resonant events
 POST /api/v2/echo/resonate
-  {"seed_event_id": "a3f12e91-...", "cloud_size": 10}
+  {"seed_id": "a3f12e91-...", "radius": 0.3, "limit": 20}
 ```
 
 The intelligence layer (Prism/Echo/Instinct) **never sees the original Russian text** — it works purely with the abstract token fingerprint `["felt", "that", "would", "almost", "impossible"]` and the structural metadata (`location`, `timestamp`, `fusion_count`).
@@ -688,14 +693,13 @@ The master key is stored in `indb.key` (32 random bytes). If not found, a new ke
 
 ```python
 MemoryManager:
-    stream: List[Event]   # In-memory event list (ordered by insertion)
-    add(event)            # O(1) append
-    __len__               # Event count
-    __iter__              # Iterate all events
-    __getitem__           # Index access for update_event
+    stream: List[Event]   # Hot events in RAM
+    _by_id: Dict[str, Event]  # 0.9.1 direct recall — no walk of the stream
+    add(event)            # O(1) append + id map
+    get(event_id)         # Hot id, then cold.bin
 ```
 
-No indexing, no B-tree — linear scan. Suitable for up to ~100k events; beyond that, a dedicated index should be added.
+Hot lookup is an id map (0.9.1). A sleeper's body stays in `cold.bin` (0.10.0). Echo still walks the hot tier; fusion in 0.11.1 scores hot events that share a token.
 
 ---
 
@@ -703,58 +707,55 @@ No indexing, no B-tree — linear scan. Suitable for up to ~100k events; beyond 
 
 These are read-only analysis modules. They do **not** write to storage.
 
-### Prism (Contextual Synthesis)
+### Prism (Paradox-aware Synthesis)
 
 ```
 POST /api/v2/prism/synthesize
-    seed_event_id → find event in memory
-    cloud_size    → take N nearby events
+    query          → event id, or text (closest matching event becomes the seed)
+    observer_context (optional)
+    radius, limit  → Echo cloud around the seed
 
 Algorithm:
-    1. Load seed event
-    2. Build "meaning cloud" from event tokens + location
-    3. Calculate significance_score:
-       - Token pattern analysis (rare tokens = higher score)
-       - Location clustering coefficient
-       - Fusion count (fused events = higher significance)
-    4. Assign context_label: "Objective Data" | "Pattern" | "Anomaly" | "Background"
-    5. Return: significance_score, context_label, insight
+    1. Resolve seed from query
+    2. Echo a resonance cloud from the seed
+    3. Synthesize a primary reading (significance_score, context_label, insight)
+    4. Keep competing readings. perception_gap / is_paradoxical when they contradict
+    5. has_unread_essence when the seed carries blind_payload
 ```
 
 ### Echo (Resonance Detection)
 
 ```
 POST /api/v2/echo/resonate
-    seed_event_id → find seed in memory
+    seed_id, radius, limit
 
 Algorithm:
     1. Build harmonic fingerprint of seed:
        - Token set (word-level)
        - Emotional classification of tokens
        - Location metadata
-    2. Score every event in memory:
+    2. Score hot events (weak faded edges are skipped — 0.11.0):
        resonance = token_similarity × 0.20
                  + emotion_similarity × 0.30
                  + meta_similarity    × 0.50
-    3. Return top-N sorted by resonance score (threshold > 0.3)
+    3. Return {center, ripples[]} sorted by score
 ```
 
 ### Instinct (Adrenaline Reflexes)
 
 ```
 POST /api/v2/prism/instinct
-    seed_event_id
-    adrenaline: float [0.0 – 1.0]
+    query, adrenaline: float [0.0 – 1.0], radius, limit
 
-Algorithm:
-    adrenaline = 0.0 → "Analytical" mode: deep token analysis (~10% confidence)
-    adrenaline = 0.5 → "Alert" mode: balanced approach (~46% confidence)
-    adrenaline = 1.0 → "Instinctive" mode: metadata-only reflex (~82% confidence)
+Modes: Analytical below 0.3, Alert below 0.7, Instinctive from 0.7.
 
-Reflex Triggers (applied regardless of mode):
-    Location Match    → +0.7 confidence
-    Owner Signature   → +0.5 confidence
-    Critical Tokens   → +0.3 confidence
+Bonuses are multiplied by adrenaline, not a fixed add:
+    Owner match           → 0.8 × adrenaline (only above 0.3)
+    Location match        → 0.7 × adrenaline
+    Shared critical token → 0.5 × adrenaline
+
+Confidence is reflex_bonus × 0.6 + adrenaline × 0.3, plus 0.1 on a location match.
+It is not a fixed 10% / 46% / 82% per mode.
 ```
 
 ---

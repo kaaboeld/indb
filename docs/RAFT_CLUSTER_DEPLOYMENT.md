@@ -309,6 +309,6 @@ To add more nodes:
 
 ---
 
-**Status**: ✅ Production-ready for MVP deployment  
+**Status**: In the engine. Optional. The public API is one node. 1.0.0 is not cut.  
 **Version**: 0.11.1  
-**Last Updated**: 2026-03-04
+**Last Updated**: 2026-11-28

@@ -63,34 +63,50 @@ A fusion count of 0 is salience 0. That event sleeps unless it is signed or stil
 
 **Visual:** A glowing, solid monolith in the center of the void.
 
+### 4. **MEMORY** (Sleep, Wake, Fade) — 0.9–0.11
+Events are anchors. The path between them is reconstructed at query time.
+
+- **0.9.0** Low salience sleeps into encrypted `cold.bin`. Signed events and the recent tail stay hot. A strong seed wakes a sleeper.
+- **0.9.1** Hot memory resolves an id without walking the stream. A sleeper is still found by id in the cold tier.
+- **0.10.0** The sleeper's body stays on disk. RAM keeps the id and the tokens, enough to notice a wake seed.
+- **0.11.0** An edge that touches a weak sleeper is marked stale and kept. Echo and wake skip that edge. Token overlap can still wake.
+- **0.11.1** Heuristic fusion scores hot events that share a token. Embeddings, when present, still see the whole hot tier.
+
+Sleep is not erase. Fusion_count 0 is salience 0: the event fades unless it is signed or still in the recent tail. Ask later, and a strong seed can pull it back. Reference: [docs/MEMORY_LIFECYCLE.md](docs/MEMORY_LIFECYCLE.md)
+
 ---
 
 ## 🧠 The Intelligence Layer
 
-INDB doesn't just store data — it **understands meaning**.
+Ways of recalling. The query is a reconstruction between anchors, not a fetch of a stored row.
 
-### **Prism** (Contextual Synthesis)
-**Transforms raw events into meaning.**
+### **Prism** (Paradox-aware Synthesis)
+**Transforms raw events into meaning at read time.**
 
-```python
-Event: ["would", "have", "died"]
-Location: "books/Dostoevsky/The Idiot"
+`POST /api/v2/prism/synthesize` takes `query` (event id or text) and optional `observer_context`. It does not take `seed_event_id` or `cloud_size`.
 
-Prism Output:
+```json
 {
-  "significance_score": 0.27,
-  "context_label": "Objective Data",
-  "insight": "Direct Hit"
+  "query": "would have died",
+  "observer_context": {
+    "token_weights": {"silence": 2.0},
+    "vocabulary": {"Subjective": ["scream", "felt"]},
+    "harmonic_weights": {"emotion": 0.8}
+  }
 }
 ```
 
-**How it works:**
-1. Analyzes token patterns
-2. Evaluates location clustering
-3. Calculates significance score
-4. Assigns contextual label
+The primary reading still carries `significance_score`, `context_label`, `insight`. That is not the whole answer. Prism also returns competing readings and the gap between them:
 
-**Use case:** Literary analysis, pattern detection, semantic search
+| Field | Meaning |
+|-------|---------|
+| `meaning` | Primary reading |
+| `alternative_readings` | Competing readings, preserved |
+| `perception_gap` | 0.0 = clear · 1.0 = maximum ambiguity |
+| `is_paradoxical` | True when the system cannot collapse the readings |
+| `has_unread_essence` | True when `blind_payload` is present |
+
+*What you see may not be what it is.*
 
 ---
 
@@ -275,13 +291,16 @@ After Fusion:
 | Module | Status | Purpose | Note |
 |--------|--------|---------|------|
 | **Raft Consensus** | In the engine | Distributed coordination | Optional. Measured run is below. The public API is one node |
-| **Prism** | In the engine | Contextual synthesis | |
-| **Echo** | In the engine | Resonance detection | |
-| **Instinct** | In the engine | Adrenaline reflexes | |
+| **Sleep & Wake** | In the engine | Hot / cold memory | 0.9.0–0.11.1. Signed and recent stay hot |
+| **Prism** | In the engine | Paradox-aware synthesis | `query` + `observer_context` |
+| **Echo** | In the engine | Resonance detection | `seed_id`, `radius`, `limit` |
+| **Instinct** | In the engine | Adrenaline reflexes | `query`, `adrenaline` |
+| **Deduction** | In the engine | Evidence chains | `query` or `seed_event_ids` |
 | **Psycho** | In the engine | Pathfinding under weight ablation | `POST /api/v2/psycho/path` |
 | **Grain** | In the engine | Identity across exact → statistical | `POST /api/v2/grain/verify` |
-| **Fusion Engine** | In the engine | Semantic deduplication | Scores hot events that share a token |
+| **Fusion Engine** | In the engine | Semantic deduplication | 0.11.1 scores hot events that share a token |
 | **Contextual Lens** | In the engine | Adaptive queries | |
+| **Subwave** | In the engine | Horizontal resonance | |
 | **Event Ingestion** | In the engine | Multi-protocol intake | Cluster rate is the measured figure below |
 | **Encryption** | In the engine | AES-256-GCM at rest | TLS when `INDB_USE_SSL` is on |
 | **Authentication** | In the engine | API keys, RBAC | Anonymous writes are rejected. An Ed25519 signature is optional |
@@ -347,11 +366,11 @@ Module-level timings that used to sit here (<1ms ingest, <10ms for 1000 events, 
 **Scenario:** Coordinated social media attack claims server is down.
 
 **INDB:**
-- **Crowd:** 10k messages "Down!" (Rep 0.01) → Mass 10
-- **Axiom:** 1 internal heartbeat "Up." (Rep 0.99) → Mass 0.98
-- **Verdict:** Data Conflict. But the Axiom stands.
+- **Crowd:** 10k messages "Down!" fuse. High `fusion_count`, low `source_weight`. Salience follows `log(1 + fusion_count) × source_weight × recency` — not a squared-reputation mass.
+- **Axiom:** 1 signed heartbeat "Up." stays hot even at fusion 0.
+- **Verdict:** Prism returns both readings. `perception_gap` is the product. The system does not collapse the conflict.
 
-**Result:** Admin sees truth through noise.
+**Result:** The admin sees the paradox, not a single winner.
 
 ---
 
@@ -359,11 +378,12 @@ Module-level timings that used to sit here (<1ms ingest, <10ms for 1000 events, 
 **Scenario:** Autonomous agent records your life history.
 
 **INDB:**
-- Routine logs ("Home", "Home", "Home") fuse into single "Habit" event
-- Critical anomalies ("Break-in") remain distinct Axioms
+- Routine logs ("Home", "Home", "Home") fuse into a habit
+- An unsigned one-off ("Break-in") has fusion 0 and sleeps unless it is still in the recent tail. Sleep is not erase
+- A signed presence stays hot. A later strong seed can wake the sleeper
 - Over years, memory remembers *meaning*, not just *files*
 
-**Result:** Compressed, meaningful life log.
+**Result:** Compressed life log. Query reconstructs the path between the points that remain.
 
 ---
 
@@ -387,9 +407,9 @@ Module-level timings that used to sit here (<1ms ingest, <10ms for 1000 events, 
 1. Ingest logs in real-time
 2. **Fusion** compresses normal patterns
 3. **Instinct** (adrenaline=1.0) triggers on anomalies
-4. **Prism** analyzes significance
+4. **Prism** analyzes significance. The odd line may be cold; the query can still wake it
 
-**Result:** The repeated line fuses. The odd one stays.
+**Result:** The repeated line fuses. The odd one is a point. Memory reconstructs from there.
 
 ---
 
@@ -424,12 +444,11 @@ curl -X POST http://localhost:8080/api/v2/events \
     "ttl": 86400
   }'
 
-# Query with Prism
+# Query with Prism. `query` is an event id or text.
 curl -X POST http://localhost:8080/api/v2/prism/synthesize \
   -H "Content-Type: application/json" \
   -d '{
-    "seed_event_id": "<event-id>",
-    "cloud_size": 10
+    "query": "test event"
   }'
 ```
 
@@ -551,18 +570,25 @@ MANIFEST = {
 
 ## 📚 API Examples
 
-### **Prism (Contextual Synthesis)**
+Writes need `X-API-Key`. Reads stay open.
+
+### **Prism (Paradox-aware Synthesis)**
 
 ```bash
 curl -X POST http://localhost:8000/api/v2/prism/synthesize \
   -H "Content-Type: application/json" \
   -d '{
-    "seed_event_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
-    "cloud_size": 10
+    "query": "would have died",
+    "observer_context": {
+      "token_weights": {"pain": 3.0},
+      "vocabulary": {"Personal": ["felt", "almost"]},
+      "harmonic_weights": {"emotion": 0.9}
+    }
   }'
 ```
 
-**Response:**
+**Shape of the reply.** `meaning` is the primary reading. The rest is the paradox:
+
 ```json
 {
   "event": {
@@ -574,7 +600,11 @@ curl -X POST http://localhost:8000/api/v2/prism/synthesize \
     "significance_score": 0.2714,
     "context_label": "Objective Data",
     "insight": "Direct Hit"
-  }
+  },
+  "alternative_readings": [],
+  "perception_gap": 0.0,
+  "is_paradoxical": false,
+  "has_unread_essence": false
 }
 ```
 
@@ -586,9 +616,10 @@ curl -X POST http://localhost:8000/api/v2/prism/synthesize \
 curl -X POST http://localhost:8000/api/v2/prism/instinct \
   -H "Content-Type: application/json" \
   -d '{
-    "seed_event_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
+    "query": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
     "adrenaline": 0.7,
-    "cloud_size": 10
+    "radius": 0.2,
+    "limit": 20
   }'
 ```
 
@@ -620,19 +651,22 @@ curl -X POST http://localhost:8000/api/v2/prism/instinct \
 curl -X POST http://localhost:8000/api/v2/echo/resonate \
   -H "Content-Type: application/json" \
   -d '{
-    "seed_event_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
-    "cloud_size": 10
+    "seed_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
+    "radius": 0.3,
+    "limit": 20
   }'
 ```
 
 **Response:**
 ```json
 {
-  "resonances": [
+  "center": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
+  "ripples": [
     {
       "event_id": "abc123",
-      "resonance_score": 0.81,
-      "tokens": ["love", "beyond", "death"]
+      "score": 0.81,
+      "harmonic_type": "mixed",
+      "reason": "Shared tokens: [love, death]"
     }
   ]
 }
@@ -814,7 +848,7 @@ python3 scripts/test_lens.py
 
 ### **Already in the engine**
 
-Prism, Echo, Instinct, Fusion, Lens, Paradox, signed memory, Raft, AES-256-GCM at rest, and the WUI/TUI consoles. 1.0.0 has not been cut.
+Prism, Echo, Instinct, Deduction, Fusion, Lens, Subwave, Paradox, signed memory, sleep/wake, Raft, AES-256-GCM at rest, and the WUI/TUI consoles. 1.0.0 has not been cut.
 
 ---
 
@@ -865,7 +899,8 @@ Proprietary - All Rights Reserved
 **INDB is:**
 - An interpretational database. Meaning is read at query time
 - Public source, packed image 0.11.1
-- Prism, Echo, Instinct, Psycho, Grain, Fusion, Lens
+- Prism, Echo, Instinct, Deduction, Psycho, Grain, Fusion, Lens, Subwave
+- Sleep, wake, cold body on disk, faded edges, fusion on shared tokens
 - Optional Raft. The public API is one node
 - AES-256-GCM at rest, optional TLS, optional Ed25519
 

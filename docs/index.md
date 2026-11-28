@@ -52,6 +52,17 @@ A fusion count of 0 is salience 0. That event sleeps unless it is signed or stil
 #### **3. AXIOM** (Irrefutable Core)
 What remains is cryptographically signed, immutable truth.
 
+#### **4. MEMORY** (Sleep, Wake, Fade) — 0.9–0.11
+Events are anchors. The path between them is reconstructed at query time.
+
+- Sleep is not erase. Fusion 0 is salience 0 unless the event is signed or still in the recent tail
+- **0.9.1** Hot memory resolves an id without walking the stream
+- **0.10.0** The sleeper's body stays in `cold.bin`. RAM keeps the id and the tokens
+- **0.11.0** A weak edge fades and stays. Token overlap can still wake
+- **0.11.1** Fusion scores hot events that share a token
+
+See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md).
+
 ---
 
 ## 🧠 Intelligence Modules
@@ -135,7 +146,7 @@ curl -X POST http://localhost:8000/api/v2/deduction/deduce \
   -d '{"seed_event_ids": ["evt-1", "evt-2"]}'
 ```
 
-**Status:** ✅ Production
+**Status:** In the engine. No separate published latency.
 
 ---
 
@@ -165,7 +176,7 @@ curl -X POST https://api.indb.tech/api/v2/grain/verify \
 
 Full reference: [GRAIN.md](./GRAIN.md)
 
-**Status:** ✅ Production (kernel-native)
+**Status:** In the engine. Kernel-native.
 
 ---
 
@@ -257,14 +268,20 @@ sleep 20
 # Verify cluster
 curl http://localhost:8080/raft/status
 
-# Ingest event
+# Ingest event. Anonymous writes are rejected.
 curl -X POST http://localhost:8080/api/v2/events \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: <your-key>" \
   -d '{
     "raw_data_anchor": ["test", "event"],
     "location": "test/demo",
     "ttl": 86400
   }'
+
+# Query with Prism. `query` is an event id or text. Reads stay open.
+curl -X POST http://localhost:8080/api/v2/prism/synthesize \
+  -H "Content-Type: application/json" \
+  -d '{"query": "test event"}'
 ```
 
 ### Standalone Mode
@@ -311,6 +328,7 @@ docker-compose -f docker-compose.standalone.yml up -d
 - Adaptive frequency tracking
 - Penalty system (prevents fusion spam)
 - Temporal awareness
+- 0.11.1: heuristic fusion scores hot events that share a token
 
 ### 🔐 Security
 - **Encryption:** AES-256-GCM at rest. TLS when `INDB_USE_SSL` is on
@@ -348,9 +366,10 @@ curl -X POST http://localhost:8000/api/v2/prism/synthesize \
 curl -X POST http://localhost:8000/api/v2/prism/instinct \
   -H "Content-Type: application/json" \
   -d '{
-    "seed_event_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
+    "query": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
     "adrenaline": 0.7,
-    "cloud_size": 10
+    "radius": 0.2,
+    "limit": 20
   }'
 ```
 
@@ -360,8 +379,9 @@ curl -X POST http://localhost:8000/api/v2/prism/instinct \
 curl -X POST http://localhost:8000/api/v2/echo/resonate \
   -H "Content-Type: application/json" \
   -d '{
-    "seed_event_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
-    "cloud_size": 10
+    "seed_id": "6dede7d7-82fb-41cc-95fe-8c534f82ad4e",
+    "radius": 0.3,
+    "limit": 20
   }'
 ```
 
@@ -387,15 +407,16 @@ curl -X POST http://localhost:8000/api/v2/lens/query \
 ### 1. **Reality Guard** ("Truth Mirror")
 Coordinated attack claims server is down.
 
-- **Crowd:** 10k messages "Down!" (Rep 0.01) → Mass 10
-- **Axiom:** 1 heartbeat "Up." (Rep 0.99) → Mass 0.98
-- **Verdict:** Data Conflict. Axiom stands.
+- **Crowd:** 10k messages "Down!" fuse. High `fusion_count`, low `source_weight`. Salience is `log(1 + fusion_count) × source_weight × recency` — not a squared-reputation mass
+- **Axiom:** 1 signed heartbeat "Up." stays hot even at fusion 0
+- **Verdict:** Prism returns both readings. `perception_gap` is the product. The conflict is not collapsed
 
 ### 2. **Digital Ghost** ("Black Box")
 Autonomous agent records life history.
 
-- Routine logs fuse into "Habit" events
-- Critical anomalies remain distinct Axioms
+- Routine logs fuse into habit events
+- An unsigned one-off sleeps unless it is still in the recent tail. Sleep is not erase
+- A signed presence stays hot. A later strong seed can wake the sleeper
 - Memory remembers *meaning*, not just *files*
 
 ### 3. **Literary Analysis**
@@ -412,7 +433,7 @@ Monitor system for anomalies.
 1. Ingest logs in real-time
 2. **Fusion** compresses normal patterns
 3. **Instinct** (adrenaline=1.0) triggers on anomalies
-4. **Prism** analyzes significance
+4. **Prism** analyzes significance. The odd line may be cold; the query can still wake it
 
 ---
 
@@ -592,7 +613,8 @@ Proprietary - All Rights Reserved
 **INDB is:**
 - An interpretational database. Meaning is read at query time
 - Public source, packed image 0.11.1
-- Prism, Echo, Instinct, Psycho, Grain, Fusion, Lens
+- Prism, Echo, Instinct, Deduction, Psycho, Grain, Fusion, Lens, Subwave
+- Sleep, wake, cold body on disk, faded edges, fusion on shared tokens
 - Optional Raft. The public API is one node
 - AES-256-GCM at rest, optional TLS, optional Ed25519
 
