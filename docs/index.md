@@ -19,9 +19,9 @@
 
 INDB is an **Interpretational Database** — not an archive, not a row store. Meaning is produced when you query (interpret, prism, echo, subwave, what-if), not fixed when you ingest.
 
-Under that sits an **Epistemological Engine**: preserve truth in the age of manipulation via signed memory, fusion, and paradox as signal.
+Under that sits an **Epistemological Engine**: signed memory, fusion, and paradox as signal. The reply is how we remember now, not a frozen archive of how it was.
 
-**The Problem:** How do you maintain objective reality when collective gaslighting can rewrite history?
+**The Problem:** When the story is rewritten, how do you still remember what you saw?
 
 **INDB's Solution:** **Memory**, not storage — inhale, exhale, axiom, horizontal resonance, sleep and wake.
 
@@ -39,7 +39,7 @@ Accept reality as it is: raw, chaotic, unfiltered.
 - **Measured 3-node Raft run:** 19–28 events/sec sustained, 50–250ms per request
 
 #### **2. EXHALE** (Fusion & Decay)
-Compress truth. Purge noise. Reputation is gravity.
+Compress the swarm. Fade the unreinforced. Reputation is gravity.
 
 What the engine computes is salience:
 
@@ -49,8 +49,8 @@ salience = log(1 + fusion_count) × source_weight × recency
 
 A fusion count of 0 is salience 0. That event sleeps unless it is signed or still in the recent tail. See [MEMORY_LIFECYCLE.md](./MEMORY_LIFECYCLE.md).
 
-#### **3. AXIOM** (Irrefutable Core)
-What remains is cryptographically signed, immutable truth.
+#### **3. AXIOM** (Signed presence)
+What remains is what you saw, signed. The observation cannot be rewritten. That is presence, not a verdict.
 
 #### **4. MEMORY** (Sleep, Wake, Fade) — 0.9–0.11
 Events are anchors. The path between them is reconstructed at query time.
@@ -591,14 +591,14 @@ Detail: [ROADMAP.md](./ROADMAP.md).
 
 ## 💡 Core Principles
 
-### 1. Truth Through Metabolism
+### 1. Memory Through Metabolism
 Data is not static. It lives, breathes, fuses, and decays.
 
 ### 2. Reputation as Gravity
-Not all data is equal. Trust shapes reality.
+Not all traces weigh the same. Trust shapes what stays hot.
 
-### 3. Axioms Resist Gaslighting
-What is signed and witnessed cannot be rewritten.
+### 3. Axiom Is What You Saw
+What is signed and witnessed cannot be rewritten. That is presence, not a verdict.
 
 ---
 
@@ -622,6 +622,6 @@ Proprietary - All Rights Reserved
 
 ---
 
-**Built with ❤️ for Truth in the Age of Manipulation**
+**Built with ❤️ for how we remember now**
 
 **"Inhale the chaos. Exhale the noise. Remember the Axiom."**
