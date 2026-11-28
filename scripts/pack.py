@@ -7,7 +7,7 @@ The catalog lives in releases/manifest.json (shipped inside the API image)
 and is copied to the sibling site as app/data/releases.json + public/releases.json.
 
   python3 scripts/pack.py --dry-run
-  python3 scripts/pack.py --bump minor --title "Psycho" --note "Factor-1 pathfinding"
+  python3 scripts/pack.py --export --title "Psycho" --note "Factor-1 pathfinding"
   python3 scripts/pack.py --version 0.8.0 --deploy --publish-site --deploy-site
 
 Does not commit, does not push git, does not force-push Fly. Those stay explicit.
@@ -65,21 +65,6 @@ def write_version(version: str) -> None:
     if not VERSION_RE.search(text):
         die(f"VERSION not found in {CONSTANTS}")
     CONSTANTS.write_text(VERSION_RE.sub(rf"\g<1>{version}\g<3>", text, count=1))
-
-
-def bump(current: str, part: str) -> str:
-    try:
-        major, minor, patch = (int(x) for x in current.split("."))
-    except ValueError:
-        die(f"VERSION {current!r} is not semver X.Y.Z")
-    if part == "major":
-        return f"{major + 1}.0.0"
-    if part == "minor":
-        return f"{major}.{minor + 1}.0"
-    if part == "patch":
-        return f"{major}.{minor}.{patch + 1}"
-    die(f"unknown bump {part!r}")
-    return current
 
 
 def load_manifest() -> Dict[str, Any]:
@@ -140,8 +125,6 @@ def pack(args: argparse.Namespace) -> None:
     current = read_version()
     if args.version:
         version = args.version.lstrip("v")
-    elif args.bump:
-        version = bump(current, args.bump)
     else:
         version = current
 
@@ -178,7 +161,7 @@ def pack(args: argparse.Namespace) -> None:
         "releases": manifest["releases"],
     }
 
-    print(f"pack {current} → {version}" + (" (dry-run)" if args.dry_run else ""))
+    print(f"pack {version}" + (" (dry-run)" if args.dry_run else ""))
     print(f"  title  {release['title']}")
     print(f"  git    {sha or '—'}")
     print(f"  image  indb:{version}")
@@ -186,7 +169,8 @@ def pack(args: argparse.Namespace) -> None:
         print(f"  note   {note}")
 
     if not args.dry_run:
-        write_version(version)
+        if version != current:
+            write_version(version)
         write_json(MANIFEST, manifest)
         write_json(ROOT / "releases" / f"{version}.json", release)
 
@@ -236,9 +220,7 @@ def pack(args: argparse.Namespace) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Pack an INDB version into Docker and onto the site.")
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument("--version", help="exact semver, e.g. 0.8.0")
-    group.add_argument("--bump", choices=("major", "minor", "patch"), help="bump current VERSION")
+    parser.add_argument("--version", help="exact semver, e.g. 0.8.0 (default: current VERSION, no bump)")
     parser.add_argument("--title", help="short release title")
     parser.add_argument("--note", action="append", help="changelog line (repeatable)")
     parser.add_argument("--docker", action="store_true", help="docker build -t indb:VERSION")

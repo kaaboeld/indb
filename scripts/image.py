@@ -223,12 +223,14 @@ def main() -> None:
     args = parser.parse_args()
 
     ver = version()
-    sold = site_current()
+    sold = site_current() if SITE.is_dir() else ""
     print(f"image: kernel {ver}")
-    if sold and sold != ver:
+    if sold and sold != ver and not args.export_only:
         die(f"site catalog is {sold} — pack --publish-site before exporting")
-    if sold:
+    if sold and sold == ver:
         print(f"image: site   v{sold}  (matches)")
+    elif sold:
+        print(f"image: site catalog is {sold} — skipped for --export-only")
 
     if not args.export_only:
         build(ver)

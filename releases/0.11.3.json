@@ -1,0 +1,13 @@
+{
+  "version": "0.11.3",
+  "title": "INDB patch",
+  "date": "2026-11-28",
+  "git": "84628df",
+  "image": "indb:0.11.3",
+  "notes": [
+    "INDB patch"
+  ],
+  "packed_at": "2026-11-28T02:53:37Z",
+  "download": "https://indb.tech/releases/indb-0.11.3.tar.gz",
+  "latest": "https://indb.tech/releases/indb-latest.tar.gz"
+}
